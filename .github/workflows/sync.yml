@@ -61,6 +61,8 @@ jobs:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -92,7 +94,7 @@ jobs:
           git config user.name "sfr-events bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/events.json data/site-hash.txt
-          git diff --cached --quiet || { git commit -m "Update public event list" && git push; }
+          git diff --cached --quiet || { git commit -m "Update public event list" && { git push || { git pull --rebase origin main && git push; }; }; }
       - uses: actions/upload-pages-artifact@v3
         if: steps.build.outputs.changed == 'true' && !inputs.dry_run
         with:
