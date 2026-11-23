@@ -50,6 +50,11 @@ def db_params() -> dict:
     if not pw:
         raise SystemExit("Set the secret SUPABASE_DB_PASSWORD (the events_job password).")
     pw = pw.removeprefix("[").removesuffix("]")
+    print(f"database password received: {len(pw)} characters, "
+          f"letters and digits only: {'yes' if pw.isalnum() and pw.isascii() else 'no'}, "
+          f"starts with a {'digit' if pw[:1].isdigit() else 'capital' if pw[:1].isupper() else 'small letter' if pw[:1].islower() else 'symbol'}, "
+          f"ends with a {'digit' if pw[-1:].isdigit() else 'capital' if pw[-1:].isupper() else 'small letter' if pw[-1:].islower() else 'symbol'}",
+          flush=True)
     return {"conninfo": "", "host": DB_HOST, "port": 5432, "dbname": "postgres",
             "user": DB_USER, "password": pw, "sslmode": "require"}
 
