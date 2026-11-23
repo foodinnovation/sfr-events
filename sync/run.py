@@ -19,6 +19,7 @@ import sys
 import traceback
 from collections import defaultdict
 from datetime import date
+from types import SimpleNamespace
 
 import psycopg
 from psycopg.types.json import Jsonb
@@ -27,7 +28,7 @@ from . import translate
 from .monday import ATTENDEES_BOARD, Monday
 from .rules import (
     Candidate, detect_igs, is_published, kind_for_group, match_group, meeting_igs,
-    parse_group_title, text_hash,
+    parse_group_title, pick_slot_event, slot_number, text_hash,
 )
 
 MAX_TRANSLATIONS_PER_RUN = int(os.environ.get("MAX_TRANSLATIONS_PER_RUN", "80"))
@@ -136,14 +137,16 @@ def sync_events(cur, events, report):
         cur.execute(
             """
             insert into events.event (source, monday_item_id, monday_group, kind, ig_id, title_src,
-                summary_src, event_date, start_time, end_time, location, signup_url,
+                summary_src, event_date, event_year, start_time, end_time, location, signup_url,
                 website_status, published, text_hash, synced_at, removed_at)
             values ('monday', %(id)s, %(group)s, %(kind)s, %(ig)s, %(title)s, %(summary)s, %(date)s,
+                %(year)s,
                 %(start)s, %(end)s, %(loc)s, %(url)s, %(status)s, %(pub)s, %(hash)s, now(), null)
             on conflict (monday_item_id) do update set
                 monday_group = excluded.monday_group, kind = excluded.kind, ig_id = excluded.ig_id,
                 title_src = excluded.title_src, summary_src = excluded.summary_src,
-                event_date = excluded.event_date, start_time = excluded.start_time,
+                event_date = excluded.event_date, event_year = excluded.event_year,
+                start_time = excluded.start_time,
                 end_time = excluded.end_time, location = excluded.location,
                 signup_url = excluded.signup_url, website_status = excluded.website_status,
                 published = excluded.published, text_hash = excluded.text_hash,
@@ -151,7 +154,8 @@ def sync_events(cur, events, report):
             returning id
             """,
             dict(id=e.monday_item_id, group=e.group_title, kind=kind, ig=igs[0] if igs else None,
-                 title=e.name, summary=e.summary, date=e.event_date, start=e.start_time,
+                 title=e.name, summary=e.summary, date=e.event_date,
+                 year=e.event_date.year if e.event_date else None, start=e.start_time,
                  end=e.end_time, loc=e.location, url=e.signup_url, status=e.website_status,
                  pub=is_published(kind, e.event_date, e.website_status), hash=thash),
         )
@@ -220,41 +224,69 @@ def link_meetings(cur, events, report):
                     continue
             wanted[mid] = (e, prio)
 
+    # undated meetings with a slot (T1, T2): the slot-th IG meeting of that year on monday
+    slot_wanted: dict[int, object] = {}
+    cur.execute("""select id, ig_id, year, slot from public.meetings
+                   where meeting_date is null and year is not null and ig_id is not null""")
+    undated = cur.fetchall()
+    candidates = [SimpleNamespace(name=e.name, event_date=e.event_date, db_id=e.db_id)
+                  for e in events
+                  if getattr(e, "db_id", None) and kind_for_group(e.group_id) in ("ig", "sfr")]
+    for mid, ig, year, slot in undated:
+        n = slot_number(slot)
+        if n is None:
+            continue
+        hit = pick_slot_event(ig, year, n, candidates)
+        if hit is not None:
+            slot_wanted[mid] = hit
+
     for mid, (e, _) in wanted.items():
         cur.execute(
             """insert into events.event_meeting (event_id, meeting_id, method) values (%s, %s, 'ig_date')
                on conflict (meeting_id) do update set event_id = excluded.event_id, method = 'ig_date'
                where events.event_meeting.method <> 'manual'""",
             [e.db_id, mid])
-    # links that no longer fit (date or name changed on monday)
+    for mid, e in slot_wanted.items():
+        cur.execute(
+            """insert into events.event_meeting (event_id, meeting_id, method) values (%s, %s, 'ig_slot')
+               on conflict (meeting_id) do update set event_id = excluded.event_id, method = 'ig_slot'
+               where events.event_meeting.method <> 'manual'""",
+            [e.db_id, mid])
+    # links that no longer fit (date, name or slot changed)
     cur.execute(
-        "delete from events.event_meeting where method = 'ig_date' and not (meeting_id = any(%s))",
-        [list(wanted)])
+        """delete from events.event_meeting
+           where (method = 'ig_date' and not (meeting_id = any(%s)))
+              or (method = 'ig_slot' and not (meeting_id = any(%s)))""",
+        [list(wanted), list(slot_wanted)])
 
-    # archive events for dated meetings without a monday event, one per meeting
+    # archive events for wiki meetings without a monday event, one per meeting.
+    # Dated meetings keep their date; undated ones show the year only.
     cur.execute(
-        """select m.id, m.ig_id, m.meeting_date, coalesce(g.crm_label, g.name)
+        """select m.id, m.ig_id, m.meeting_date, m.year, coalesce(g.crm_label, g.name)
            from public.meetings m join public.ig_groups g on g.id = m.ig_id
-           where m.meeting_date is not null
+           where (m.meeting_date is not null or m.year is not null)
              and not exists (select 1 from events.event_meeting em where em.meeting_id = m.id)""")
-    for mid, ig, d, ig_name in cur.fetchall():
+    for mid, ig, d, year, ig_name in cur.fetchall():
         title = f"Innovation Group {ig_name}"
         cur.execute(
             """insert into events.event (source, kind, ig_id, title_src, title_en, event_date,
-                   published, text_hash, translated_hash)
-               values ('wiki', 'ig', %s, %s, %s, %s, true, 'wiki', 'wiki') returning id""",
-            [ig, title, title, d])
-        cur.execute("insert into events.event_meeting (event_id, meeting_id, method) "
-                    "values (%s, %s, 'wiki_only')", [cur.fetchone()[0], mid])
+                   event_year, published, text_hash, translated_hash)
+               values ('wiki', 'ig', %s, %s, %s, %s, %s, true, 'wiki', 'wiki') returning id""",
+            [ig, title, title, d, d.year if d else year])
+        cur.execute("insert into events.event_meeting (event_id, meeting_id, method) values (%s, %s, %s)",
+                    [cur.fetchone()[0], mid, "wiki_only" if d else "wiki_year"])
     # archive events whose meeting moved to a monday event
     cur.execute(
         """delete from events.event e where e.source = 'wiki'
            and not exists (select 1 from events.event_meeting em where em.event_id = e.id)""")
 
-    cur.execute("select count(*) from public.meetings where meeting_date is null")
+    cur.execute("select count(*) from events.event_meeting where method = 'wiki_year'")
     report["counts"]["wiki_meetings_linked_to_monday"] = len(wanted)
-    report["counts"]["wiki_meetings_without_date"] = cur.fetchone()[0]
+    report["counts"]["wiki_meetings_linked_by_slot"] = len(slot_wanted)
+    report["counts"]["wiki_meetings_year_only"] = cur.fetchone()[0]
     report["meeting_conflicts"] = conflicts
+    report["slot_links"] = sorted(
+        f"meeting {mid} -> {e.name} ({e.event_date})" for mid, e in slot_wanted.items())
 
 
 # --------------------------------------------------------------------------- decks
@@ -413,6 +445,8 @@ def write_report(report):
     lines += ["", "## Attendee groups", "", "| Group | Match | Note |", "|---|---|---|"]
     for r in report.get("attendee_groups", []):
         lines.append(f"| {r['group']} | {r['method']} | {r['note'] or ''} |")
+    if report.get("slot_links"):
+        lines += ["", "## Wiki meetings linked by slot (T1/T2)", ""] + [f"- {x}" for x in report["slot_links"]]
     if report.get("meeting_conflicts"):
         lines += ["", "## Wiki meeting conflicts", ""] + [f"- {c}" for c in report["meeting_conflicts"]]
     lines += ["", "## Upcoming published events", ""]

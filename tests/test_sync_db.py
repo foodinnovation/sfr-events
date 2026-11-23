@@ -24,7 +24,7 @@ do $$ begin
 end $$;
 create schema private;
 create table public.ig_groups (id int primary key, name text, crm_label text);
-create table public.meetings (id int primary key, ig_id int, meeting_date date);
+create table public.meetings (id int primary key, ig_id int, meeting_date date, year int, slot text);
 create table public.presentations (id uuid primary key default gen_random_uuid(), meeting_id int,
   onedrive_drive_id text, onedrive_item_id text, filename text, title text, file_path text,
   doc_type text, removed_at timestamptz, duplicate_of uuid);
@@ -32,17 +32,22 @@ create table public.crm_members (domain text, status text);
 create table public.staff (email text, active boolean);
 insert into public.ig_groups values (3,'Kaffee','Coffee'),(5,'Insekten','Insects'),(7,'Proteins4Future','Proteins4Future'),(10,'Schokolade','Chocolate');
 insert into public.meetings values
-  (1, 5, '2026-11-17'),   -- 18th Insects (on monday)
-  (2, 7, '2026-11-17'),   -- 15th P4F (on monday)
-  (3, 10, '2026-10-20'),  -- joint cocoa & coffee: chocolate side
-  (4, 3, '2026-10-20'),   -- joint: coffee side
-  (5, 3, '2016-05-04'),   -- old coffee meeting, not on monday -> archive event
-  (6, 3, null);           -- undated
+  (1, 5, '2026-11-17', 2026, 'T2'),   -- 18th Insects (on monday)
+  (2, 7, '2026-11-17', 2026, 'T2'),   -- 15th P4F (on monday)
+  (3, 10, '2026-10-20', 2026, 'T2'),  -- joint cocoa & coffee: chocolate side
+  (4, 3, '2026-10-20', 2026, 'T2'),   -- joint: coffee side
+  (5, 3, '2016-05-04', 2016, null),   -- old coffee meeting, not on monday -> archive event
+  (6, 3, null, null, null),           -- undated, no year: stays out
+  (7, 5, null, 2026, 'T1'),           -- undated insects T1 -> 17th Meeting IG Insects
+  (8, 3, null, 2015, null),           -- undated, year only -> year-only archive event
+  (9, 5, null, 2026, 'T3');           -- no third insects meeting -> year-only archive
 insert into public.presentations (meeting_id, onedrive_drive_id, onedrive_item_id, filename, file_path) values
   (1,'d','i1','a.pdf','05_Insekten/Treffen/2026/T2 - Präsentationen WEB/a.pdf'),
   (1,'d','i2','b.pdf','05_Insekten/Treffen/2026/T2 - intern/b.pdf'),
   (3,'d','i3','Programm.pdf','10_Schokolade/Treffen/2026/T2 - Präsentationen Web/Programm.pdf'),
-  (5,'d','i4','c.pdf','03_Kaffee/Treffen/2016/Präsentationen WEB/c.pdf');
+  (5,'d','i4','c.pdf','03_Kaffee/Treffen/2016/Präsentationen WEB/c.pdf'),
+  (7,'d','i5','e.pdf','05_Insekten/Treffen/2026/T1 - Präsentationen WEB/e.pdf'),
+  (8,'d','i6','f.pdf','03_Kaffee/Treffen/2015/Präsentationen WEB/f.pdf');
 insert into public.crm_members values ('member.ch','active'),('gone.ch','cancelled');
 insert into public.staff values ('lucas@swissfoodresearch.ch', true);
 """
@@ -66,6 +71,8 @@ EVENTS = [
     ev(15, EXT, "Swiss Soil Day 2026", "2026-12-01", status="Bereit für Website"),
     ev(16, EXT, "FRUIT LOGISTICA", "2026-02-04"),
     ev(17, OTHER, "Newsletter Dezember", "2026-12-15"),
+    ev(18, IG, "17th Meeting IG Insects", "2026-06-18"),
+    ev(19, SFR, "Insect Tasting Festival", "2026-03-01"),
 ]
 GROUPS = [
     mon.AttendeeGroup("g1", "2026-11-17 / 18th Meeting of the Innovation Group Insects"),
@@ -100,8 +107,8 @@ def db(tmp_path_factory):
     admin.execute("create database sfrtest")
     with psycopg.connect(DB, autocommit=True) as c:
         c.execute(STUB)
-        c.execute(Path(__file__).parents[1].joinpath(
-            "supabase/migrations/20261123_events_schema.sql").read_text())
+        for f in sorted(Path(__file__).parents[1].joinpath("supabase/migrations").glob("*.sql")):
+            c.execute(f.read_text())
     return DB
 
 
@@ -133,10 +140,16 @@ def test_full_sync_twice(db, monkeypatch, tmp_path):
     assert links[2].startswith("15th Meeting")
     assert links[3] == links[4] == "59th Meeting of the IG Cocoa & Chocolate and Coffee"
     assert links[5] == "Innovation Group Coffee"            # archive event from the wiki
-    assert q(db, "select count(*) from events.event where source='wiki'")[0][0] == 1
+    assert links[7] == "17th Meeting IG Insects"            # T1 by slot, festival skipped
+    assert 6 not in links
+    methods = dict(q(db, "select meeting_id, method from events.event_meeting"))
+    assert methods[7] == "ig_slot" and methods[8] == "wiki_year" and methods[9] == "wiki_year"
+    assert q(db, "select event_date, event_year from events.event e join events.event_meeting em "
+                 "on em.event_id = e.id where em.meeting_id = 8")[0] == (None, 2015)
+    assert q(db, "select count(*) from events.event where source='wiki'")[0][0] == 3
 
     decks = dict(q(db, "select item_id, in_web_folder from events.deck"))
-    assert decks == {"i1": True, "i2": False, "i3": True, "i4": True}
+    assert decks == {"i1": True, "i2": False, "i3": True, "i4": True, "i5": True, "i6": True}
     assert q(db, "select is_programme from events.deck where item_id='i3'")[0][0]
 
     groups = dict(q(db, "select monday_group_id, match_method from events.attendee_group"))

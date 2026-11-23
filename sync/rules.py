@@ -77,7 +77,7 @@ IG_PATTERNS: list[tuple[int, str]] = [
     (11, r"fungi|pilze?\b"),
     (13, r"\bcarbon\b"),
     (15, r"zgl\s*(lu\b|luzern)|luzern|agrarzukunft"),
-    (16, r"jura|jurassien|agriculture du futur"),
+    (16, r"jura|jurassien|agriculture du futur|zgl\s*ju\b"),
     (17, r"espace\s*mittelland|zgl\s*(bern|em\b)"),
     (14, r"sustainable\s*nutrition|\bsunu\b"),
 ]
@@ -100,6 +100,36 @@ def meeting_igs(igs: list[int]) -> set[int]:
     if out & ZGL_FAMILY:
         out |= ZGL_FAMILY
     return out
+
+
+# --------------------------------------------------------------------------- wiki slots
+
+def slot_number(slot: str | None) -> int | None:
+    """'T1' -> 1, 'T2' -> 2. Anything else -> None."""
+    m = re.fullmatch(r"\s*T\s*(\d)\s*", slot or "", re.I)
+    return int(m.group(1)) if m else None
+
+
+_MEETING_WORDS = re.compile(r"treffen|meeting|rencontre|aquaculture day", re.I)
+# "2. IG ZGL JU", "11es IG ...": a meeting number followed by "IG"
+_NUMBERED_IG = re.compile(r"^\s*\d+\s*(\.|st|nd|rd|th|tes|te|es|e|ème|eme)?\s*ig\b", re.I)
+
+
+def is_ig_meeting(name: str) -> bool:
+    """A regular IG meeting, as opposed to a festival, tasting or side event that
+    happens to mention the IG ('Pilz Tastefestival', 'Swiss Coffee Festival')."""
+    return bool(_MEETING_WORDS.search(name or "") or _NUMBERED_IG.search(name or ""))
+
+
+def pick_slot_event(meeting_ig: int, year: int, slot: int, events: list) -> object | None:
+    """events: objects with .name, .event_date, .key. Returns the slot-th IG meeting
+    of that IG in that year, or None. Each ZGL region only matches its own meetings."""
+    hits = sorted(
+        (e for e in events
+         if e.event_date and e.event_date.year == year and is_ig_meeting(e.name)
+         and meeting_ig in detect_igs(e.name)),
+        key=lambda e: e.event_date)
+    return hits[slot - 1] if 0 < slot <= len(hits) else None
 
 
 # --------------------------------------------------------------------------- text helpers

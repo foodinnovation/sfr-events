@@ -30,4 +30,4 @@ begin
     execute format('create policy events_job_read on public.%I for select to events_job using (true)', t);
   end loop;
 end $$;
-alter role events_sync nologin;
+do $$ begin if exists (select 1 from pg_roles where rolname = 'events_sync') then alter role events_sync nologin; end if; end $$;

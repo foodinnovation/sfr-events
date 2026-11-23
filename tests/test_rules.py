@@ -165,6 +165,7 @@ def test_group_kinds():
     ("Members Webinar", set()),
     ("14. Treffen IG Digi", {6}),
     ("12. Treffen IG Biocon", {9}),
+    ("2. IG ZGL JU", {16}),
     ("57. Treffen der IG Kakao & Schokolade", {10}),
 ])
 def test_detect_igs(name, igs):
@@ -181,3 +182,25 @@ def test_ordinals_normalise():
 def test_parse_group_title():
     assert parse_group_title("2026-11-17 / 18th Meeting") == (D("2026-11-17"), "18th Meeting")
     assert parse_group_title("Neue Gruppe") == (None, "Neue Gruppe")
+
+
+from sync.rules import is_ig_meeting, pick_slot_event, slot_number  # noqa: E402
+from types import SimpleNamespace as NS  # noqa: E402
+
+
+def test_slots():
+    assert slot_number("T1") == 1 and slot_number("T2") == 2 and slot_number(None) is None
+    ev = [NS(name="Pilz Tastefestival", event_date=D("2025-09-12")),
+          NS(name="8. Treffen IG Fungi", event_date=D("2025-04-29")),
+          NS(name="9. Treffen IG Fungi", event_date=D("2025-10-21")),
+          NS(name="New Food JamSession at FungiFeeds", event_date=D("2025-07-14"))]
+    assert pick_slot_event(11, 2025, 2, ev).name == "9. Treffen IG Fungi"
+    assert pick_slot_event(11, 2025, 3, ev) is None
+    zgl = [NS(name="4tes Treffen IG ZGL Luzern", event_date=D("2025-03-18")),
+           NS(name="2. IG ZGL JU", event_date=D("2025-06-05")),
+           NS(name="3. Treffen IG ZGL Jura", event_date=D("2025-12-11")),
+           NS(name="5tes Treffen IG ZGL Luzern", event_date=D("2025-11-11"))]
+    assert pick_slot_event(15, 2025, 2, zgl).name == "5tes Treffen IG ZGL Luzern"
+    assert pick_slot_event(16, 2025, 1, zgl).name == "2. IG ZGL JU"
+    assert pick_slot_event(16, 2025, 2, zgl).name == "3. Treffen IG ZGL Jura"
+    assert not is_ig_meeting("Swiss Coffee Festival")
