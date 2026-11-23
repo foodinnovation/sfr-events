@@ -49,6 +49,9 @@ def db_params() -> dict:
         pw = url      # a bare password pasted into SUPABASE_DB_URL
     if not pw:
         raise SystemExit("Set the secret SUPABASE_DB_PASSWORD (the events_job password).")
+    if "://" in pw:      # a whole connection string pasted as the password
+        from urllib.parse import unquote, urlsplit
+        pw = unquote(urlsplit(pw).password or "")
     pw = pw.removeprefix("[").removesuffix("]")
     print(f"database password received: {len(pw)} characters, "
           f"letters and digits only: {'yes' if pw.isalnum() and pw.isascii() else 'no'}, "
