@@ -209,9 +209,9 @@ def shell(title: str, body: str, depth: int, description: str = "") -> str:
     <button class="btn btn-secondary btn-block" type="submit">Email me a sign-in link</button>
   </form>
   <form id="signin-code" class="stack" hidden>
-    <p>We have sent a sign-in link to <strong id="signin-sent-to"></strong>. Open it on this device, or enter the 6-digit code from the email.</p>
+    <p>We have sent a sign-in link to <strong id="signin-sent-to"></strong>. Open it on this device, or enter the code from the email. Always use the most recent email.</p>
     <label for="signin-otp">Code</label>
-    <input id="signin-otp" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{{6}}" maxlength="6" required>
+    <input id="signin-otp" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{{6,12}}" maxlength="12" required>
     <button class="btn btn-primary btn-block" type="submit">Sign in</button>
   </form>
   <p class="form-message" id="signin-message" role="status"></p>

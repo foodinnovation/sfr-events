@@ -1,6 +1,7 @@
 // SFR event calendar: deck access.
 //
-//   GET /deck?id=<deck uuid>   signed-in visitor -> { url, filename } (one-hour SharePoint link)
+//   GET /deck?id=<deck uuid>   signed-in visitor -> { url, filename, kind } (opens in Microsoft's viewer;
+//                              &mode=download gives the one-hour download link instead)
 //   GET /deck?me=1             signed-in visitor -> { email, access: "staff"|"member"|"participant"|"none", events }
 //   GET /deck?health=1         anyone -> { graph: "ok" | error } (checks the Microsoft connection, no data)
 //
@@ -73,6 +74,21 @@ async function downloadUrl(drive: string, item: string): Promise<string> {
   throw new Error(`graph ${r.status}`);
 }
 
+/** Short-lived link that opens the file in Microsoft's browser viewer (no download, no sign-in). */
+async function viewUrl(drive: string, item: string): Promise<string> {
+  const r = await fetch(
+    `https://graph.microsoft.com/v1.0/drives/${encodeURIComponent(drive)}/items/${encodeURIComponent(item)}/preview`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${await graphToken()}`, "Content-Type": "application/json" },
+      body: "{}",
+    },
+  );
+  const body = await r.json().catch(() => ({}));
+  if (r.ok && body.getUrl) return body.getUrl;
+  throw new Error(`preview ${r.status}`);
+}
+
 // ------------------------------------------------------------------ handlers
 
 async function signedInEmail(req: Request): Promise<string | null> {
@@ -88,7 +104,9 @@ async function health(req: Request): Promise<Response> {
     const [d] = await sql`select drive_id, item_id from events.deck
                           where in_web_folder and removed_at is null limit 1`;
     await downloadUrl(d.drive_id, d.item_id);
-    return json(req, 200, { graph: "ok" });
+    let preview = "ok";
+    try { await viewUrl(d.drive_id, d.item_id); } catch (e) { preview = String((e as Error).message); }
+    return json(req, 200, { graph: "ok", preview });
   } catch (e) {
     return json(req, 503, { graph: String((e as Error).message) });
   }
@@ -104,7 +122,7 @@ async function me(req: Request, email: string): Promise<Response> {
   return json(req, 200, { email, access: events.length ? "participant" : "none", events });
 }
 
-async function deck(req: Request, email: string, id: string): Promise<Response> {
+async function deck(req: Request, email: string, id: string, mode: string): Promise<Response> {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return json(req, 400, { error: "bad_id" });
   const [d] = await sql`select d.drive_id, d.item_id, d.filename, events.access_reason(${email}, d.id) reason
                         from events.deck d where d.id = ${id}`;
@@ -114,7 +132,14 @@ async function deck(req: Request, email: string, id: string): Promise<Response> 
   if (!d) return json(req, 404, { error: "not_found" });
   if (!reason) return json(req, 403, { error: "no_access" });
   try {
-    return json(req, 200, { url: await downloadUrl(d.drive_id, d.item_id), filename: d.filename });
+    if (mode !== "download") {
+      try {
+        return json(req, 200, { url: await viewUrl(d.drive_id, d.item_id), filename: d.filename, kind: "view" });
+      } catch (e) {
+        console.warn("preview failed, falling back to download", id, (e as Error).message);
+      }
+    }
+    return json(req, 200, { url: await downloadUrl(d.drive_id, d.item_id), filename: d.filename, kind: "download" });
   } catch (e) {
     console.error("deck link failed", id, (e as Error).message);
     return json(req, 502, { error: "file_unavailable" });
@@ -131,7 +156,7 @@ Deno.serve(async (req) => {
     if (!email) return json(req, 401, { error: "sign_in" });
     if (url.searchParams.has("me")) return await me(req, email);
     const id = url.searchParams.get("id");
-    if (id) return await deck(req, email, id);
+    if (id) return await deck(req, email, id, url.searchParams.get("mode") ?? "view");
     return json(req, 400, { error: "missing_id" });
   } catch (e) {
     console.error("deck function error", (e as Error).message);

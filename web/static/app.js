@@ -107,7 +107,7 @@
   $("#signin-code").addEventListener("submit", function (ev) {
     ev.preventDefault();
     say("Checking ...");
-    sb.auth.verifyOtp({ email: pendingEmail, token: $("#signin-otp").value.trim(), type: "email" })
+    sb.auth.verifyOtp({ email: pendingEmail, token: $("#signin-otp").value.replace(/\D/g, ""), type: "email" })
       .then(function (r) { if (r.error) say(friendly(r.error), true); else { say(""); dialog.close(); } });
   });
 
@@ -159,7 +159,7 @@
       note.textContent = "Your account has no access to this meeting's presentations. They are available to members and to registered participants of this meeting.";
       note.classList.remove("ok");
     } else if (allowed) {
-      note.textContent = "You have access to these presentations. Links open the original file and are valid for one hour.";
+      note.textContent = "You have access to these presentations. They open in your browser; the viewer also lets you download the file.";
       note.classList.add("ok");
     }
   }
