@@ -52,7 +52,7 @@ insert into public.presentations (meeting_id, onedrive_drive_id, onedrive_item_i
   (1,'d','i7','Teilnehmerliste.pdf','05_Insekten/Treffen/2026/T2 - Präsentationen WEB/Teilnehmerliste.pdf');
 update public.presentations set doc_type = 'participant_list' where onedrive_item_id = 'i7';
 insert into public.crm_members values ('member.ch','active'),('gone.ch','cancelled');
-insert into public.staff values ('lucas@swissfoodresearch.ch', true);
+insert into public.staff values ('staff.test@swissfoodresearch.ch', true);
 """
 
 IG, SFR, EXT, OTHER = "new_group76309", "new_group80213", "neue_gruppe8981__1", "neue_gruppe__1"
@@ -166,7 +166,7 @@ def test_full_sync_twice(db, monkeypatch, tmp_path):
 @pytest.mark.parametrize("email,item,reason", [
     ("someone@member.ch", "i1", "member"),
     ("someone@MEMBER.ch", "i4", "member"),            # archive deck, member
-    ("lucas@swissfoodresearch.ch", "i1", "staff"),
+    ("staff.test@swissfoodresearch.ch", "i1", "staff"),
     ("anna@extern.ch", "i1", "participant"),           # attended
     ("dora@extern.ch", "i1", "participant"),           # blank status keeps access
     ("bert@extern.ch", "i1", None),                    # no show
@@ -176,7 +176,7 @@ def test_full_sync_twice(db, monkeypatch, tmp_path):
     ("x@gone.ch", "i1", None),                         # cancelled member
     ("someone@member.ch", "i2", None),                 # not in a web folder
     ("someone@member.ch", "i7", None),                 # participant list: never served
-    ("lucas@swissfoodresearch.ch", "i7", None),        # not even to staff
+    ("staff.test@swissfoodresearch.ch", "i7", None),        # not even to staff
 ])
 def test_access_rules(db, monkeypatch, tmp_path, email, item, reason):
     if not q(db, "select 1 from events.deck limit 1"):
@@ -188,7 +188,7 @@ def test_access_rules(db, monkeypatch, tmp_path, email, item, reason):
 
 def test_sign_up_gate(db):
     ok = lambda e: q(db, "select events.may_sign_up(%s)", e)[0][0]  # noqa: E731
-    assert ok("a@member.ch") and ok("anna@extern.ch") and ok("lucas@swissfoodresearch.ch")
+    assert ok("a@member.ch") and ok("anna@extern.ch") and ok("staff.test@swissfoodresearch.ch")
     assert not ok("bert@extern.ch") and not ok("random@gmail.com")
 
 
