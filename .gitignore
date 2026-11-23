@@ -4,4 +4,4 @@ report.json
 report.md
 .env
 _site/
-site-hash.txt
+/site-hash.txt
