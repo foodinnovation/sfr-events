@@ -1,0 +1,2934 @@
+[
+ {
+  "id": 1639,
+  "slug": "2015-innovation-group-packaging",
+  "kind": "ig",
+  "title": "Innovation Group Packaging",
+  "date": null,
+  "year": 2015,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Packaging"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 1640,
+  "slug": "2015-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": null,
+  "year": 2015,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 10
+ },
+ {
+  "id": 448,
+  "slug": "2015-02-12-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2015-02-12",
+  "year": 2015,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 446,
+  "slug": "2015-07-02-innovation-group-coffee",
+  "kind": "ig",
+  "title": "Innovation Group Coffee",
+  "date": "2015-07-02",
+  "year": 2015,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 9
+ },
+ {
+  "id": 433,
+  "slug": "2015-10-27-innovation-group-packaging",
+  "kind": "ig",
+  "title": "Innovation Group Packaging",
+  "date": "2015-10-27",
+  "year": 2015,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Packaging"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 432,
+  "slug": "2015-10-29-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2015-10-29",
+  "year": 2015,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 10
+ },
+ {
+  "id": 1643,
+  "slug": "2016-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": null,
+  "year": 2016,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 454,
+  "slug": "2016-06-15-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2016-06-15",
+  "year": 2016,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 386,
+  "slug": "2016-09-20-innovation-group-packaging",
+  "kind": "ig",
+  "title": "Innovation Group Packaging",
+  "date": "2016-09-20",
+  "year": 2016,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Packaging"
+  ],
+  "sessions": 0,
+  "presentations": 12
+ },
+ {
+  "id": 427,
+  "slug": "2016-10-20-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2016-10-20",
+  "year": 2016,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 402,
+  "slug": "2016-10-25-innovation-group-coffee",
+  "kind": "ig",
+  "title": "Innovation Group Coffee",
+  "date": "2016-10-25",
+  "year": 2016,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 394,
+  "slug": "2016-11-08-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2016-11-08",
+  "year": 2016,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 9
+ },
+ {
+  "id": 1638,
+  "slug": "2017-innovation-group-coffee",
+  "kind": "ig",
+  "title": "Innovation Group Coffee",
+  "date": null,
+  "year": 2017,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 437,
+  "slug": "2017-02-09-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2017-02-09",
+  "year": 2017,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 9
+ },
+ {
+  "id": 441,
+  "slug": "2017-04-04-innovation-group-packaging",
+  "kind": "ig",
+  "title": "Innovation Group Packaging",
+  "date": "2017-04-04",
+  "year": 2017,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Packaging"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 442,
+  "slug": "2017-05-03-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2017-05-03",
+  "year": 2017,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 474,
+  "slug": "2017-05-16-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2017-05-16",
+  "year": 2017,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 477,
+  "slug": "2017-10-24-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2017-10-24",
+  "year": 2017,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 3
+ },
+ {
+  "id": 458,
+  "slug": "2017-11-09-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2017-11-09",
+  "year": 2017,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 480,
+  "slug": "2017-11-15-innovation-group-digitalization",
+  "kind": "ig",
+  "title": "Innovation Group Digitalization",
+  "date": "2017-11-15",
+  "year": 2017,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 0,
+  "presentations": 10
+ },
+ {
+  "id": 1642,
+  "slug": "2018-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": null,
+  "year": 2018,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 11
+ },
+ {
+  "id": 1644,
+  "slug": "2018-innovation-group-digitalization",
+  "kind": "ig",
+  "title": "Innovation Group Digitalization",
+  "date": null,
+  "year": 2018,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 0,
+  "presentations": 10
+ },
+ {
+  "id": 1645,
+  "slug": "2018-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": null,
+  "year": 2018,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 10
+ },
+ {
+  "id": 434,
+  "slug": "2018-05-17-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2018-05-17",
+  "year": 2018,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 9
+ },
+ {
+  "id": 451,
+  "slug": "2018-05-24-innovation-group-packaging",
+  "kind": "ig",
+  "title": "Innovation Group Packaging",
+  "date": "2018-05-24",
+  "year": 2018,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Packaging"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 410,
+  "slug": "2018-06-26-innovation-group-coffee",
+  "kind": "ig",
+  "title": "Innovation Group Coffee",
+  "date": "2018-06-26",
+  "year": 2018,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 387,
+  "slug": "2018-09-25-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2018-09-25",
+  "year": 2018,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 425,
+  "slug": "2018-10-02-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2018-10-02",
+  "year": 2018,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 390,
+  "slug": "2018-10-25-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2018-10-25",
+  "year": 2018,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 414,
+  "slug": "2018-11-27-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "Innovation Group Proteins4Future",
+  "date": "2018-11-27",
+  "year": 2018,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 0,
+  "presentations": 9
+ },
+ {
+  "id": 423,
+  "slug": "2018-12-11-innovation-group-non-thermal-preservation",
+  "kind": "ig",
+  "title": "Innovation Group Non-Thermal Preservation",
+  "date": "2018-12-11",
+  "year": 2018,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Non-Thermal Preservation"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 406,
+  "slug": "2019-02-19-innovation-group-bioconversion",
+  "kind": "ig",
+  "title": "Innovation Group Bioconversion",
+  "date": "2019-02-19",
+  "year": 2019,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Bioconversion"
+  ],
+  "sessions": 0,
+  "presentations": 10
+ },
+ {
+  "id": 462,
+  "slug": "2019-05-21-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2019-05-21",
+  "year": 2019,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 4
+ },
+ {
+  "id": 396,
+  "slug": "2019-06-05-innovation-group-packaging",
+  "kind": "ig",
+  "title": "Innovation Group Packaging",
+  "date": "2019-06-05",
+  "year": 2019,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Packaging"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 389,
+  "slug": "2019-06-27-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "Innovation Group Proteins4Future",
+  "date": "2019-06-27",
+  "year": 2019,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 445,
+  "slug": "2019-07-02-innovation-group-coffee",
+  "kind": "ig",
+  "title": "Innovation Group Coffee",
+  "date": "2019-07-02",
+  "year": 2019,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 9
+ },
+ {
+  "id": 469,
+  "slug": "2019-07-04-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2019-07-04",
+  "year": 2019,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 479,
+  "slug": "2019-09-24-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2019-09-24",
+  "year": 2019,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 450,
+  "slug": "2019-10-30-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2019-10-30",
+  "year": 2019,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 395,
+  "slug": "2019-11-26-innovation-group-non-thermal-preservation",
+  "kind": "ig",
+  "title": "Innovation Group Non-Thermal Preservation",
+  "date": "2019-11-26",
+  "year": 2019,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Non-Thermal Preservation"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 453,
+  "slug": "2019-11-28-innovation-group-bioconversion",
+  "kind": "ig",
+  "title": "Innovation Group Bioconversion",
+  "date": "2019-11-28",
+  "year": 2019,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Bioconversion"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 405,
+  "slug": "2020-10-27-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2020-10-27",
+  "year": 2020,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 447,
+  "slug": "2020-10-29-innovation-group-bioconversion",
+  "kind": "ig",
+  "title": "Innovation Group Bioconversion",
+  "date": "2020-10-29",
+  "year": 2020,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Bioconversion"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 426,
+  "slug": "2020-11-25-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "Innovation Group Proteins4Future",
+  "date": "2020-11-25",
+  "year": 2020,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 419,
+  "slug": "2021-05-20-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2021-05-20",
+  "year": 2021,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 393,
+  "slug": "2021-06-08-innovation-group-coffee",
+  "kind": "ig",
+  "title": "Innovation Group Coffee",
+  "date": "2021-06-08",
+  "year": 2021,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 2
+ },
+ {
+  "id": 422,
+  "slug": "2021-06-16-innovation-group-packaging",
+  "kind": "ig",
+  "title": "Innovation Group Packaging",
+  "date": "2021-06-16",
+  "year": 2021,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Packaging"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 392,
+  "slug": "2021-06-17-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2021-06-17",
+  "year": 2021,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 4
+ },
+ {
+  "id": 440,
+  "slug": "2021-06-24-innovation-group-chocolate",
+  "kind": "ig",
+  "title": "Innovation Group Chocolate",
+  "date": "2021-06-24",
+  "year": 2021,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 475,
+  "slug": "2021-08-26-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2021-08-26",
+  "year": 2021,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 439,
+  "slug": "2021-09-08-innovation-group-fungi-fungal-systems",
+  "kind": "ig",
+  "title": "Innovation Group Fungi & Fungal Systems",
+  "date": "2021-09-08",
+  "year": 2021,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Fungi & Fungal Systems"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 471,
+  "slug": "2021-10-28-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "Innovation Group Proteins4Future",
+  "date": "2021-10-28",
+  "year": 2021,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 1637,
+  "slug": "2022-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": null,
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 1646,
+  "slug": "2022-innovation-group-bioconversion",
+  "kind": "ig",
+  "title": "Innovation Group Bioconversion",
+  "date": null,
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Bioconversion"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 482,
+  "slug": "2022-02-08-innovation-group-coffee",
+  "kind": "ig",
+  "title": "Innovation Group Coffee",
+  "date": "2022-02-08",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 4
+ },
+ {
+  "id": 429,
+  "slug": "2022-03-15-innovation-group-chocolate",
+  "kind": "ig",
+  "title": "Innovation Group Chocolate",
+  "date": "2022-03-15",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 464,
+  "slug": "2022-03-17-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2022-03-17",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 417,
+  "slug": "2022-03-21-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2022-03-21",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 391,
+  "slug": "2022-04-05-innovation-group-digitalization",
+  "kind": "ig",
+  "title": "Innovation Group Digitalization",
+  "date": "2022-04-05",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 415,
+  "slug": "2022-05-11-innovation-group-packaging",
+  "kind": "ig",
+  "title": "Innovation Group Packaging",
+  "date": "2022-05-11",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Packaging"
+  ],
+  "sessions": 0,
+  "presentations": 2
+ },
+ {
+  "id": 460,
+  "slug": "2022-05-11-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "Innovation Group Proteins4Future",
+  "date": "2022-05-11",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 0,
+  "presentations": 4
+ },
+ {
+  "id": 452,
+  "slug": "2022-05-17-innovation-group-fungi-fungal-systems",
+  "kind": "ig",
+  "title": "Innovation Group Fungi & Fungal Systems",
+  "date": "2022-05-17",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Fungi & Fungal Systems"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 470,
+  "slug": "2022-05-17-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2022-05-17",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 449,
+  "slug": "2022-05-31-innovation-group-bioconversion",
+  "kind": "ig",
+  "title": "Innovation Group Bioconversion",
+  "date": "2022-05-31",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Bioconversion"
+  ],
+  "sessions": 0,
+  "presentations": 4
+ },
+ {
+  "id": 459,
+  "slug": "2022-08-30-innovation-group-coffee",
+  "kind": "ig",
+  "title": "Innovation Group Coffee",
+  "date": "2022-08-30",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 4
+ },
+ {
+  "id": 438,
+  "slug": "2022-09-06-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2022-09-06",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 1
+ },
+ {
+  "id": 400,
+  "slug": "2022-09-13-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2022-09-13",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 483,
+  "slug": "2022-09-15-innovation-group-chocolate",
+  "kind": "ig",
+  "title": "Innovation Group Chocolate",
+  "date": "2022-09-15",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 0,
+  "presentations": 9
+ },
+ {
+  "id": 476,
+  "slug": "2022-09-21-innovation-group-fungi-fungal-systems",
+  "kind": "ig",
+  "title": "Innovation Group Fungi & Fungal Systems",
+  "date": "2022-09-21",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Fungi & Fungal Systems"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 461,
+  "slug": "2022-10-27-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "Innovation Group Proteins4Future",
+  "date": "2022-10-27",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 421,
+  "slug": "2022-11-02-innovation-group-digitalization",
+  "kind": "ig",
+  "title": "Innovation Group Digitalization",
+  "date": "2022-11-02",
+  "year": 2022,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 397,
+  "slug": "2023-01-24-innovation-group-coffee",
+  "kind": "ig",
+  "title": "Innovation Group Coffee",
+  "date": "2023-01-24",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 4
+ },
+ {
+  "id": 416,
+  "slug": "2023-01-31-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2023-01-31",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 4
+ },
+ {
+  "id": 457,
+  "slug": "2023-02-03-innovation-group-fungi-fungal-systems",
+  "kind": "ig",
+  "title": "Innovation Group Fungi & Fungal Systems",
+  "date": "2023-02-03",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Fungi & Fungal Systems"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 481,
+  "slug": "2023-03-09-innovation-group-digitalization",
+  "kind": "ig",
+  "title": "Innovation Group Digitalization",
+  "date": "2023-03-09",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 409,
+  "slug": "2023-03-16-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2023-03-16",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 413,
+  "slug": "2023-03-23-innovation-group-chocolate",
+  "kind": "ig",
+  "title": "Innovation Group Chocolate",
+  "date": "2023-03-23",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 399,
+  "slug": "2023-06-01-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "Innovation Group Proteins4Future",
+  "date": "2023-06-01",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 468,
+  "slug": "2023-06-08-innovation-group-bioconversion",
+  "kind": "ig",
+  "title": "Innovation Group Bioconversion",
+  "date": "2023-06-08",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Bioconversion"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 404,
+  "slug": "2023-07-06-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2023-07-06",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 428,
+  "slug": "2023-08-29-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2023-08-29",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 408,
+  "slug": "2023-09-12-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2023-09-12",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 436,
+  "slug": "2023-09-14-innovation-group-chocolate",
+  "kind": "ig",
+  "title": "Innovation Group Chocolate",
+  "date": "2023-09-14",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 0,
+  "presentations": 10
+ },
+ {
+  "id": 463,
+  "slug": "2023-09-28-innovation-group-fungi-fungal-systems",
+  "kind": "ig",
+  "title": "Innovation Group Fungi & Fungal Systems",
+  "date": "2023-09-28",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Fungi & Fungal Systems"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 465,
+  "slug": "2023-10-24-innovation-group-digitalization",
+  "kind": "ig",
+  "title": "Innovation Group Digitalization",
+  "date": "2023-10-24",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 401,
+  "slug": "2023-10-26-innovation-group-zgl-luzern",
+  "kind": "ig",
+  "title": "Innovation Group ZGL Luzern",
+  "date": "2023-10-26",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Lucerne"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 388,
+  "slug": "2023-11-14-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "Innovation Group Proteins4Future",
+  "date": "2023-11-14",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 412,
+  "slug": "2023-12-05-innovation-group-coffee",
+  "kind": "ig",
+  "title": "Innovation Group Coffee",
+  "date": "2023-12-05",
+  "year": 2023,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 1647,
+  "slug": "2024-innovation-group-zgl-luzern",
+  "kind": "ig",
+  "title": "Innovation Group ZGL Luzern",
+  "date": null,
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Lucerne"
+  ],
+  "sessions": 0,
+  "presentations": 4
+ },
+ {
+  "id": 467,
+  "slug": "2024-01-23-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2024-01-23",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 444,
+  "slug": "2024-02-07-innovation-group-chocolate",
+  "kind": "ig",
+  "title": "Innovation Group Chocolate",
+  "date": "2024-02-07",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 456,
+  "slug": "2024-02-27-innovation-group-fungi-fungal-systems",
+  "kind": "ig",
+  "title": "Innovation Group Fungi & Fungal Systems",
+  "date": "2024-02-27",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Fungi & Fungal Systems"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 435,
+  "slug": "2024-02-29-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2024-02-29",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 418,
+  "slug": "2024-03-05-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2024-03-05",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 473,
+  "slug": "2024-04-24-innovation-group-zgl-luzern",
+  "kind": "ig",
+  "title": "Innovation Group ZGL Luzern",
+  "date": "2024-04-24",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Lucerne"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 472,
+  "slug": "2024-05-21-innovation-group-digitalization",
+  "kind": "ig",
+  "title": "Innovation Group Digitalization",
+  "date": "2024-05-21",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 407,
+  "slug": "2024-05-23-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "Innovation Group Proteins4Future",
+  "date": "2024-05-23",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 420,
+  "slug": "2024-06-06-innovation-group-bioconversion",
+  "kind": "ig",
+  "title": "Innovation Group Bioconversion",
+  "date": "2024-06-06",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Bioconversion"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 466,
+  "slug": "2024-06-11-innovation-group-coffee",
+  "kind": "ig",
+  "title": "Innovation Group Coffee",
+  "date": "2024-06-11",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 431,
+  "slug": "2024-09-05-innovation-group-chocolate",
+  "kind": "ig",
+  "title": "Innovation Group Chocolate",
+  "date": "2024-09-05",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 0,
+  "presentations": 9
+ },
+ {
+  "id": 411,
+  "slug": "2024-09-17-innovation-group-aquaculture",
+  "kind": "ig",
+  "title": "Innovation Group Aquaculture",
+  "date": "2024-09-17",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 455,
+  "slug": "2024-09-26-innovation-group-insects",
+  "kind": "ig",
+  "title": "Innovation Group Insects",
+  "date": "2024-09-26",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 424,
+  "slug": "2024-10-16-innovation-group-fungi-fungal-systems",
+  "kind": "ig",
+  "title": "Innovation Group Fungi & Fungal Systems",
+  "date": "2024-10-16",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Fungi & Fungal Systems"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 443,
+  "slug": "2024-10-29-innovation-group-grains-baked-goods",
+  "kind": "ig",
+  "title": "Innovation Group Grains & Baked Goods",
+  "date": "2024-10-29",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 7
+ },
+ {
+  "id": 403,
+  "slug": "2024-11-19-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "Innovation Group Proteins4Future",
+  "date": "2024-11-19",
+  "year": 2024,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 0,
+  "presentations": 5
+ },
+ {
+  "id": 3,
+  "slug": "2024-12-05-11es-treffen-der-ig-bioconversion",
+  "kind": "ig",
+  "title": "11es Treffen der IG Bioconversion",
+  "date": "2024-12-05",
+  "year": 2024,
+  "location": "Food Brewer AG, Bachtobelstrasse, Horgen, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Bioconversion"
+  ],
+  "sessions": 0,
+  "presentations": 4
+ },
+ {
+  "id": 4,
+  "slug": "2024-12-05-13tes-treffen-der-ig-digitalisierung",
+  "kind": "ig",
+  "title": "13tes Treffen der IG Digitalisierung",
+  "date": "2024-12-05",
+  "year": 2024,
+  "location": "Sitem Medtech Hub by Sitem StartUp Club, Weyermannsstrasse, Bern, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 0,
+  "presentations": 6
+ },
+ {
+  "id": 5,
+  "slug": "2024-12-10-1tes-treffen-ig-zgl-jura",
+  "kind": "ig",
+  "title": "1tes Treffen IG ZGL Jura",
+  "date": "2024-12-10",
+  "year": 2024,
+  "location": "Fondation rurale interjurassienne, Courtételle, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Jura"
+  ],
+  "sessions": 0,
+  "presentations": 1
+ },
+ {
+  "id": 6,
+  "slug": "2025-01-23-13tes-treffen-der-ig-kaffee",
+  "kind": "ig",
+  "title": "13tes Treffen der IG Kaffee",
+  "date": "2025-01-23",
+  "year": 2025,
+  "location": "Thermoplan AG, Thermoplan-Platz, Weggis, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 7,
+  "presentations": 5
+ },
+ {
+  "id": 67,
+  "slug": "2025-01-23-empack",
+  "kind": "sfr",
+  "title": "Empack",
+  "date": "2025-01-23",
+  "year": 2025,
+  "location": "Messe Zürich, Wallisellenstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 2,
+  "presentations": 0
+ },
+ {
+  "id": 68,
+  "slug": "2025-01-30-innovation-catalyst-day",
+  "kind": "sfr",
+  "title": "Innovation Catalyst Day",
+  "date": "2025-01-30",
+  "year": 2025,
+  "location": "Technopark, Technoparkstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 8,
+  "presentations": 0
+ },
+ {
+  "id": 69,
+  "slug": "2025-02-06-future-food-symposium",
+  "kind": "sfr",
+  "title": "Future Food Symposium",
+  "date": "2025-02-06",
+  "year": 2025,
+  "location": "Berner Fachhochschule BFH, HAFL, Länggasse, Zollikofen, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 70,
+  "slug": "2025-02-06-glug-25",
+  "kind": "sfr",
+  "title": "Glug 25",
+  "date": "2025-02-06",
+  "year": 2025,
+  "location": "Bühne Aarau, Tuchlaube, Alte Reithalle, Metzgergasse, Aarau, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 3,
+  "presentations": 0
+ },
+ {
+  "id": 71,
+  "slug": "2025-02-12-branchfood-gza-present-sustainable-innovations-in-the-chocol",
+  "kind": "sfr",
+  "title": "Branchfood & GZA present: Sustainable Innovations in the Chocolate Industry",
+  "date": "2025-02-12",
+  "year": 2025,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 72,
+  "slug": "2025-03-04-workshop-eit-food-innostars",
+  "kind": "sfr",
+  "title": "Workshop EIT Food Innostars",
+  "date": "2025-03-04",
+  "year": 2025,
+  "location": "Zagreb, Kroatien",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 7,
+  "slug": "2025-03-06-56tes-treffen-der-ig-kakao-schokolade",
+  "kind": "ig",
+  "title": "56tes Treffen der IG Kakao & Schokolade",
+  "date": "2025-03-06",
+  "year": 2025,
+  "location": "Bühler AG, Gupfenstrasse, Uzwil, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 13,
+  "presentations": 9
+ },
+ {
+  "id": 8,
+  "slug": "2025-03-18-4tes-treffen-ig-zgl-luzern",
+  "kind": "ig",
+  "title": "4tes Treffen IG ZGL Luzern",
+  "date": "2025-03-18",
+  "year": 2025,
+  "location": "Berufsbildungszentrum Natur und Ernährung Sursee, Centralstrasse, Sursee, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Lucerne"
+  ],
+  "sessions": 8,
+  "presentations": 9
+ },
+ {
+  "id": 73,
+  "slug": "2025-03-22-cas-digitalization",
+  "kind": "sfr",
+  "title": "CAS Digitalization",
+  "date": "2025-03-22",
+  "year": 2025,
+  "location": "ZHAW Campus Grüental (GA), School of Life Sciences and Facility Management, Grüentalstrasse, Wädenswil, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 3,
+  "presentations": 0
+ },
+ {
+  "id": 9,
+  "slug": "2025-03-27-15-treffen-ig-insekten",
+  "kind": "ig",
+  "title": "15. Treffen IG Insekten",
+  "date": "2025-03-27",
+  "year": 2025,
+  "location": "Bühler AG, Gupfenstrasse, Uzwil, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 6,
+  "presentations": 5
+ },
+ {
+  "id": 74,
+  "slug": "2025-03-27-novelfood-discussion",
+  "kind": "sfr",
+  "title": "NovelFood Discussion",
+  "date": "2025-03-27",
+  "year": 2025,
+  "location": "Die Cuisine, Geerenweg, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 10,
+  "slug": "2025-04-08-17-treffen-ig-g-b",
+  "kind": "ig",
+  "title": "17. Treffen IG G&B",
+  "date": "2025-04-08",
+  "year": 2025,
+  "location": "ETH Zürich Hauptgebäude, Rämistrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 5,
+  "presentations": 4
+ },
+ {
+  "id": 11,
+  "slug": "2025-04-29-8-treffen-ig-fungi",
+  "kind": "ig",
+  "title": "8. Treffen IG Fungi",
+  "date": "2025-04-29",
+  "year": 2025,
+  "location": "Berner Fachhochschule BFH, Wirtschaft, Brückenstrasse, Bern, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Fungi & Fungal Systems"
+  ],
+  "sessions": 4,
+  "presentations": 5
+ },
+ {
+  "id": 12,
+  "slug": "2025-05-15-12-treffen-ig-p4f",
+  "kind": "ig",
+  "title": "12. Treffen IG P4F",
+  "date": "2025-05-15",
+  "year": 2025,
+  "location": "Universität Zürich Campus Irchel, Winterthurerstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 6,
+  "presentations": 5
+ },
+ {
+  "id": 13,
+  "slug": "2025-05-20-15-treffen-ig-aquaculture",
+  "kind": "ig",
+  "title": "15. Treffen IG Aquaculture",
+  "date": "2025-05-20",
+  "year": 2025,
+  "location": "Berner Fachhochschule BFH, Wirtschaft, Brückenstrasse, Bern, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 8,
+  "presentations": 5
+ },
+ {
+  "id": 14,
+  "slug": "2025-05-21-14-treffen-ig-digi",
+  "kind": "ig",
+  "title": "14. Treffen IG Digi",
+  "date": "2025-05-21",
+  "year": 2025,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 10,
+  "presentations": 10
+ },
+ {
+  "id": 15,
+  "slug": "2025-06-05-12-treffen-ig-biocon",
+  "kind": "ig",
+  "title": "12. Treffen IG Biocon",
+  "date": "2025-06-05",
+  "year": 2025,
+  "location": "New Roots AG, Burgdorfstrasse, Oberdiessbach, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Bioconversion"
+  ],
+  "sessions": 8,
+  "presentations": 5
+ },
+ {
+  "id": 16,
+  "slug": "2025-06-05-2-ig-zgl-ju",
+  "kind": "ig",
+  "title": "2. IG ZGL JU",
+  "date": "2025-06-05",
+  "year": 2025,
+  "location": "Fondation rurale interjurassienne, Courtételle, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Jura"
+  ],
+  "sessions": 3,
+  "presentations": 6
+ },
+ {
+  "id": 75,
+  "slug": "2025-08-21-ib-fff-workshop-frij",
+  "kind": "sfr",
+  "title": "IB FFF Workshop Frij",
+  "date": "2025-08-21",
+  "year": 2025,
+  "location": "Courtemelon, Courtételle, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 76,
+  "slug": "2025-08-21-agroscope-writers-day",
+  "kind": "sfr",
+  "title": "Agroscope Writers Day",
+  "date": "2025-08-21",
+  "year": 2025,
+  "location": "Gurten, Köniz, Bern, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 77,
+  "slug": "2025-09-02-ib-fff-grunstadt-zh",
+  "kind": "sfr",
+  "title": "IB FFF Grünstadt ZH",
+  "date": "2025-09-02",
+  "year": 2025,
+  "location": null,
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 17,
+  "slug": "2025-09-04-57-treffen-der-ig-kakao-schokolade",
+  "kind": "ig",
+  "title": "57. Treffen der IG Kakao & Schokolade",
+  "date": "2025-09-04",
+  "year": 2025,
+  "location": "Universität Freiburg, Avenue de l'Europe, Freiburg, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 9,
+  "presentations": 10
+ },
+ {
+  "id": 78,
+  "slug": "2025-09-05-storytelling-breakfast-future-of-our-food-system",
+  "kind": "sfr",
+  "title": "Storytelling Breakfast. Future of our food system",
+  "date": "2025-09-05",
+  "year": 2025,
+  "location": "Viaduktstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 79,
+  "slug": "2025-09-08-ga-afif-2030-5-years-to-go",
+  "kind": "sfr",
+  "title": "GA & AFIF: 2030 - 5 years to go",
+  "date": "2025-09-08",
+  "year": 2025,
+  "location": "Technoparkstrasse 1, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 3,
+  "presentations": 0
+ },
+ {
+  "id": 398,
+  "slug": "2025-09-18-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "Innovation Group Proteins4Future",
+  "date": "2025-09-18",
+  "year": 2025,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 0,
+  "presentations": 8
+ },
+ {
+  "id": 18,
+  "slug": "2025-09-30-16-treffen-ig-insects",
+  "kind": "ig",
+  "title": "16.Treffen IG Insects",
+  "date": "2025-09-30",
+  "year": 2025,
+  "location": "ETH Student Project House, Clausiusstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 9,
+  "presentations": 7
+ },
+ {
+  "id": 19,
+  "slug": "2025-10-09-18-treffen-ig-g-b-agf-dach-tagung",
+  "kind": "ig",
+  "title": "18. Treffen IG G&B - AGF DACH Tagung",
+  "date": "2025-10-09",
+  "year": 2025,
+  "location": "Bühler AG, Gupfenstrasse, Uzwil, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 20,
+  "slug": "2025-10-21-9-treffen-ig-fungi",
+  "kind": "ig",
+  "title": "9. Treffen IG Fungi",
+  "date": "2025-10-21",
+  "year": 2025,
+  "location": "BRIDGE, Europaallee, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Fungi & Fungal Systems"
+  ],
+  "sessions": 6,
+  "presentations": 5
+ },
+ {
+  "id": 21,
+  "slug": "2025-11-06-13-treffen-ig-p4f-13-treffen-ig-bc",
+  "kind": "ig",
+  "title": "13. Treffen IG P4F + 13. Treffen IG BC",
+  "date": "2025-11-06",
+  "year": 2025,
+  "location": "Eichenweg 49, 3052 Zollikofen, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 10,
+  "presentations": 0
+ },
+ {
+  "id": 22,
+  "slug": "2025-11-11-5tes-treffen-ig-zgl-luzern",
+  "kind": "ig",
+  "title": "5tes Treffen IG ZGL Luzern",
+  "date": "2025-11-11",
+  "year": 2025,
+  "location": "Berufsbildungszentrum Natur und Ernährung Schüpfheim, Chlosterbüel, Schüpfheim, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Lucerne"
+  ],
+  "sessions": 11,
+  "presentations": 9
+ },
+ {
+  "id": 81,
+  "slug": "2025-11-11-satw-future-food-market",
+  "kind": "sfr",
+  "title": "SATW & Future Food Market",
+  "date": "2025-11-11",
+  "year": 2025,
+  "location": "Löwenbräu, Limmatstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 23,
+  "slug": "2025-12-04-14th-treffen-der-ig-kaffee",
+  "kind": "ig",
+  "title": "14th Treffen der IG Kaffee",
+  "date": "2025-12-04",
+  "year": 2025,
+  "location": "Vouvry, Suisse",
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 8,
+  "presentations": 7
+ },
+ {
+  "id": 24,
+  "slug": "2025-12-11-3-treffen-ig-zgl-jura",
+  "kind": "ig",
+  "title": "3. Treffen IG ZGL Jura",
+  "date": "2025-12-11",
+  "year": 2025,
+  "location": "Fondation rurale interjurassienne, Courtételle, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Jura"
+  ],
+  "sessions": 3,
+  "presentations": 5
+ },
+ {
+  "id": 82,
+  "slug": "2025-12-12-vorstandssitzung",
+  "kind": "sfr",
+  "title": "Vorstandssitzung",
+  "date": "2025-12-12",
+  "year": 2025,
+  "location": "TECHNOPARK® Zürich, Technoparkstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 83,
+  "slug": "2026-01-14-shl-kitchen-session",
+  "kind": "sfr",
+  "title": "SHL Kitchen Session",
+  "date": "2026-01-14",
+  "year": 2026,
+  "location": "Schweizerische Hotelfachschule Luzern SHL City Campus, Schweizerhofquai, Luzern, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 25,
+  "slug": "2026-01-19-aquaculture-day-2026-how-much-is-the-fish",
+  "kind": "ig",
+  "title": "Aquaculture Day 2026 - How much is the Fish?",
+  "date": "2026-01-19",
+  "year": 2026,
+  "location": "Campus Liebefeld, Schwarzenburgstrasse, Köniz, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 6,
+  "presentations": 11
+ },
+ {
+  "id": 85,
+  "slug": "2026-01-19-shl-kitchen-battle",
+  "kind": "sfr",
+  "title": "SHL Kitchen Battle",
+  "date": "2026-01-19",
+  "year": 2026,
+  "location": "Schweizerische Hotelfachschule Luzern SHL City Campus, Schweizerhofquai, Luzern, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 86,
+  "slug": "2026-01-27-innovation-catalyst-day",
+  "kind": "sfr",
+  "title": "Innovation Catalyst Day",
+  "date": "2026-01-27",
+  "year": 2026,
+  "location": "TECHNOPARK® Zürich, Technoparkstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 87,
+  "slug": "2026-01-28-ib-fff-workshop",
+  "kind": "sfr",
+  "title": "IB FFF Workshop",
+  "date": "2026-01-28",
+  "year": 2026,
+  "location": "Dagorà Innovation Center di Manno, Via Pietro Peri, Lugano, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 88,
+  "slug": "2026-02-03-ib-fff-workshop",
+  "kind": "sfr",
+  "title": "IB FFF Workshop",
+  "date": "2026-02-03",
+  "year": 2026,
+  "location": "Bluefactory Fribourg-Freiburg SA, Passage du Cardinal, Freiburg, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 89,
+  "slug": "2026-02-05-future-food-symposium-2026",
+  "kind": "sfr",
+  "title": "Future Food Symposium 2026",
+  "date": "2026-02-05",
+  "year": 2026,
+  "location": "Luma Westbau, Löwenbräukunst, Limmatstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 2,
+  "presentations": 0
+ },
+ {
+  "id": 90,
+  "slug": "2026-02-05-glug26",
+  "kind": "sfr",
+  "title": "Glug26",
+  "date": "2026-02-05",
+  "year": 2026,
+  "location": "Bühne Aarau (Alte Reithalle), Apfelhausenweg, Aarau, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 91,
+  "slug": "2026-02-28-ib-fff-workshop-slow-food",
+  "kind": "sfr",
+  "title": "IB FFF Workshop Slow Food",
+  "date": "2026-02-28",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 988,
+  "slug": "2026-03-02-webinar-route2market-call",
+  "kind": "sfr",
+  "title": "Webinar: Route2Market Call",
+  "date": "2026-03-02",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 26,
+  "slug": "2026-03-10-6tes-treffen-ig-zgl-luzern",
+  "kind": "ig",
+  "title": "6tes Treffen IG ZGL Luzern",
+  "date": "2026-03-10",
+  "year": 2026,
+  "location": "Erlebnishof & Restaurant Burgrain, Burgrain, Alberswil, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Lucerne"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 92,
+  "slug": "2026-03-16-ib-fff-workshop",
+  "kind": "sfr",
+  "title": "IB FFF Workshop",
+  "date": "2026-03-16",
+  "year": 2026,
+  "location": "Basel, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 93,
+  "slug": "2026-03-16-healthy3-stakeholder-meeting",
+  "kind": "sfr",
+  "title": "healthy3 Stakeholder Meeting",
+  "date": "2026-03-16",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 94,
+  "slug": "2026-03-19-ib-workshop-shift-vd",
+  "kind": "sfr",
+  "title": "IB Workshop Shift VD",
+  "date": "2026-03-19",
+  "year": 2026,
+  "location": "Vevey, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 27,
+  "slug": "2026-03-24-10th-ig-fungi",
+  "kind": "ig",
+  "title": "10th IG Fungi",
+  "date": "2026-03-24",
+  "year": 2026,
+  "location": "Berner Fachhochschule BFH, Wirtschaft, Brückenstrasse, Bern, Schweiz P114",
+  "url": null,
+  "innovation_groups": [
+   "Fungi & Fungal Systems"
+  ],
+  "sessions": 5,
+  "presentations": 4
+ },
+ {
+  "id": 96,
+  "slug": "2026-04-01-route2market-challenge-room-collective-pitching-session",
+  "kind": "sfr",
+  "title": "Route2Market Challenge room (collective pitching session)",
+  "date": "2026-04-01",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 97,
+  "slug": "2026-04-28-innosuisse-day-mentoring",
+  "kind": "sfr",
+  "title": "InnoSuisse Day (mentoring)",
+  "date": "2026-04-28",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 28,
+  "slug": "2026-05-05-15th-meeting-ig-coffee",
+  "kind": "ig",
+  "title": "15th Meeting IG Coffee",
+  "date": "2026-05-05",
+  "year": 2026,
+  "location": "La Semeuse, Allée Paysans-Horlogers, La Chaux-de-Fonds, Suisse",
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 11,
+  "presentations": 6
+ },
+ {
+  "id": 29,
+  "slug": "2026-05-05-18-meeting-ig-grains-baked-goods",
+  "kind": "ig",
+  "title": "18. Meeting IG Grains & Baked Goods",
+  "date": "2026-05-05",
+  "year": 2026,
+  "location": "Durrer Spezialmaschinen AG, Calendariaweg, Immensee, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 9,
+  "presentations": 5
+ },
+ {
+  "id": 98,
+  "slug": "2026-05-06-stammtisch-landwirtschaftliche-netzwerke",
+  "kind": "sfr",
+  "title": "Stammtisch landwirtschaftliche Netzwerke",
+  "date": "2026-05-06",
+  "year": 2026,
+  "location": "Total Bar, Tellstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 30,
+  "slug": "2026-05-12-58th-meeting-ig-cocoa-chocolate",
+  "kind": "ig",
+  "title": "58th Meeting IG Cocoa & Chocolate",
+  "date": "2026-05-12",
+  "year": 2026,
+  "location": "House of Läderach, Grabenstrasse, Bilten, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 9,
+  "presentations": 6
+ },
+ {
+  "id": 99,
+  "slug": "2026-05-12-ib-fff-ws-dicifood",
+  "kind": "sfr",
+  "title": "IB FFF WS Dicifood",
+  "date": "2026-05-12",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 31,
+  "slug": "2026-05-21-1st-meeting-ig-sustainable-nutrition",
+  "kind": "ig",
+  "title": "1st Meeting IG Sustainable Nutrition",
+  "date": "2026-05-21",
+  "year": 2026,
+  "location": "Agroscope (Liebefeld), Schwarzenburgstrasse, Liebefeld, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Sustainable Nutrition"
+  ],
+  "sessions": 10,
+  "presentations": 5
+ },
+ {
+  "id": 100,
+  "slug": "2026-05-28-wfsc-dialogue-series-stories-from-startups",
+  "kind": "sfr",
+  "title": "WFSC Dialogue Series: Stories from Startups",
+  "date": "2026-05-28",
+  "year": 2026,
+  "location": "Dozentenfoyer HG, ETH-Zentrum, Rämistrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 32,
+  "slug": "2026-06-02-14th-meeting-ig-proteins4future",
+  "kind": "ig",
+  "title": "14th Meeting IG Proteins4Future",
+  "date": "2026-06-02",
+  "year": 2026,
+  "location": "ETH Zürich Hauptgebäude, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 9,
+  "presentations": 0
+ },
+ {
+  "id": 33,
+  "slug": "2026-06-04-15th-meeting-ig-digitalization",
+  "kind": "ig",
+  "title": "15th Meeting IG Digitalization",
+  "date": "2026-06-04",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 0,
+  "presentations": 2
+ },
+ {
+  "id": 102,
+  "slug": "2026-06-16-new-members-webinar",
+  "kind": "sfr",
+  "title": "New Members Webinar",
+  "date": "2026-06-16",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 103,
+  "slug": "2026-06-16-kickoff-biosphare",
+  "kind": "sfr",
+  "title": "Kickoff - Biosphäre",
+  "date": "2026-06-16",
+  "year": 2026,
+  "location": "Berufsbildungszentrum Natur und Ernährung Schüpfheim, Chlosterbüel, Schüpfheim, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 34,
+  "slug": "2026-06-18-17th-meeting-ig-insects",
+  "kind": "ig",
+  "title": "17th Meeting IG Insects",
+  "date": "2026-06-18",
+  "year": 2026,
+  "location": "Berner Fachhochschule BFH, Wirtschaft, Brückenstrasse, Bern, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 4,
+  "presentations": 4
+ },
+ {
+  "id": 35,
+  "slug": "2026-06-22-4eme-rencontre-du-groupe-d-innovation-jurassien-agriculture",
+  "kind": "ig",
+  "title": "4ème rencontre du groupe d'innovation jurassien \"Agriculture du Futur\"",
+  "date": "2026-06-22",
+  "year": 2026,
+  "location": "Universität Neuenburg, Avenue du Premier-Mars, Neuenburg, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Jura"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 36,
+  "slug": "2026-06-23-11th-meeting-ig-packaging-x-cirvalis",
+  "kind": "ig",
+  "title": "11th Meeting IG Packaging X Cirvalis",
+  "date": "2026-06-23",
+  "year": 2026,
+  "location": "ZHAW Campus Reidbach (RT), School of Life Sciences und Facility Management, Einsiedlerstrasse, Wädenswil, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Packaging"
+  ],
+  "sessions": 6,
+  "presentations": 0
+ },
+ {
+  "id": 37,
+  "slug": "2026-06-25-14th-meeting-ig-bioconversion",
+  "kind": "ig",
+  "title": "14th Meeting IG Bioconversion",
+  "date": "2026-06-25",
+  "year": 2026,
+  "location": "HES-SO Valais-Wallis, Rue de l'Industrie, Sion, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Bioconversion"
+  ],
+  "sessions": 8,
+  "presentations": 5
+ },
+ {
+  "id": 104,
+  "slug": "2026-08-22-future-food-market-future-food-p-act",
+  "kind": "sfr",
+  "title": "Future Food Market / Future Food P-Act",
+  "date": "2026-08-22",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 105,
+  "slug": "2026-09-01-14-swiss-green-economy-symposium",
+  "kind": "sfr",
+  "title": "14. Swiss Green Economy Symposium",
+  "date": "2026-09-01",
+  "year": 2026,
+  "location": "Winterthur, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 106,
+  "slug": "2026-09-07-afif-farming-healthy-diets",
+  "kind": "sfr",
+  "title": "AFIF: Farming Healthy Diets",
+  "date": "2026-09-07",
+  "year": 2026,
+  "location": "PROGR, Waisenhausplatz, Bern, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 3,
+  "presentations": 0
+ },
+ {
+  "id": 38,
+  "slug": "2026-09-10-16th-meeting-of-the-innovation-group-digitalization",
+  "kind": "ig",
+  "title": "16th Meeting of the Innovation Group Digitalization",
+  "date": "2026-09-10",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 107,
+  "slug": "2026-09-17-ib-fff-ws-bern-zollikofen",
+  "kind": "sfr",
+  "title": "IB FFF - WS Bern/Zollikofen",
+  "date": "2026-09-17",
+  "year": 2026,
+  "location": "RegioFoodHub",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 39,
+  "slug": "2026-10-15-11th-ig-fungi",
+  "kind": "ig",
+  "title": "11th IG Fungi",
+  "date": "2026-10-15",
+  "year": 2026,
+  "location": "Empa, Ueberlandstrasse, Dübendorf, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Fungi & Fungal Systems"
+  ],
+  "sessions": 9,
+  "presentations": 5
+ },
+ {
+  "id": 40,
+  "slug": "2026-10-20-16th-ig-coffee",
+  "kind": "ig",
+  "title": "16th IG Coffee",
+  "date": "2026-10-20",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 41,
+  "slug": "2026-10-20-59th-meeting-of-the-ig-cocoa-chocolate-and-coffee",
+  "kind": "ig",
+  "title": "59th Meeting of the IG Cocoa & Chocolate and Coffee",
+  "date": "2026-10-20",
+  "year": 2026,
+  "location": "ZHAW Campus Reidbach (RV), School of Life Sciences und Facility Management, Einsiedlerstrasse, Wädenswil, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Coffee",
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 7,
+  "presentations": 8
+ },
+ {
+  "id": 42,
+  "slug": "2026-10-22-5eme-rencontre-du-groupe-d-innovation-jurassien-agriculture",
+  "kind": "ig",
+  "title": "5ème rencontre du groupe d'innovation jurassien \"Agriculture du Futur\"",
+  "date": "2026-10-22",
+  "year": 2026,
+  "location": "Courtemelon, Courtételle, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Jura"
+  ],
+  "sessions": 5,
+  "presentations": 4
+ },
+ {
+  "id": 109,
+  "slug": "2026-10-22-ib-fff-ws-swiss-future-farm-the-last-one",
+  "kind": "sfr",
+  "title": "IB FFF - WS Swiss Future Farm - the last one!",
+  "date": "2026-10-22",
+  "year": 2026,
+  "location": "Swiss Future Farm, Tanikon, Ettenhausen, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 43,
+  "slug": "2026-10-29-2nd-meeting-of-the-innovation-group-sustainable-nutrition",
+  "kind": "ig",
+  "title": "2nd Meeting of the Innovation Group Sustainable Nutrition",
+  "date": "2026-10-29",
+  "year": 2026,
+  "location": "ETH Zurich: World Food System Center, Weinbergstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Sustainable Nutrition"
+  ],
+  "sessions": 7,
+  "presentations": 5
+ },
+ {
+  "id": 110,
+  "slug": "2026-11-03-brennpunkt-nahrung-26",
+  "kind": "sfr",
+  "title": "Brennpunkt Nahrung 26",
+  "date": "2026-11-03",
+  "year": 2026,
+  "location": "Messe Luzern, Horwerstrasse, Luzern, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 44,
+  "slug": "2026-11-05-1-treffen-ig-zgl-espace-mittelland",
+  "kind": "ig",
+  "title": "1. Treffen IG ZGL Espace Mittelland",
+  "date": "2026-11-05",
+  "year": 2026,
+  "location": "INFORAMA Rütti, Rütti, Zollikofen, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Bern / Espace Mittelland"
+  ],
+  "sessions": 7,
+  "presentations": 5
+ },
+ {
+  "id": 111,
+  "slug": "2026-11-10-members-webinar",
+  "kind": "sfr",
+  "title": "Members Webinar",
+  "date": "2026-11-10",
+  "year": 2026,
+  "location": null,
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 45,
+  "slug": "2026-11-12-19th-ig-g-b",
+  "kind": "ig",
+  "title": "19th IG G&B",
+  "date": "2026-11-12",
+  "year": 2026,
+  "location": "ZHAW School of Engineering Standort Zürich, Lagerstrasse, Zürich, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Grains & Baked Goods"
+  ],
+  "sessions": 6,
+  "presentations": 4
+ },
+ {
+  "id": 46,
+  "slug": "2026-11-17-18th-ig-insects",
+  "kind": "ig",
+  "title": "18th IG Insects",
+  "date": "2026-11-17",
+  "year": 2026,
+  "location": "Eawag, Ueberlandstrasse, Dübendorf, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Insects"
+  ],
+  "sessions": 7,
+  "presentations": 0
+ },
+ {
+  "id": 47,
+  "slug": "2026-11-17-15th-meeting-of-the-innovation-group-proteins4future",
+  "kind": "ig",
+  "title": "15th Meeting of the Innovation Group Proteins4Future",
+  "date": "2026-11-17",
+  "year": 2026,
+  "location": "Berner Fachhochschule BFH, HAFL, Länggasse, Zollikofen, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Proteins4Future"
+  ],
+  "sessions": 10,
+  "presentations": 0
+ },
+ {
+  "id": 48,
+  "slug": "2026-11-19-7-treffen-ig-zgl-lu",
+  "kind": "ig",
+  "title": "7. Treffen IG ZGL LU",
+  "date": "2026-11-19",
+  "year": 2026,
+  "location": "Berufsbildungszentrum Natur und Ernährung Sursee, Centralstrasse, Sursee, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Lucerne"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 49,
+  "slug": "2026-12-03-15th-meeting-of-the-innovation-group-bioconversion",
+  "kind": "ig",
+  "title": "15th Meeting of the Innovation Group Bioconversion",
+  "date": "2026-12-03",
+  "year": 2026,
+  "location": "Givaudan International SA, Kemptpark, Kemptthal, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Bioconversion"
+  ],
+  "sessions": 10,
+  "presentations": 0
+ },
+ {
+  "id": 50,
+  "slug": "2026-12-10-workshop-agrarmarktpionier",
+  "kind": "ig",
+  "title": "Workshop AgrarMarktPionier",
+  "date": "2026-12-10",
+  "year": 2026,
+  "location": "Berufsbildungszentrum Natur und Ernährung Sursee, Centralstrasse, Sursee, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 120,
+  "slug": "2027-01-28-innovation-catalyst-day-2027-roi-of-digitalisation",
+  "kind": "sfr",
+  "title": "Innovation Catalyst Day 2027: ROI of digitalisation",
+  "date": "2027-01-28",
+  "year": 2027,
+  "location": "Technopark Zürich, Technoparkstrasse 1, 8005 Zürich",
+  "url": null,
+  "innovation_groups": [
+   "Digitalization"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 52,
+  "slug": "2027-02-04-aquaculture-day-2027-smart-fish-smart-systems",
+  "kind": "ig",
+  "title": "Aquaculture Day 2027 - Smart Fish, Smart Systems",
+  "date": "2027-02-04",
+  "year": 2027,
+  "location": "Campus Liebefeld, Schwarzenburgstrasse, Köniz, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Aquaculture"
+  ],
+  "sessions": 11,
+  "presentations": 0
+ },
+ {
+  "id": 121,
+  "slug": "2027-02-11-innovationsforum-glug27",
+  "kind": "sfr",
+  "title": "Innovationsforum Glug27",
+  "date": "2027-02-11",
+  "year": 2027,
+  "location": "Bühne Aarau, Alte Reithalle, Apfelhausenweg, Aarau, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 1,
+  "presentations": 0
+ },
+ {
+  "id": 53,
+  "slug": "2027-03-04-2-treffen-ig-zgl-espace-mittelland",
+  "kind": "ig",
+  "title": "2. Treffen IG ZGL Espace Mittelland",
+  "date": "2027-03-04",
+  "year": 2027,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Bern / Espace Mittelland"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 1,
+  "slug": "2027-03-09-abschlussveranstaltung-agrarmarktpionier",
+  "kind": "ig",
+  "title": "Abschlussveranstaltung AgrarMarktPionier",
+  "date": "2027-03-09",
+  "year": 2027,
+  "location": "Olten, Schweiz",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 2,
+  "slug": "2027-03-16-forum-agrarzukunft-ehemals-ig-zgl-luzern",
+  "kind": "ig",
+  "title": "Forum AgrarZukunft (ehemals IG ZGL Luzern)",
+  "date": "2027-03-16",
+  "year": 2027,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Lucerne"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ }
+]
