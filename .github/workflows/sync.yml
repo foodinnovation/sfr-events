@@ -1,0 +1,74 @@
+name: Sync monday to Supabase
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"        # every 30 minutes
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (read everything, write nothing)"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths: ["sync/**", "tests/**", "supabase/**", ".github/workflows/sync.yml"]
+
+concurrency:
+  group: sync
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pytest -q
+        env:
+          TEST_DB_URL: "host=localhost port=5432 user=postgres password=postgres dbname=sfrtest"
+
+  sync:
+    needs: test
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Sync
+        env:
+          MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$MONDAY_TOKEN" ] || [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::warning::Secrets MONDAY_TOKEN and SUPABASE_DB_URL are not set yet; nothing to do."
+            exit 0
+          fi
+          python -m sync.run ${{ inputs.dry_run && '--dry-run' || '' }}
+      - name: Report
+        if: always()
+        run: test -f report.md && cat report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sync-report
+          path: report.*
+          if-no-files-found: ignore
+          retention-days: 14
