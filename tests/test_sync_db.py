@@ -21,6 +21,7 @@ STUB = """
 do $$ begin
   if not exists (select 1 from pg_roles where rolname='anon') then create role anon; end if;
   if not exists (select 1 from pg_roles where rolname='authenticated') then create role authenticated; end if;
+  if not exists (select 1 from pg_roles where rolname='supabase_auth_admin') then create role supabase_auth_admin; end if;
 end $$;
 create schema private;
 create table public.ig_groups (id int primary key, name text, crm_label text);
@@ -47,7 +48,9 @@ insert into public.presentations (meeting_id, onedrive_drive_id, onedrive_item_i
   (3,'d','i3','Programm.pdf','10_Schokolade/Treffen/2026/T2 - Präsentationen Web/Programm.pdf'),
   (5,'d','i4','c.pdf','03_Kaffee/Treffen/2016/Präsentationen WEB/c.pdf'),
   (7,'d','i5','e.pdf','05_Insekten/Treffen/2026/T1 - Präsentationen WEB/e.pdf'),
-  (8,'d','i6','f.pdf','03_Kaffee/Treffen/2015/Präsentationen WEB/f.pdf');
+  (8,'d','i6','f.pdf','03_Kaffee/Treffen/2015/Präsentationen WEB/f.pdf'),
+  (1,'d','i7','Teilnehmerliste.pdf','05_Insekten/Treffen/2026/T2 - Präsentationen WEB/Teilnehmerliste.pdf');
+update public.presentations set doc_type = 'participant_list' where onedrive_item_id = 'i7';
 insert into public.crm_members values ('member.ch','active'),('gone.ch','cancelled');
 insert into public.staff values ('lucas@swissfoodresearch.ch', true);
 """
@@ -149,7 +152,8 @@ def test_full_sync_twice(db, monkeypatch, tmp_path):
     assert q(db, "select count(*) from events.event where source='wiki'")[0][0] == 3
 
     decks = dict(q(db, "select item_id, in_web_folder from events.deck"))
-    assert decks == {"i1": True, "i2": False, "i3": True, "i4": True, "i5": True, "i6": True}
+    assert decks == {"i1": True, "i2": False, "i3": True, "i4": True, "i5": True, "i6": True, "i7": True}
+    assert q(db, "select doc_type from events.deck where item_id='i7'")[0][0] == "participant_list"
     assert q(db, "select is_programme from events.deck where item_id='i3'")[0][0]
 
     groups = dict(q(db, "select monday_group_id, match_method from events.attendee_group"))
@@ -171,6 +175,8 @@ def test_full_sync_twice(db, monkeypatch, tmp_path):
     ("emil@extern.ch", "i1", None),                    # other event's participant
     ("x@gone.ch", "i1", None),                         # cancelled member
     ("someone@member.ch", "i2", None),                 # not in a web folder
+    ("someone@member.ch", "i7", None),                 # participant list: never served
+    ("lucas@swissfoodresearch.ch", "i7", None),        # not even to staff
 ])
 def test_access_rules(db, monkeypatch, tmp_path, email, item, reason):
     if not q(db, "select 1 from events.deck limit 1"):

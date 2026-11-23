@@ -297,12 +297,12 @@ def sync_decks(cur, report):
     cur.execute(
         """
         insert into events.deck (event_id, source, presentation_id, drive_id, item_id, filename,
-                                 title, file_path, in_web_folder, is_programme, removed_at)
+                                 title, file_path, in_web_folder, is_programme, doc_type, removed_at)
         select em.event_id, 'wiki', p.id, p.onedrive_drive_id, p.onedrive_item_id, p.filename,
                p.title, p.file_path,
                regexp_replace(p.file_path, '/[^/]*$', '') ~* 'web',
                coalesce(p.filename, '') ~* 'programm' or coalesce(p.doc_type, '') ~* 'program',
-               p.removed_at
+               p.doc_type, p.removed_at
         from public.presentations p
         join events.event_meeting em on em.meeting_id = p.meeting_id
         where p.onedrive_drive_id is not null and p.onedrive_item_id is not null
@@ -311,7 +311,7 @@ def sync_decks(cur, report):
             event_id = excluded.event_id, drive_id = excluded.drive_id, item_id = excluded.item_id,
             filename = excluded.filename, title = excluded.title, file_path = excluded.file_path,
             in_web_folder = excluded.in_web_folder, is_programme = excluded.is_programme,
-            removed_at = excluded.removed_at
+            doc_type = excluded.doc_type, removed_at = excluded.removed_at
         """)
     report["counts"]["decks_upserted"] = cur.rowcount
     cur.execute(

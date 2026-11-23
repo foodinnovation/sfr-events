@@ -1,0 +1,275 @@
+/* Swiss Food Research Design System 2026 — generated from tokens.json */
+:root, [data-theme="default"] {
+  --sfr-black: #030a21;
+  --sfr-blue-01: #081f44;
+  --sfr-blue-02: #204e82;
+  --sfr-blue-03: #3f89bb;
+  --sfr-white: #f3f6ff;
+  --sfr-cyan: #00e9ff;
+  --sfr-magenta: #9200ff;
+  --sfr-orange: #ff8a00;
+  --sfr-green: #20bf55;
+  --sfr-ink-72: rgb(3 10 33/.72);
+  --sfr-ink-56: rgb(3 10 33/.56);
+  --sfr-ink-38: rgb(3 10 33/.38);
+  --sfr-ink-16: rgb(3 10 33/.16);
+  --sfr-ink-08: rgb(3 10 33/.08);
+  --sfr-ink-04: rgb(3 10 33/.04);
+  --sfr-paper-72: rgb(243 246 255/.72);
+  --sfr-paper-56: rgb(243 246 255/.56);
+  --sfr-paper-24: rgb(243 246 255/.24);
+  --sfr-paper-12: rgb(243 246 255/.12);
+  --sfr-steel: #a1abbe;
+  --sfr-chip: #dae6f4;
+  --sfr-chip-alt: #d1d6e3;
+  --sfr-blue-deep: #0f3057;
+  --surface-page: var(--sfr-white);
+  --surface-card: #ffffff;
+  --surface-sunken: #e9eefb;
+  --surface-inverse: var(--sfr-black);
+  --surface-brand: var(--sfr-blue-01);
+  --surface-accent: var(--sfr-cyan);
+  --text-heading: var(--sfr-black);
+  --text-body: var(--sfr-ink-72);
+  --text-muted: var(--sfr-ink-56);
+  --text-inverse: var(--sfr-white);
+  --text-inverse-muted: var(--sfr-paper-72);
+  --text-link: var(--sfr-blue-02);
+  --text-link-hover: var(--sfr-blue-03);
+  --border-subtle: var(--sfr-ink-16);
+  --border-strong: var(--sfr-black);
+  --border-inverse: var(--sfr-paper-24);
+  --focus-ring: var(--sfr-cyan);
+  --action-primary-bg: var(--sfr-black);
+  --action-primary-fg: var(--sfr-white);
+  --action-primary-bg-hover: var(--sfr-blue-01);
+  --action-primary-bg-active: var(--sfr-blue-02);
+  --action-secondary-fg: var(--sfr-black);
+  --action-secondary-border: var(--sfr-black);
+  --action-secondary-bg-hover: var(--sfr-ink-08);
+  --action-ghost-fg: var(--sfr-blue-02);
+  --action-ghost-bg-hover: var(--sfr-ink-04);
+  --action-disabled-fg: var(--sfr-ink-38);
+  --action-disabled-bg: var(--sfr-ink-08);
+  --pillar-innovation: var(--sfr-orange);
+  --pillar-business-creation: var(--sfr-magenta);
+  --pillar-talent-development: var(--sfr-green);
+  --pillar-general: var(--sfr-cyan);
+  --status-success: var(--sfr-green);
+  --status-info: var(--sfr-blue-03);
+  --status-warning: var(--sfr-orange);
+  --status-critical: var(--sfr-magenta);
+  --shadow-none: none;
+  --shadow-xs: 0 1px 2px rgb(3 10 33/.06);
+  --shadow-sm: 0 2px 6px rgb(3 10 33/.08);
+  --shadow-md: 0 8px 24px rgb(3 10 33/.10);
+  --shadow-lg: 0 20px 48px rgb(3 10 33/.16);
+  --shadow-focus: 0 0 0 3px rgb(0 233 255/.55);
+}
+[data-theme="sfr-inverse"] {
+  --surface-page: var(--sfr-black);
+  --surface-card: rgb(243 246 255/.06);
+  --surface-sunken: var(--sfr-blue-01);
+  --surface-inverse: var(--sfr-black);
+  --surface-brand: var(--sfr-blue-01);
+  --surface-accent: var(--sfr-cyan);
+  --text-heading: var(--sfr-white);
+  --text-body: var(--sfr-paper-72);
+  --text-muted: var(--sfr-paper-56);
+  --text-inverse: var(--sfr-white);
+  --text-inverse-muted: var(--sfr-paper-72);
+  --text-link: var(--sfr-cyan);
+  --text-link-hover: #8df4ff;
+  --border-subtle: var(--sfr-paper-24);
+  --border-strong: var(--sfr-white);
+  --border-inverse: var(--sfr-paper-24);
+  --focus-ring: var(--sfr-cyan);
+  --action-primary-bg: var(--sfr-white);
+  --action-primary-fg: var(--sfr-black);
+  --action-primary-bg-hover: #ffffff;
+  --action-primary-bg-active: #d7e0fb;
+  --action-secondary-fg: var(--sfr-white);
+  --action-secondary-border: var(--sfr-white);
+  --action-secondary-bg-hover: var(--sfr-paper-12);
+  --action-ghost-fg: var(--sfr-cyan);
+  --action-ghost-bg-hover: var(--sfr-paper-12);
+  --action-disabled-fg: var(--sfr-paper-56);
+  --action-disabled-bg: var(--sfr-paper-12);
+  --pillar-innovation: var(--sfr-orange);
+  --pillar-business-creation: var(--sfr-magenta);
+  --pillar-talent-development: var(--sfr-green);
+  --pillar-general: var(--sfr-cyan);
+  --status-success: var(--sfr-green);
+  --status-info: var(--sfr-blue-03);
+  --status-warning: var(--sfr-orange);
+  --status-critical: var(--sfr-magenta);
+}
+:root {
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+  --layout-gutter: 24px;
+  --layout-margin: 48px;
+  --layout-max: 1280px;
+  --slide-w: 1920px;
+  --slide-h: 1080px;
+  --slide-margin-x: 56px;
+  --slide-title-y: 105px;
+  --slide-body-y: 264px;
+  --slide-footer-y: 1021px;
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+  --ease-standard: cubic-bezier(.2,0,0,1);
+  --ease-out: cubic-bezier(0,0,.2,1);
+  --ease-in: cubic-bezier(.4,0,1,1);
+  --duration-instant: 80ms;
+  --duration-fast: 140ms;
+  --duration-base: 220ms;
+  --duration-slow: 400ms;
+  --sfr-black-rgb: 3 10 33;
+  --sfr-blue-01-rgb: 8 31 68;
+  --sfr-blue-02-rgb: 32 78 130;
+  --sfr-blue-03-rgb: 63 137 187;
+  --sfr-white-rgb: 243 246 255;
+  --sfr-cyan-rgb: 0 233 255;
+  --sfr-magenta-rgb: 146 0 255;
+  --sfr-orange-rgb: 255 138 0;
+  --sfr-green-rgb: 32 191 85;
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-extended: 0.08em;
+  --tracking-extended-wide: 0.18em;
+  --leading-tight: 1.04;
+  --leading-snug: 1.16;
+  --leading-normal: 1.45;
+  --leading-relaxed: 1.6;
+  --role-headline-weight: 700;
+  --role-headline-leading: 1.04;
+  --role-headline-tracking: -0.02em;
+  --role-headline-transform: none;
+  --role-sub01-weight: 400;
+  --role-sub01-tracking: 0.08em;
+  --role-sub01-transform: uppercase;
+  --role-sub01-leading: 1.16;
+  --role-sub02-weight: 600;
+  --role-sub02-tracking: 0em;
+  --role-sub02-transform: none;
+  --role-sub02-leading: 1.16;
+  --role-text-weight: 400;
+  --role-text-tracking: 0em;
+  --role-text-leading: 1.45;
+  --role-note-weight: 300;
+  --role-note-tracking: 0.08em;
+  --role-note-transform: uppercase;
+  --role-note-leading: 1.16;
+  --logo-clearspace-ratio: 0.5;
+  --partner-banner-ratio: 2;
+  --border-hairline: 1px solid rgb(3 10 33/.16);
+  --border-hairline-inverse: 1px solid rgb(243 246 255/.24);
+  --transition-control: background-color 140ms cubic-bezier(.2,0,0,1),color 140ms cubic-bezier(.2,0,0,1),border-color 140ms cubic-bezier(.2,0,0,1),box-shadow 140ms cubic-bezier(.2,0,0,1),transform 80ms cubic-bezier(.2,0,0,1);
+  --gradient-general: radial-gradient(120% 140% at 88% 96%,#3f89bb 0%,#204e82 26%,#081f44 56%,#030a21 100%);
+  --gradient-general-soft: radial-gradient(100% 120% at 10% 100%,#204e82 0%,#081f44 45%,#030a21 100%);
+  --gradient-innovation: radial-gradient(120% 140% at 92% 8%,#ff8a00 0%,#204e82 44%,#081f44 72%,#030a21 100%);
+  --gradient-business-creation: radial-gradient(120% 140% at 92% 8%,#9200ff 0%,#204e82 46%,#081f44 74%,#030a21 100%);
+  --gradient-talent: radial-gradient(120% 140% at 92% 8%,#20bf55 0%,#204e82 46%,#081f44 74%,#030a21 100%);
+  --gradient-accent: radial-gradient(120% 140% at 92% 8%,#00e9ff 0%,#3f89bb 30%,#081f44 70%,#030a21 100%);
+  --scrim-bottom: linear-gradient(to top,rgb(3 10 33/.88) 0%,rgb(3 10 33/.55) 38%,rgb(3 10 33/0) 100%);
+  --scrim-left: linear-gradient(to right,rgb(3 10 33/.85) 0%,rgb(3 10 33/0) 70%);
+  --text-3xs: 11px;
+  --text-2xs: 12px;
+  --text-xs: 13px;
+  --text-sm: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 26px;
+  --text-2xl: 34px;
+  --text-3xl: 46px;
+  --text-4xl: 64px;
+  --text-5xl: 88px;
+  --text-6xl: 120px;
+  --slide-text-hero: 112px;
+  --slide-text-quote: 75px;
+  --slide-text-title: 69px;
+  --slide-text-statement: 48px;
+  --slide-text-subtitle: 43px;
+  --slide-text-cardhead: 37px;
+  --slide-text-body: 29px;
+  --slide-text-footer: 16px;
+  --font-sans: "Funnel Sans","Helvetica Neue",Arial,sans-serif;
+  --text-h1: 700 64px/1.04 var(--font-sans); /* From `h1,h2,h3,h4,h5,h6` · `h1` in tokens/base.css. */
+  --text-h2: 700 46px/1.04 var(--font-sans); /* From `h1,h2,h3,h4,h5,h6` · `h2` in tokens/base.css. */
+  --text-h3: 700 34px/1.04 var(--font-sans); /* From `h1,h2,h3,h4,h5,h6` · `h3` in tokens/base.css. */
+  --text-h4: 700 26px/1.04 var(--font-sans); /* From `h1,h2,h3,h4,h5,h6` · `h4` in tokens/base.css. */
+  --text-h5: 700 20px/1.04 var(--font-sans); /* From `h1,h2,h3,h4,h5,h6` · `h5` in tokens/base.css. */
+  --text-h6: 700 17px/1.04 var(--font-sans); /* From `h1,h2,h3,h4,h5,h6` · `h6` in tokens/base.css. */
+}
+.body {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.45;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.h1 {
+  font-family: var(--font-sans);
+  font-size: 64px;
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.h2 {
+  font-family: var(--font-sans);
+  font-size: 46px;
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.h3 {
+  font-family: var(--font-sans);
+  font-size: 34px;
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.h4 {
+  font-family: var(--font-sans);
+  font-size: 26px;
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.h5 {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.h6 {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}

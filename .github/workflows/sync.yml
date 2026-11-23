@@ -1,4 +1,4 @@
-name: Sync monday to Supabase
+name: Sync and publish
 
 on:
   schedule:
@@ -6,16 +6,25 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Dry run (read everything, write nothing)"
+        description: "Dry run (read everything, write nothing, publish nothing)"
+        type: boolean
+        default: false
+      force_deploy:
+        description: "Publish the page even if nothing changed"
         type: boolean
         default: false
   push:
     branches: [main]
-    paths: ["sync/**", "tests/**", "supabase/**", ".github/workflows/sync.yml"]
+    paths: ["sync/**", "web/**", "tests/**", "supabase/migrations/**", ".github/workflows/sync.yml"]
 
 concurrency:
   group: sync
   cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   test:
@@ -41,9 +50,15 @@ jobs:
 
   sync:
     needs: test
-    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    outputs:
+      changed: ${{ steps.build.outputs.changed }}
+    env:
+      MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -51,21 +66,37 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
-      - name: Sync
-        env:
-          MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - name: Sync monday to Supabase
         run: |
           if [ -z "$MONDAY_TOKEN" ] || { [ -z "$SUPABASE_DB_URL" ] && [ -z "$SUPABASE_DB_PASSWORD" ]; }; then
-            echo "::warning::Secrets MONDAY_TOKEN and SUPABASE_DB_PASSWORD are not set yet; nothing to do."
-            exit 0
+            echo "::error::Secrets MONDAY_TOKEN and SUPABASE_DB_PASSWORD are missing."; exit 1
           fi
           python -m sync.run ${{ inputs.dry_run && '--dry-run' || '' }}
-      - name: Report
+      - name: Sync report
         if: always()
         run: test -f report.md && cat report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Build the page
+        id: build
+        run: |
+          python web/build.py --out _site ${{ inputs.dry_run && '--dry-run' || '' }}
+          old=$(cat data/site-hash.txt 2>/dev/null || true)
+          new=$(cat site-hash.txt)
+          if [ "$old" != "$new" ] || [ "${{ inputs.force_deploy }}" = "true" ] || [ "${{ github.event_name }}" = "push" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"; cp site-hash.txt data/site-hash.txt
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Keep the public event list in the repo
+        if: steps.build.outputs.changed == 'true' && !inputs.dry_run
+        run: |
+          git config user.name "sfr-events bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/events.json data/site-hash.txt
+          git diff --cached --quiet || { git commit -m "Update public event list" && git push; }
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.build.outputs.changed == 'true' && !inputs.dry_run
+        with:
+          path: _site
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -73,3 +104,14 @@ jobs:
           path: report.*
           if-no-files-found: ignore
           retention-days: 14
+
+  deploy:
+    needs: sync
+    if: needs.sync.outputs.changed == 'true' && !inputs.dry_run
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

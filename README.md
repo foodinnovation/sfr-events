@@ -56,10 +56,21 @@ TEST_DB_URL="host=... dbname=sfrtest" pytest -q   # plus database tests on a thr
 MONDAY_TOKEN=... SUPABASE_DB_URL=... python -m sync.run --dry-run
 ```
 
+## The page
+
+`web/build.py` writes the static page from Supabase after each sync: the listing with filters
+(type, Innovation Group, search), one page per SFR and Innovation Group event (programme,
+presentations), and the archive back to 2015. Partner events link to the partner's page.
+Fonts and the sign-in library are bundled; the page loads nothing from third parties.
+Published by the same workflow to GitHub Pages whenever something changed.
+
 ## Layout
 
 * `sync/rules.py`: business rules (types, publishing, access statuses, matching)
 * `sync/monday.py`: reads the two monday boards (read-only)
 * `sync/translate.py`: English translation via the Claude API
 * `sync/run.py`: the sync itself
+* `web/`: page build (`build.py`) and static assets (styles, script, logo, fonts)
 * `supabase/migrations/`: the `events` schema and access functions
+* `supabase/functions/`: `deck` (access check, SharePoint link) and `send-email` (sign-in emails from contact@)
+* `docs/setup-sign-in.md`: one-off sign-in setup (Entra, Exchange, Supabase)
