@@ -2818,6 +2818,19 @@
   "presentations": 0
  },
  {
+  "id": 378,
+  "slug": null,
+  "kind": "external",
+  "title": "Swiss Soil Day 2026 – Nationales Bodenforum",
+  "date": "2026-12-01",
+  "year": 2026,
+  "location": "Cinémont, Rue Émile-Boéchat 85, 2800 Delémont",
+  "url": "https://www.swisssoilday.ch/de/",
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
   "id": 49,
   "slug": "2026-12-03-15th-meeting-of-the-innovation-group-bioconversion",
   "kind": "ig",
@@ -2876,6 +2889,19 @@
   "presentations": 0
  },
  {
+  "id": 369,
+  "slug": null,
+  "kind": "external",
+  "title": "Cheese Affair",
+  "date": "2027-02-08",
+  "year": 2027,
+  "location": "Alte Reithalle, Apfelhausenweg 20, 5000 Aarau",
+  "url": null,
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
   "id": 121,
   "slug": "2027-02-11-innovationsforum-glug27",
   "kind": "sfr",
@@ -2917,6 +2943,32 @@
   "presentations": 0
  },
  {
+  "id": 371,
+  "slug": null,
+  "kind": "external",
+  "title": "2. Schweizer Ernährungssystemgipfel",
+  "date": "2027-03-11",
+  "year": 2027,
+  "location": "Bern",
+  "url": "https://sdsn.ch/anlaesse/",
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 372,
+  "slug": null,
+  "kind": "external",
+  "title": "VDB CH Frühjahrstagung 2027",
+  "date": "2027-03-11",
+  "year": 2027,
+  "location": "Landgut Bocken, Bockenweg, Horgen, Schweiz",
+  "url": "https://www.vdb-ch.ch/2026/07/01/save-the-date-vdb-ch-fruehjahrstagung-am-11-12-maerz-2027/",
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
   "id": 2,
   "slug": "2027-03-16-forum-agrarzukunft-ehemals-ig-zgl-luzern",
   "kind": "ig",
@@ -2928,6 +2980,32 @@
   "innovation_groups": [
    "Future Proof Farming Lucerne"
   ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 373,
+  "slug": null,
+  "kind": "external",
+  "title": "InnoFood&Co 2027",
+  "date": "2027-04-20",
+  "year": 2027,
+  "location": "Forum Fribourg",
+  "url": "https://infomaniak.events/en-ch/conferences/innofoodco-2027/8a1bd226-59a5-40c4-b532-e64337bd5b16/events/397301",
+  "innovation_groups": [],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
+  "id": 374,
+  "slug": null,
+  "kind": "external",
+  "title": "ACHEMA 2027",
+  "date": "2027-06-14",
+  "year": 2027,
+  "location": "Messe Frankfurt, Ludwig-Erhard-Anlage 1, 60327 Frankfurt am Main, Germany",
+  "url": "https://www.achema.de",
+  "innovation_groups": [],
   "sessions": 0,
   "presentations": 0
  }
