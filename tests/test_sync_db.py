@@ -241,6 +241,7 @@ def test_knowledge_write_and_access(db):
                  max_funding_chf=None, project_topic="any", impact_area=None, location="CH", active_2026=True)]
     with psycopg.connect(db) as c, c.cursor() as cur:
         report = {}
+        cur.execute("set role events_job")            # the job's own rights: RLS applies, no COPY
         k.write(cur, radicle, inst, report)
         k.write(cur, radicle, inst, report)          # idempotent: replaces, never duplicates
         assert report["counts"]["knowledge_projects"] == 1
@@ -248,12 +249,14 @@ def test_knowledge_write_and_access(db):
         assert cur.fetchone()[0] == 1
         cur.execute("select count(*) from knowledge.contact where fallback")
         assert cur.fetchone()[0] == 1
+        cur.execute("reset role")
         # members and staff read; participants and strangers do not
         for email, ok in [("a@member.ch", True), ("staff.test@swissfoodresearch.ch", True),
                           ("anna@extern.ch", False), ("x@gone.ch", False), ("x@gmail.com", False)]:
             cur.execute("select knowledge.can_read(%s)", [email])
             assert cur.fetchone()[0] is ok, email
         # monday hiccup (no instruments read) keeps the previous instruments
+        cur.execute("set role events_job")
         k.write(cur, None, [], report)
         cur.execute("select count(*) from knowledge.instrument")
         assert cur.fetchone()[0] == 1

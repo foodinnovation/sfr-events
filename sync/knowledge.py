@@ -113,26 +113,28 @@ def read_instruments(mon) -> list[dict]:
 
 # --------------------------------------------------------------------------- writer
 
+def _insert(cur, table: str, cols: list[str], rows) -> None:
+    """Plain batched inserts: COPY is refused on RLS-protected tables for a non-owner (events_job)."""
+    sql = f"insert into knowledge.{table} ({', '.join(cols)}) values ({', '.join(['%s'] * len(cols))})"
+    cur.executemany(sql, rows)
+
+
 def write(cur, radicle: dict | None, instruments: list[dict], report: dict) -> None:
     counts = report.setdefault("counts", {})
     if radicle is not None:
         cur.execute("delete from knowledge.article")
-        with cur.copy("""copy knowledge.article (topic_slug, topic_label, parent_topic, title, body_markdown,
-                             key_findings, related_topics, active_projects, completed_projects,
-                             funding_trend, last_compiled) from stdin""") as cp:
-            for r in radicle["articles"]:
-                cp.write_row([*r[:5], *(Jsonb(x) for x in r[5:9]), *r[9:]])
+        _insert(cur, "article", ["topic_slug", "topic_label", "parent_topic", "title", "body_markdown",
+                                 "key_findings", "related_topics", "active_projects", "completed_projects",
+                                 "funding_trend", "last_compiled"],
+                [[*r[:5], *(Jsonb(x) for x in r[5:9]), *r[9:]] for r in radicle["articles"]])
         cur.execute("delete from knowledge.project")
-        with cur.copy("""copy knowledge.project (id, source, title, summary, topics, trl, funder,
-                             start_date, end_date, status, budget_chf, institution, lead, partners,
-                             source_url) from stdin""") as cp:
-            for r in radicle["projects"]:
-                cp.write_row([*r[:4], Jsonb(r[4]), *r[5:]])
+        _insert(cur, "project", ["id", "source", "title", "summary", "topics", "trl", "funder", "start_date",
+                                 "end_date", "status", "budget_chf", "institution", "lead", "partners",
+                                 "source_url"],
+                [[*r[:4], Jsonb(r[4]), *r[5:]] for r in radicle["projects"]])
         cur.execute("delete from knowledge.gap")
-        with cur.copy("""copy knowledge.gap (spot_id, topic_slug, description, severity, cost_range_chf,
-                             evidence_block) from stdin""") as cp:
-            for r in radicle["gaps"]:
-                cp.write_row(r)
+        _insert(cur, "gap", ["spot_id", "topic_slug", "description", "severity", "cost_range_chf",
+                             "evidence_block"], [list(r) for r in radicle["gaps"]])
         counts["knowledge_articles"] = len(radicle["articles"])
         counts["knowledge_projects"] = len(radicle["projects"])
         counts["knowledge_gaps"] = len(radicle["gaps"])
@@ -141,18 +143,16 @@ def write(cur, radicle: dict | None, instruments: list[dict], report: dict) -> N
 
     if instruments:   # an empty read is treated as a monday hiccup, not as 'no instruments'
         cur.execute("delete from knowledge.instrument")
-        with cur.copy("""copy knowledge.instrument (id, name, funder, stage, link, max_funding_chf,
-                             project_topic, impact_area, location, active_2026) from stdin""") as cp:
-            for i in instruments:
-                cp.write_row([i["id"], i["name"], i["funder"], i["stage"], i["link"], i["max_funding_chf"],
-                              i["project_topic"], i["impact_area"], i["location"], i["active_2026"]])
+        _insert(cur, "instrument", ["id", "name", "funder", "stage", "link", "max_funding_chf",
+                                    "project_topic", "impact_area", "location", "active_2026"],
+                [[i["id"], i["name"], i["funder"], i["stage"], i["link"], i["max_funding_chf"],
+                  i["project_topic"], i["impact_area"], i["location"], i["active_2026"]] for i in instruments])
     counts["knowledge_instruments"] = len(instruments)
 
     cur.execute("delete from knowledge.contact")
-    for c in CONTACTS:
-        cur.execute("""insert into knowledge.contact (key, name, role, topics, keywords, fallback)
-                       values (%s, %s, %s, %s, %s, %s)""",
-                    [c["key"], c["name"], c["role"], c["topics"], c["keywords"], c.get("fallback", False)])
+    _insert(cur, "contact", ["key", "name", "role", "topics", "keywords", "fallback"],
+            [[c["key"], c["name"], c["role"], c["topics"], c["keywords"], c.get("fallback", False)]
+             for c in CONTACTS])
 
 
 def run(cur, mon, report: dict) -> None:
