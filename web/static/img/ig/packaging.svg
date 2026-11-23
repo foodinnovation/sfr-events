@@ -1,0 +1,11 @@
+<?xml version="1.0"?><svg id="Vektor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 2400" xmlns:c2pa="http://c2pa.org/manifest">
+  <defs></defs>
+  <polygon class="cls-1" fill="#030a21" points="1200 941.4 439.69 738.65 460.31 661.35 1200 858.6 1939.69 661.35 1960.31 738.65 1200 941.4"></polygon>
+  <g>
+    <polygon class="cls-1" fill="#030a21" points="1240 900 1240 1147.93 1200 1158.6 1160 1147.93 1160 900 1240 900"></polygon>
+    <polygon class="cls-1" fill="#030a21" points="1200 1241.4 1240 1230.73 1240 1900 1160 1900 1160 1230.73 1200 1241.4"></polygon>
+  </g>
+  <polygon class="cls-1" fill="#030a21" points="460.31 961.35 1160 1147.93 1160 1230.73 439.69 1038.65 460.31 961.35"></polygon>
+  <polygon class="cls-1" fill="#030a21" points="1960.31 1038.65 1240 1230.73 1240 1147.93 1939.69 961.35 1960.31 1038.65"></polygon>
+  <path class="cls-1" fill="#030a21" d="M1200,458.6l-790,210.67v1061.46l790,210.67,710-189.34v-82.79l-710,189.33-710-189.33v-938.54l710-189.33,710,189.33v938.29h80v-999.75l-790-210.67Z"></path>
+</svg>

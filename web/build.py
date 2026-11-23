@@ -28,6 +28,7 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import psycopg
+from urllib.parse import quote_plus
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT.parent))
@@ -45,6 +46,16 @@ IG_NAMES = {   # English display names; wiki names are German
     13: "Carbon", 14: "Sustainable Nutrition", 15: "Future Proof Farming Lucerne",
     16: "Future Proof Farming Jura", 17: "Future Proof Farming Bern / Espace Mittelland",
 }
+# Design System 2026 assets per IG: icon (assets/img/ig/<name>.svg) and picture (<name>.webp).
+# Future Proof Farming and its regional groups share one set. Carbon (13) has none.
+IG_ASSET = {
+    1: "aquaculture", 2: "bread-baked-goods", 3: "coffee", 4: "packaging", 5: "insects",
+    6: "digitalization", 7: "protein4future", 8: "non-thermal-preservation", 9: "bioconversion",
+    10: "cocoa-chocolate", 11: "fungi", 12: "future-oriented-farming", 14: "sustainable-nutrition",
+    15: "future-oriented-farming", 16: "future-oriented-farming", 17: "future-oriented-farming",
+}
+IG_NO_PICTURE = {"non-thermal-preservation"}
+ONLINE = re.compile(r"\b(online|webinar|zoom|teams|virtual|virtuell|hybrid only|livestream)\b", re.I)
 KIND_LABEL = {"ig": "Innovation Group", "sfr": "SFR event", "external": "Partner event"}
 
 esc = lambda s: html.escape(s or "", quote=True)  # noqa: E731
@@ -158,6 +169,44 @@ def ig_labels(e: dict) -> list[str]:
     return [IG_NAMES.get(i, "") for i in sorted(e["igs"]) if IG_NAMES.get(i)]
 
 
+def primary_asset(e: dict) -> str | None:
+    for i in sorted(e["igs"]):
+        if i in IG_ASSET:
+            return IG_ASSET[i]
+    return None
+
+
+def icon(name: str, cls: str = "ig-icon") -> str:
+    """Design-system IG icon, drawn as a mask so it takes the text colour. The path is absolute
+    because browsers resolve relative url() in custom properties inconsistently."""
+    return f'<span class="{cls}" style="--icon:url({SITE_BASE}assets/img/ig/{name}.svg)" aria-hidden="true"></span>'
+
+
+def maps_url(location: str | None) -> str | None:
+    """Google Maps search link for a physical place; None for online or missing places."""
+    loc = (location or "").strip()
+    if not loc or ONLINE.search(loc) or loc.lower().startswith("http"):
+        return None
+    return "https://www.google.com/maps/search/?api=1&query=" + quote_plus(loc)
+
+
+def signup(url: str | None) -> dict | None:
+    """Classify the monday sign-up link. ti.to and Eventbrite can be embedded; links to the old
+    swissfoodresearch.ch event pages are dropped, since this calendar replaces them."""
+    u = (url or "").strip()
+    if not u.lower().startswith(("http://", "https://")):
+        return None
+    m = re.match(r"https?://(?:www\.)?ti\.to/([\w-]+)/([\w-]+)", u, re.I)
+    if m:
+        return {"kind": "tito", "url": u, "ref": f"{m.group(1)}/{m.group(2)}", "host": "ti.to"}
+    m = re.match(r"https?://(?:www\.)?eventbrite\.[a-z.]+/e/(?:[\w-]*-)?(\d{6,})", u, re.I)
+    if m:
+        return {"kind": "eventbrite", "url": u, "ref": m.group(1), "host": "Eventbrite"}
+    if re.match(r"https?://(?:www\.)?swissfoodresearch\.ch/", u, re.I):
+        return None
+    return {"kind": "link", "url": u, "ref": None, "host": None}
+
+
 # --------------------------------------------------------------------------- page shell
 
 def shell(title: str, body: str, depth: int, description: str = "") -> str:
@@ -230,7 +279,8 @@ def list_item(e: dict, today: date) -> str:
     day, mon, yr = fmt_short(e["date"], e["year"])
     igs = ig_labels(e)
     tags = [f'<span class="tag tag-{e["kind"]}">{KIND_LABEL[e["kind"]]}</span>']
-    tags += [f'<span class="tag">{esc(i)}</span>' for i in igs]
+    tags += [f'<span class="tag">{icon(IG_ASSET[i]) if i in IG_ASSET else ""}{esc(IG_NAMES[i])}</span>'
+             for i in sorted(e["igs"]) if i in IG_NAMES]
     meta = [x for x in (time_range(e), e["location"]) if x]
     has_decks = any(not d["programme"] for d in e["decks"])
     if e["kind"] == "external":
@@ -304,18 +354,38 @@ def index_page(events: list[dict], today: date) -> str:
 # --------------------------------------------------------------------------- event page
 
 def event_page(e: dict, today: date) -> str:
+    up = "../../"
     igs = ig_labels(e)
     upcoming = bool(e["date"] and e["date"] >= today)
-    facts = [("Date", fmt_date(e["date"], e["year"]))]
+    asset = primary_asset(e)
+    facts = [("Date", esc(fmt_date(e["date"], e["year"])))]
     if time_range(e):
-        facts.append(("Time", time_range(e)))
+        facts.append(("Time", esc(time_range(e))))
     if e["location"]:
-        facts.append(("Place", e["location"]))
+        m = maps_url(e["location"])
+        place = (f'<a href="{esc(m)}" rel="noopener" target="_blank">{esc(e["location"])}'
+                 f'<span class="visually-hidden"> (opens Google Maps)</span></a>' if m else esc(e["location"]))
+        facts.append(("Place", place))
     if igs:
-        facts.append(("Innovation Group" if len(igs) == 1 else "Innovation Groups", ", ".join(igs)))
-    facts_html = "".join(f"<div><dt>{k}</dt><dd>{esc(v)}</dd></div>" for k, v in facts)
-    register = (f'<a class="btn btn-primary" href="{esc(e["url"])}" rel="noopener">Register</a>'
-                if upcoming and e["url"] else "")
+        facts.append(("Innovation Group" if len(igs) == 1 else "Innovation Groups", esc(", ".join(igs))))
+    facts_html = "".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in facts)
+
+    reg = signup(e["url"]) if upcoming else None
+    register, reg_block = "", ""
+    if reg and reg["kind"] in ("tito", "eventbrite"):
+        register = '<a class="btn btn-primary" href="#registration" data-register>Register</a>'
+        reg_block = f"""<section class="block registration" id="registration"
+    data-provider="{reg['kind']}" data-ref="{esc(reg['ref'])}">
+  <h2 class="h4">Registration</h2>
+  <p class="muted reg-note">Registration runs on {reg['host']}. The form loads from {reg['host']} once you open it.</p>
+  <div class="reg-actions">
+    <button type="button" class="btn btn-primary" data-register>Open the registration form</button>
+    <a class="btn btn-ghost btn-sm" href="{esc(reg['url'])}" rel="noopener" target="_blank">Register on {reg['host']} instead</a>
+  </div>
+  <div class="reg-widget" hidden></div>
+</section>"""
+    elif reg:
+        register = f'<a class="btn btn-primary" href="{esc(reg["url"])}" rel="noopener" target="_blank">Register</a>'
 
     prog = ""
     if e["sessions"]:
@@ -333,8 +403,11 @@ def event_page(e: dict, today: date) -> str:
         items = "".join(
             f'<li class="deck"><span class="deck-title">{esc(d["title"])}'
             f'{" <span class=tag>Programme</span>" if d["programme"] else ""}</span>'
+            f'<span class="deck-actions">'
             f'<button type="button" class="btn btn-secondary btn-sm deck-open" data-deck="{d["id"]}" disabled>'
-            f'<span class="lock" aria-hidden="true"></span><span class="label">Sign in to open</span></button></li>'
+            f'<span class="lock" aria-hidden="true"></span><span class="label">Sign in to open</span></button>'
+            f'<button type="button" class="btn btn-ghost btn-sm deck-download" data-deck="{d["id"]}" data-mode="download" hidden>'
+            f'<span class="label">Download</span></button></span></li>'
             for d in e["decks"])
         decks = f"""<section class="block" id="presentations" data-event="{e['id']}">
   <h2 class="h4">Presentations</h2>
@@ -342,11 +415,15 @@ def event_page(e: dict, today: date) -> str:
   <ul class="decks">{items}</ul>
 </section>"""
 
+    has_picture = bool(asset and asset not in IG_NO_PICTURE)
+    hero_style = f' style="--hero-img:url({SITE_BASE}assets/img/ig/{asset}.webp)"' if has_picture else ""
+    hero_icon = icon(asset, "hero-icon") if asset else ""
     body = f"""
-<section class="hero hero-event">
+<section class="hero hero-event{' hero-photo' if has_picture else ''}"{hero_style}>
   <div class="wrap">
-    <p class="crumbs"><a href="../../">All events</a></p>
-    <p class="sfr-sub01 eyebrow">{KIND_LABEL[e['kind']]}</p>
+    <p class="crumbs"><a href="{up}">All events</a></p>
+    {hero_icon}
+    <p class="sfr-sub01 eyebrow">{KIND_LABEL[e['kind']]}{(' &middot; ' + esc(igs[0])) if len(igs) == 1 else ''}</p>
     <h1>{esc(e['title'])}</h1>
     <p class="hero-date">{esc(fmt_date(e['date'], e['year']))}</p>
   </div>
@@ -354,6 +431,7 @@ def event_page(e: dict, today: date) -> str:
 <div class="wrap event-grid">
   <article class="event-main">
     {paragraphs(e['summary']) and '<section class="block summary">' + paragraphs(e['summary']) + '</section>'}
+    {reg_block}
     {prog}
     {decks}
   </article>

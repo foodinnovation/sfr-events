@@ -155,13 +155,19 @@
       b.classList.toggle("is-open", allowed);
       $(".label", b).textContent = !session ? "Sign in to open" : allowed ? "Open" : "Not available";
     });
+    $$(".deck-download", sec).forEach(function (b) { b.hidden = !allowed; });
     if (session && !allowed) {
       note.textContent = "Your account has no access to this meeting's presentations. They are available to members and to registered participants of this meeting.";
       note.classList.remove("ok");
     } else if (allowed) {
-      note.textContent = "You have access to these presentations. They open in your browser; the viewer also lets you download the file.";
+      note.textContent = "You have access to these presentations. Open shows them in your browser; Download saves the file.";
       note.classList.add("ok");
     }
+  }
+
+  function failed(res) {
+    toast(res && res.status === 403 ? "No access to this presentation." :
+          res && res.status === 401 ? "Please sign in again." : "The file is not available right now.");
   }
 
   $$(".deck-open").forEach(function (b) {
@@ -174,15 +180,75 @@
           $(".label", b).textContent = "Open";
           if (res.status === 200 && res.body.url) {
             if (win) win.location = res.body.url; else location.href = res.body.url;
-          } else {
-            if (win) win.close();
-            toast(res.status === 403 ? "No access to this presentation." :
-                  res.status === 401 ? "Please sign in again." : "The file is not available right now.");
-          }
-        }).catch(function () { if (win) win.close(); toast("The file is not available right now."); });
+          } else { if (win) win.close(); failed(res); }
+        }).catch(function () { if (win) win.close(); failed(null); });
       });
     });
   });
+
+  $$(".deck-download").forEach(function (b) {
+    b.addEventListener("click", function () {
+      sb.auth.getSession().then(function (r) {
+        var s = r.data.session; if (!s) { openDialog(); return; }
+        $(".label", b).textContent = "Preparing ...";
+        call("id=" + encodeURIComponent(b.dataset.deck) + "&mode=download", s).then(function (res) {
+          $(".label", b).textContent = "Download";
+          if (res.status === 200 && res.body.url) {
+            var a = document.createElement("a");   // the link is short-lived and pre-authorised
+            a.href = res.body.url; a.rel = "noopener";
+            if (res.body.filename) a.download = res.body.filename;
+            document.body.appendChild(a); a.click(); a.remove();
+          } else failed(res);
+        }).catch(function () { $(".label", b).textContent = "Download"; failed(null); });
+      });
+    });
+  });
+
+  /* ------------------------------------------------------------------ registration */
+  // ti.to and Eventbrite scripts load only when a visitor asks for the form, so a plain visit
+  // to the calendar makes no request to third parties.
+  var reg = $("#registration");
+  function loadScript(src) {
+    return new Promise(function (ok, fail) {
+      var el = document.createElement("script");
+      el.src = src; el.async = true; el.onload = ok; el.onerror = fail;
+      document.head.appendChild(el);
+    });
+  }
+  function openRegistration() {
+    if (!reg) return;
+    reg.scrollIntoView({ behavior: "smooth", block: "start" });
+    var box = $(".reg-widget", reg);
+    if (reg.dataset.loaded) return;
+    reg.dataset.loaded = "1";
+    box.hidden = false;
+    box.innerHTML = '<p class="muted">Loading the registration form ...</p>';
+    var ref = reg.dataset.ref, done;
+    if (reg.dataset.provider === "tito") {
+      done = loadScript("https://js.tito.io/v2").then(function () {
+        box.innerHTML = "";
+        var w = document.createElement("tito-widget");
+        w.setAttribute("event", ref);
+        box.appendChild(w);
+      });
+    } else {
+      done = loadScript("https://www.eventbrite.com/static/widgets/eb_widgets.js").then(function () {
+        box.innerHTML = '<div id="eb-widget"></div>';
+        window.EBWidgets.createWidget({ widgetType: "checkout", eventId: ref,
+          iframeContainerId: "eb-widget", iframeContainerHeight: 640 });
+      });
+    }
+    done.then(function () {
+      var first = $(".reg-actions .btn-primary", reg); if (first) first.hidden = true;
+    }).catch(function () {
+      delete reg.dataset.loaded;
+      box.innerHTML = '<p class="form-message error">The form could not be loaded. Please use the link to register directly.</p>';
+    });
+  }
+  $$("[data-register]").forEach(function (b) {
+    b.addEventListener("click", function (ev) { ev.preventDefault(); openRegistration(); });
+  });
+  if (reg && location.hash === "#register") openRegistration();
 
   function refresh(session) {
     if (!session) { access = null; renderAccount(null); renderDecks(null); return; }

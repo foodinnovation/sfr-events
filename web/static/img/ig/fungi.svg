@@ -1,0 +1,8 @@
+<?xml version="1.0"?><svg id="Vektor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 2400" xmlns:c2pa="http://c2pa.org/manifest">
+  <defs></defs>
+  <line class="cls-1" fill="none" stroke="#030a21" stroke-width="80" stroke-miterlimit="10" x1="1400" y1="1960" x2="1000" y2="1960"></line>
+  <line class="cls-1" fill="none" stroke="#030a21" stroke-width="80" stroke-miterlimit="10" x1="1440" y1="1320" x2="1440" y2="1920"></line>
+  <line class="cls-1" fill="none" stroke="#030a21" stroke-width="80" stroke-miterlimit="10" x1="960" y1="1920" x2="960" y2="1320"></line>
+  <path class="cls-1" fill="none" stroke="#030a21" stroke-width="80" stroke-miterlimit="10" d="M1133.03,437.53h133.93c353.23,0,640,286.77,640,640v112.87H493.03v-112.87c0-353.23,286.77-640,640-640Z"></path>
+  <polyline class="cls-1" fill="none" stroke="#030a21" stroke-width="80" stroke-miterlimit="10" points="1640 1220 1640 1360 760 1360 760 1220"></polyline>
+</svg>

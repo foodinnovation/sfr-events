@@ -154,3 +154,30 @@ a.item-title:hover { color: var(--text-link); text-decoration: underline; }
   input[type="search"] { min-width: 0; flex: 1; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Innovation Group icons and pictures (Design System 2026, assets/icons/ig and assets/visuals) */
+.ig-icon, .hero-icon { display: inline-block; background: currentColor; flex: none;
+  -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat; }
+.ig-icon { width: 16px; height: 16px; margin: -2px 6px -2px 0; }
+.tag { display: inline-flex; align-items: center; }
+.hero-icon { width: 56px; height: 56px; color: var(--sfr-white); margin-bottom: var(--space-4); }
+.hero-photo { position: relative; padding: var(--space-20, 80px) 0 var(--space-12);
+  background: var(--scrim-left), var(--scrim-bottom), var(--hero-img) center / cover no-repeat, var(--sfr-black); }
+.hero-photo .eyebrow { color: var(--sfr-cyan); }
+
+/* Presentations: open in the browser viewer, or download */
+.deck-actions { display: flex; align-items: center; gap: var(--space-2); flex: none; }
+.deck-download { padding-left: var(--space-2); padding-right: var(--space-2); }
+
+/* Registration, embedded from ti.to or Eventbrite on request */
+.registration { padding: var(--space-6); background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); }
+.reg-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+.reg-widget { margin-top: var(--space-4); min-height: 120px; }
+.reg-widget iframe { width: 100%; border: 0; }
+.facts dd a { color: var(--text-heading); }
+.facts dd a:hover { color: var(--text-link); }
+
+@media (max-width: 860px) {
+  .hero-photo { background: var(--scrim-bottom), linear-gradient(rgb(3 10 33/.35), rgb(3 10 33/.35)), var(--hero-img) center / cover no-repeat, var(--sfr-black); }
+  .deck { flex-wrap: wrap; }
+}
