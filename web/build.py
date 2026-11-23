@@ -28,7 +28,7 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import psycopg
-from urllib.parse import quote_plus
+from urllib.parse import quote, quote_plus
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT.parent))
@@ -38,6 +38,7 @@ SUPABASE_URL = "https://iudsjtrdtncqqhswcnfu.supabase.co"
 PUBLISHABLE_KEY = "sb_publishable_o-EAN8xKYr-dKhcoflQ5SQ_49go67yT"   # public by design
 SITE_BASE = os.environ.get("SITE_BASE", "/sfr-events/")   # path of the site root on its host
 ORG = "Swiss Food Research"
+CONTACT = "contact@swissfoodresearch.ch"
 
 IG_NAMES = {   # English display names; wiki names are German
     1: "Aquaculture", 2: "Grains & Baked Goods", 3: "Coffee", 4: "Packaging", 5: "Insects",
@@ -292,7 +293,7 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
   <div class="wrap footer-row">
     <img src="{up}assets/img/logo-sfr-white.svg" alt="{ORG}" height="48">
     <p>Presentations are available to members of {ORG} and to registered participants of each event.
-    Questions: <a href="mailto:contact@swissfoodresearch.ch">contact@swissfoodresearch.ch</a></p>
+    Questions: <a href="mailto:{CONTACT}">{CONTACT}</a></p>
     <p class="sfr-note"><a href="https://www.swissfoodresearch.ch/">{ORG}</a></p>
   </div>
 </footer>
@@ -402,6 +403,26 @@ def index_page(events: list[dict], today: date) -> str:
     return shell(f"Events | {ORG}", body, 0)
 
 
+# --------------------------------------------------------------------------- programme not yet out
+
+def programme_pending(e: dict, igs: list[str]) -> str:
+    """Upcoming IG meeting without a published programme: say it is in preparation with the
+    steering board and invite topic ideas by email, with the subject naming the group."""
+    group = " and ".join(igs)
+    noun = "Innovation Group" if len(igs) == 1 else "Innovation Groups"
+    board = "steering board" if len(igs) == 1 else "steering boards"
+    subject = f"Topic idea for {noun} {group}"
+    body = f"Meeting: {e['title']} ({fmt_date(e['date'], e['year'])})\n\nMy topic idea:\n"
+    href = f"mailto:{CONTACT}?subject={quote(subject)}&body={quote(body)}"
+    return f"""<section class="block programme-pending">
+  <h2 class="h4">Programme</h2>
+  <p>We are preparing the programme together with the {board} of the {noun} {esc(group)}.
+  If you have a topic or a speaker in mind, tell us.</p>
+  <p><a class="btn btn-secondary" href="{esc(href)}">Suggest a topic</a></p>
+  <p class="muted">Or write to <a href="mailto:{CONTACT}">{CONTACT}</a>.</p>
+</section>"""
+
+
 # --------------------------------------------------------------------------- event page
 
 def event_page(e: dict, today: date) -> str:
@@ -448,6 +469,8 @@ def event_page(e: dict, today: date) -> str:
                         f'<span class="p-body"><span class="p-title">{esc(s["title"])}</span>'
                         f'{f"<span class=p-who>{who}</span>" if who else ""}</span></li>')
         prog = f'<section class="block"><h2 class="h4">Programme</h2><ol class="programme">{"".join(rows)}</ol></section>'
+    elif upcoming and e["kind"] == "ig" and igs:
+        prog = programme_pending(e, igs)
 
     decks = ""
     if e["decks"] and not upcoming:

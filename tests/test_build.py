@@ -72,3 +72,39 @@ def test_knowledge_page_is_an_empty_members_shell():
     assert "fonts.googleapis" not in html and "cdn." not in html
     assert 'class="kn-page"' in html
     assert "—" not in html
+
+
+def _ev(**kw):
+    from datetime import date
+    e = dict(id=1, kind="ig", title="15th Meeting of the Innovation Group Bioconversion", date=date(2026, 12, 3),
+             year=2026, igs={9}, location=None, url=None, summary=None, decks=[], sessions=[], start=None, end=None,
+             slug="x", source="monday")
+    e.update(kw)
+    return e
+
+
+def test_upcoming_ig_meeting_without_programme_invites_topic_ideas():
+    from datetime import date
+    from urllib.parse import unquote
+    html = b.event_page(_ev(), date(2026, 11, 23))
+    assert "We are preparing the programme together with the steering board of the Innovation Group Bioconversion" in html
+    assert "Suggest a topic" in html
+    assert "mailto:contact@swissfoodresearch.ch?subject=Topic%20idea%20for%20Innovation%20Group%20Bioconversion" in html
+    assert "15th Meeting of the Innovation Group Bioconversion" in unquote(html)
+
+
+def test_no_topic_invitation_once_programme_is_out_past_or_not_an_ig_meeting():
+    from datetime import date
+    today = date(2026, 11, 23)
+    with_prog = _ev(sessions=[dict(time="13:00", title="Welcome", speakers=[])])
+    assert "Suggest a topic" not in b.event_page(with_prog, today)
+    assert "Suggest a topic" not in b.event_page(_ev(date=date(2026, 10, 1), year=2026), today)
+    assert "Suggest a topic" not in b.event_page(_ev(kind="external", igs=set()), today)
+    assert "Suggest a topic" not in b.event_page(_ev(igs=set()), today)   # e.g. Members Webinar
+
+
+def test_joint_meeting_names_both_groups():
+    from datetime import date
+    html = b.event_page(_ev(igs={9, 7}), date(2026, 11, 23))
+    assert "steering boards of the Innovation Groups Proteins4Future and Bioconversion" in html
+    assert "Topic%20idea%20for%20Innovation%20Groups%20Proteins4Future%20and%20Bioconversion" in html
