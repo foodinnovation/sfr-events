@@ -329,7 +329,7 @@ def list_item(e: dict, today: date) -> str:
     extra = '<span class="item-flag">Presentations</span>' if has_decks else ""
     search = " ".join([e["title"] or "", e["location"] or "", " ".join(igs), KIND_LABEL[e["kind"]]]).lower()
     return f"""<li class="item" data-kind="{e['kind']}" data-igs="{' '.join(str(i) for i in sorted(e['igs']))}" data-search="{esc(search)}">
-  <div class="datebox{' datebox-year' if not e['date'] else ''}"><span class="d">{day}</span><span class="m">{mon}</span><span class="y">{yr}</span></div>
+  <div class="datebox{' datebox-year' if not e['date'] else ''}{' datebox-sfr' if e['kind'] != 'external' else ''}"><span class="d">{day}</span><span class="m">{mon}</span><span class="y">{yr}</span></div>
   <div class="item-body">
     <div class="tags">{''.join(tags)}{extra}</div>
     {link}

@@ -181,3 +181,8 @@ a.item-title:hover { color: var(--text-link); text-decoration: underline; }
   .hero-photo { background: var(--scrim-bottom), linear-gradient(rgb(3 10 33/.35), rgb(3 10 33/.35)), var(--hero-img) center / cover no-repeat, var(--sfr-black); }
   .deck { flex-wrap: wrap; }
 }
+
+/* SFR events and Innovation Group meetings: the SFR symbol, faded, behind the date */
+.datebox-sfr { position: relative; overflow: hidden; isolation: isolate; }
+.datebox-sfr::before { content: ""; position: absolute; z-index: -1; inset: 8px;
+  background: url(img/symbol-sfr-black.svg) center / contain no-repeat; opacity: .14; }
