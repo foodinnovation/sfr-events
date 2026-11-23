@@ -163,6 +163,9 @@ def test_group_kinds():
     ("6th Meeting of the Innovation Future Proof Farming", {12}),
     ("15th Meeting of the Innovation Group Proteins4Future", {7}),
     ("Members Webinar", set()),
+    ("14. Treffen IG Digi", {6}),
+    ("12. Treffen IG Biocon", {9}),
+    ("57. Treffen der IG Kakao & Schokolade", {10}),
 ])
 def test_detect_igs(name, igs):
     assert set(detect_igs(name)) == igs
