@@ -85,7 +85,7 @@ hour or two before the permission works.
 4. Authentication > **URL Configuration**
    * Site URL: `https://foodinnovation.github.io/sfr-events/`
    * Redirect URLs: `https://foodinnovation.github.io/sfr-events/**`,
-     `https://events.swissfoodresearch.ch/**`, `http://localhost:8000/**`
+     `https://hub.swissfoodresearch.ch/**`, `http://localhost:8000/**`
 
 ## E. Test
 

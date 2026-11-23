@@ -250,12 +250,18 @@
   });
   if (reg && location.hash === "#register") openRegistration();
 
+  /* other parts of the hub (the knowledge tab) listen for sign-in changes */
+  window.SFR = { sb: sb, openDialog: openDialog, toast: toast };
+  function announce(session) {
+    document.dispatchEvent(new CustomEvent("sfr:session", { detail: { session: session, access: access } }));
+  }
+
   function refresh(session) {
-    if (!session) { access = null; renderAccount(null); renderDecks(null); return; }
+    if (!session) { access = null; renderAccount(null); renderDecks(null); announce(null); return; }
     call("me=1", session).then(function (res) {
       access = res.status === 200 ? res.body : null;
-      renderAccount(session); renderDecks(session);
-    }).catch(function () { access = null; renderAccount(session); renderDecks(session); });
+      renderAccount(session); renderDecks(session); announce(session);
+    }).catch(function () { access = null; renderAccount(session); renderDecks(session); announce(session); });
   }
 
   sb.auth.onAuthStateChange(function (event, session) {

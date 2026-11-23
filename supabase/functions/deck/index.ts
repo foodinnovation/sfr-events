@@ -17,7 +17,7 @@ const sql = postgres(Deno.env.get("SUPABASE_DB_URL")!, { max: 3, prepare: false 
 const auth = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!);
 
 const ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ??
-  "https://foodinnovation.github.io,https://events.swissfoodresearch.ch,https://www.swissfoodresearch.ch,http://localhost:8000")
+  "https://foodinnovation.github.io,https://hub.swissfoodresearch.ch,https://www.swissfoodresearch.ch,http://localhost:8000")
   .split(",").map((s) => s.trim());
 
 function cors(req: Request): Record<string, string> {

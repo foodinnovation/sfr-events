@@ -225,3 +225,36 @@ def test_page_builds_from_synced_data(db, tmp_path):
     pages = list((tmp_path / "site" / "events").glob("*/index.html"))
     assert pages and (tmp_path / "site" / "index.html").is_file()
     assert any("Presentations" in p.read_text() for p in pages)
+
+
+def test_knowledge_write_and_access(db):
+    from sync import knowledge as k
+    radicle = {
+        "articles": [("soil", "Soil", "environment", "Soil health", "## Intro\nText.",
+                      ["finding"], ["water"], ["snf:1"], [], "increasing", "2026-07-15")],
+        "projects": [("snf:1", "snf", "Soil microbes", "A summary about soil microbes.", ["soil"], 4,
+                      "SNF", "2024-01-01", "2027-12-31", "running", 450000.0, "ETH", "Jane Doe", None,
+                      "https://p3.snf.ch/project-1")],
+        "gaps": [("g1", "soil", "No long-term soil carbon trials in the Jura.", 4, "1-2 M", "evidence")],
+    }
+    inst = [dict(id="9", name="Innovation project", funder="Innosuisse", stage=None, link=None,
+                 max_funding_chf=None, project_topic="any", impact_area=None, location="CH", active_2026=True)]
+    with psycopg.connect(db) as c, c.cursor() as cur:
+        report = {}
+        k.write(cur, radicle, inst, report)
+        k.write(cur, radicle, inst, report)          # idempotent: replaces, never duplicates
+        assert report["counts"]["knowledge_projects"] == 1
+        cur.execute("select count(*) from knowledge.project where fts @@ to_tsquery('english', 'microbe')")
+        assert cur.fetchone()[0] == 1
+        cur.execute("select count(*) from knowledge.contact where fallback")
+        assert cur.fetchone()[0] == 1
+        # members and staff read; participants and strangers do not
+        for email, ok in [("a@member.ch", True), ("staff.test@swissfoodresearch.ch", True),
+                          ("anna@extern.ch", False), ("x@gone.ch", False), ("x@gmail.com", False)]:
+            cur.execute("select knowledge.can_read(%s)", [email])
+            assert cur.fetchone()[0] is ok, email
+        # monday hiccup (no instruments read) keeps the previous instruments
+        k.write(cur, None, [], report)
+        cur.execute("select count(*) from knowledge.instrument")
+        assert cur.fetchone()[0] == 1
+        c.rollback()

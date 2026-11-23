@@ -1,7 +1,11 @@
 # sfr-events
 
-The Swiss Food Research event calendar: upcoming events, the archive back to 2015, and the
-presentation decks for members and participants.
+The Swiss Food Research hub (planned address: hub.swissfoodresearch.ch), with two tabs:
+
+* **Events**: upcoming events, the archive back to 2015, and the presentation decks for
+  members and participants.
+* **Radicle – Knowledge**: radicle's topic articles, the ~6,600 relevant funded projects
+  and a funding finder, for members and staff only.
 
 Staff edit events in one place only: the monday board **Events Planung**. Everything else
 follows from there.
@@ -38,6 +42,7 @@ SharePoint decks (wiki) ─┘                                      │
 |---|---|
 | `MONDAY_TOKEN` | monday API token (read access to Events Planung and Events attendees) |
 | `SUPABASE_DB_PASSWORD` | Password of the database login `events_job` (set once in the ig-wiki SQL editor with `alter role events_job with login password '...'`; to change it later, create a new role rather than rotating, because the Supabase pooler caches passwords) |
+| `RADICLE_DB_PASSWORD` | Password of the read-only login `knowledge_reader` on the radicle database (set once in the radicle SQL editor with `alter role knowledge_reader with login password '...'`). Without it the knowledge tab keeps its last copy and only the funding instruments refresh |
 | `ANTHROPIC_API_KEY` | Claude API key for the English translations (optional; without it texts stay in the original language) |
 
 ## Running it
@@ -77,6 +82,21 @@ presentations), and the archive back to 2015. Partner events link to the partner
 Fonts and the sign-in library are bundled; the page loads nothing from third parties.
 Published by the same workflow to GitHub Pages whenever something changed.
 
+## Radicle – Knowledge
+
+The tab's page (`/knowledge/`) is an empty shell on the public site. Its content loads after
+sign-in from the Supabase function `knowledge`, which admits members (exact member domain) and
+staff only; event participants are refused. The function reads schema `knowledge` in ig-wiki,
+which the sync job refills from:
+
+* radicle's Supabase copy (`wiki_articles`, `projects` with `stage_gate = 'passed'`,
+  `white_spots`), through the read-only login `knowledge_reader`. Radicle's own compile step
+  pushes to that copy, so the tab is as current as radicle's last pipeline run;
+* the monday board Funding Schemes (1737639790) for the funding finder's programmes;
+* the contact routing in `sync/knowledge.py` (names and roles only, no email addresses).
+
+A failure here never stops the event sync: it shows as a warning on the run and in the report.
+
 ## Layout
 
 * `sync/rules.py`: business rules (types, publishing, access statuses, matching)
@@ -85,5 +105,7 @@ Published by the same workflow to GitHub Pages whenever something changed.
 * `sync/run.py`: the sync itself
 * `web/`: page build (`build.py`) and static assets (styles, script, logo, fonts)
 * `supabase/migrations/`: the `events` schema and access functions
-* `supabase/functions/`: `deck` (access check, SharePoint link) and `send-email` (sign-in emails from contact@)
+* `sync/knowledge.py`: copy for the knowledge tab (radicle, Funding Schemes, contacts)
+* `supabase/functions/`: `deck` (access check, SharePoint link), `knowledge` (knowledge tab API),
+  `sync-trigger` (starts the sync) and `send-email` (sign-in emails from contact@)
 * `docs/setup-sign-in.md`: one-off sign-in setup (Entra, Exchange, Supabase)

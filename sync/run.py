@@ -24,7 +24,7 @@ from types import SimpleNamespace
 import psycopg
 from psycopg.types.json import Jsonb
 
-from . import translate
+from . import knowledge, translate
 from .monday import ATTENDEES_BOARD, Monday
 from .rules import (
     Candidate, detect_igs, is_published, kind_for_group, match_group, meeting_igs,
@@ -98,6 +98,14 @@ def main() -> int:
                 else:
                     report["translated"] = "skipped"
                 summarise(cur, report)
+            # Radicle – Knowledge: own savepoint, so a radicle problem never blocks the events
+            try:
+                with conn.transaction(), conn.cursor() as kcur:
+                    knowledge.run(kcur, mon, report)
+            except Exception as exc:  # noqa: BLE001
+                report["knowledge_error"] = str(exc)[:500]
+                print(f"::warning::Radicle - Knowledge copy failed; events synced as usual: {exc}",
+                      flush=True)
             if args.dry_run:
                 conn.rollback()
                 print("dry run: rolled back", flush=True)
@@ -442,6 +450,8 @@ def write_report(report):
         json.dump(report, f, indent=1, default=str, ensure_ascii=False)
     lines = [f"# Sync report {report['today']}" + (" (dry run)" if report.get("dry_run") else ""), ""]
     lines += [f"- {k}: {v}" for k, v in report["counts"].items()]
+    if report.get("knowledge_error"):
+        lines += ["", "## Radicle - Knowledge copy failed", "", report["knowledge_error"]]
     lines += ["", "## Attendee groups", "", "| Group | Match | Note |", "|---|---|---|"]
     for r in report.get("attendee_groups", []):
         lines.append(f"| {r['group']} | {r['method']} | {r['note'] or ''} |")

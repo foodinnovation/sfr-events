@@ -245,8 +245,19 @@ def signup(url: str | None) -> dict | None:
 
 # --------------------------------------------------------------------------- page shell
 
-def shell(title: str, body: str, depth: int, description: str = "") -> str:
+KNOWLEDGE = "Radicle \u2013 Knowledge"
+
+
+def shell(title: str, body: str, depth: int, description: str = "", tab: str = "events",
+          scripts: tuple[str, ...] = ()) -> str:
     up = "../" * depth
+    def tab_link(key, href, label):
+        on = key == tab
+        cls = "tab is-on" if on else "tab"
+        cur = ' aria-current="page"' if on else ""
+        return f'<a class="{cls}" href="{href}"{cur}>{label}</a>'
+    tabs = tab_link("events", up or "./", "Events") + tab_link("knowledge", f"{up}knowledge/", KNOWLEDGE)
+    extra = "".join(f'<script src="{up}assets/{js}"></script>' for js in scripts)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -265,7 +276,7 @@ def shell(title: str, body: str, depth: int, description: str = "") -> str:
 <header class="site-header">
   <div class="wrap header-row">
     <a class="logo" href="{up}" aria-label="{ORG} events, home"><img src="{up}assets/img/logo-sfr-black.svg" alt="{ORG}" height="52"></a>
-    <span class="header-title sfr-note">Events</span>
+    <nav class="tabs" aria-label="Sections">{tabs}</nav>
     <div class="account" id="account">
       <button class="btn btn-secondary btn-sm" id="signin-open" type="button">Sign in</button>
     </div>
@@ -304,6 +315,7 @@ def shell(title: str, body: str, depth: int, description: str = "") -> str:
 <script>window.SFR_EVENTS = {{ supabaseUrl: "{SUPABASE_URL}", key: "{PUBLISHABLE_KEY}" }};</script>
 <script src="{up}assets/supabase.js"></script>
 <script src="{up}assets/app.js"></script>
+{extra}
 </body>
 </html>
 """
@@ -481,6 +493,29 @@ def event_page(e: dict, today: date) -> str:
     return shell(f"{e['title']} | {ORG}", body, 2, desc)
 
 
+# --------------------------------------------------------------------------- knowledge tab
+
+def knowledge_page() -> str:
+    """Static shell only: radicle content loads in the browser after a member signs in
+    (functions/v1/knowledge), so none of it is ever published on this public site."""
+    body = f"""
+<section class="hero hero-compact">
+  <div class="wrap">
+    <p class="sfr-sub01 eyebrow">{KNOWLEDGE}</p>
+    <h1>Swiss agro-food research, mapped</h1>
+    <p class="lead">Topic articles, funded research projects and a funding finder, compiled by radicle
+    from ARAMIS, SNF and Regiosuisse. For members of {ORG}.</p>
+  </div>
+</section>
+<div class="wrap kn" id="kn" aria-live="polite">
+  <p class="muted kn-loading">Loading ...</p>
+  <noscript><p>This section needs JavaScript and a member sign-in.</p></noscript>
+</div>"""
+    return shell(f"{KNOWLEDGE} | {ORG}", body, 1,
+                 "Radicle: Swiss agro-food research topics, funded projects and a funding finder for members "
+                 f"of {ORG}.", tab="knowledge", scripts=("knowledge.js",))
+
+
 # --------------------------------------------------------------------------- build
 
 def public_json(events: list[dict]) -> list[dict]:
@@ -503,6 +538,8 @@ def build(out: Path, events: list[dict], today: date) -> str:
             p = out / "events" / e["slug"]
             p.mkdir(parents=True, exist_ok=True)
             (p / "index.html").write_text(event_page(e, today))
+    (out / "knowledge").mkdir()
+    (out / "knowledge" / "index.html").write_text(knowledge_page())
     (out / "404.html").write_text(shell(f"Not found | {ORG}", '<div class="wrap block"><h1>Page not found</h1>'
                                         f'<p><a href="{SITE_BASE}">Back to all events</a></p></div>', 0))
     (out / ".nojekyll").write_text("")
