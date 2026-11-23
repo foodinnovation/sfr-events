@@ -97,6 +97,8 @@ which the sync job refills from:
 
 A failure here never stops the event sync: it shows as a warning on the run and in the report.
 
+The tab runs radicle's own Obsidian-style reader (web/static/knowledge/, adapted from agro-food-intelligence src/api/static/wiki): topic tree with gap-severity dots and project counts, a tab per opened topic, Cmd+K / Ctrl+K quick switcher across topics and projects, graph view, research gaps on each topic page and the funding finder. The members-only function functions/v1/knowledge speaks radicle's wiki API through `?path=`.
+
 ## Layout
 
 * `sync/rules.py`: business rules (types, publishing, access statuses, matching)

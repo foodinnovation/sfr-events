@@ -91,7 +91,7 @@ def read_radicle(conn) -> dict:
                        from public.projects where stage_gate = 'passed'""")
         projects = cur.fetchall()
         cur.execute("""select spot_id, topic_slug, description, nullif(severity, '')::int,
-                              cost_range_chf, evidence_block
+                              cost_range_chf, evidence_block, gap_reason
                        from public.white_spots
                        where not coalesce(dismissed, false) and coalesce(description, '') <> ''""")
         gaps = cur.fetchall()
@@ -134,7 +134,7 @@ def write(cur, radicle: dict | None, instruments: list[dict], report: dict) -> N
                 [[*r[:4], Jsonb(r[4]), *r[5:]] for r in radicle["projects"]])
         cur.execute("delete from knowledge.gap")
         _insert(cur, "gap", ["spot_id", "topic_slug", "description", "severity", "cost_range_chf",
-                             "evidence_block"], [list(r) for r in radicle["gaps"]])
+                             "evidence_block", "gap_reason"], [list(r) for r in radicle["gaps"]])
         counts["knowledge_articles"] = len(radicle["articles"])
         counts["knowledge_projects"] = len(radicle["projects"])
         counts["knowledge_gaps"] = len(radicle["gaps"])

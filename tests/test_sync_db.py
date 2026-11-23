@@ -235,7 +235,7 @@ def test_knowledge_write_and_access(db):
         "projects": [("snf:1", "snf", "Soil microbes", "A summary about soil microbes.", ["soil"], 4,
                       "SNF", "2024-01-01", "2027-12-31", "running", 450000.0, "ETH", "Jane Doe", None,
                       "https://p3.snf.ch/project-1")],
-        "gaps": [("g1", "soil", "No long-term soil carbon trials in the Jura.", 4, "1-2 M", "evidence")],
+        "gaps": [("g1", "soil", "No long-term soil carbon trials in the Jura.", 4, "1-2 M", "evidence", "unexplored")],
     }
     inst = [dict(id="9", name="Innovation project", funder="Innosuisse", stage=None, link=None,
                  max_funding_chf=None, project_topic="any", impact_area=None, location="CH", active_2026=True)]

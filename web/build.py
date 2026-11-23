@@ -249,15 +249,17 @@ KNOWLEDGE = "Radicle \u2013 Knowledge"
 
 
 def shell(title: str, body: str, depth: int, description: str = "", tab: str = "events",
-          scripts: tuple[str, ...] = ()) -> str:
+          scripts: tuple[str, ...] = (), styles: tuple[str, ...] = (), body_class: str = "") -> str:
     up = "../" * depth
     def tab_link(key, href, label):
         on = key == tab
-        cls = "tab is-on" if on else "tab"
+        cls = "hub-tab is-on" if on else "hub-tab"
         cur = ' aria-current="page"' if on else ""
         return f'<a class="{cls}" href="{href}"{cur}>{label}</a>'
     tabs = tab_link("events", up or "./", "Events") + tab_link("knowledge", f"{up}knowledge/", KNOWLEDGE)
     extra = "".join(f'<script src="{up}assets/{js}"></script>' for js in scripts)
+    extra_css = "".join(f'<link rel="stylesheet" href="{up}assets/{css}">' for css in styles)
+    body_attr = f' class="{body_class}"' if body_class else ""
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -270,13 +272,14 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
 <link rel="stylesheet" href="{up}assets/fonts.css">
 <link rel="stylesheet" href="{up}assets/tokens.css">
 <link rel="stylesheet" href="{up}assets/site.css">
+{extra_css}
 <link rel="icon" href="{up}assets/img/favicon.svg" type="image/svg+xml">
 </head>
-<body>
+<body{body_attr}>
 <header class="site-header">
   <div class="wrap header-row">
     <a class="logo" href="{up}" aria-label="{ORG} events, home"><img src="{up}assets/img/logo-sfr-black.svg" alt="{ORG}" height="52"></a>
-    <nav class="tabs" aria-label="Sections">{tabs}</nav>
+    <nav class="hub-tabs" aria-label="Sections">{tabs}</nav>
     <div class="account" id="account">
       <button class="btn btn-secondary btn-sm" id="signin-open" type="button">Sign in</button>
     </div>
@@ -496,24 +499,96 @@ def event_page(e: dict, today: date) -> str:
 # --------------------------------------------------------------------------- knowledge tab
 
 def knowledge_page() -> str:
-    """Static shell only: radicle content loads in the browser after a member signs in
-    (functions/v1/knowledge), so none of it is ever published on this public site."""
+    """Radicle's wiki reader (sidebar tree, tabs, Cmd+K, graph) as an empty shell: the content
+    loads in the browser after a member signs in (functions/v1/knowledge), so none of it is
+    ever published on this public site."""
+    finder_icon = ('<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" '
+                   'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/>'
+                   '<path d="M20 20l-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>')
     body = f"""
-<section class="hero hero-compact">
-  <div class="wrap">
-    <p class="sfr-sub01 eyebrow">{KNOWLEDGE}</p>
-    <h1>Swiss agro-food research, mapped</h1>
-    <p class="lead">Topic articles, funded research projects and a funding finder, compiled by radicle
-    from ARAMIS, SNF and Regiosuisse. For members of {ORG}.</p>
+<div class="kn-app">
+<div id="app">
+  <aside id="sidebar" aria-label="Topic navigation">
+    <div class="sidebar-head">
+      <div class="brand" id="brand-home" title="Home" role="button" tabindex="0">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M12 3v18"/><path d="M12 9c0-3-2.5-5-5.5-5C6.5 7 9 9 12 9z"/><path d="M12 14c0-3 2.5-5 5.5-5C17.5 12 15 14 12 14z"/>
+          </svg>
+        </span>
+        <span class="brand-text"><span class="brand-title">Radicle</span><span class="brand-sub">KNOWLEDGE</span></span>
+      </div>
+      <button id="sidebar-close" class="icon-btn only-narrow" title="Close sidebar" aria-label="Close sidebar">&times;</button>
+    </div>
+    <div class="sidebar-search">
+      <input id="tree-filter" type="search" placeholder="Filter topics ..." autocomplete="off" spellcheck="false">
+      <button id="open-switcher-hint" class="kbd-hint" title="Quick search (Cmd+K)">&#8984;K</button>
+    </div>
+    <nav class="side-tools" aria-label="Tools">
+      <button class="side-tool" id="nav-funding-finder" type="button"><span class="side-tool-ic" aria-hidden="true">{finder_icon}</span> Funding Finder</button>
+    </nav>
+    <div class="side-tree-label">Topics</div>
+    <nav id="topic-tree" class="topic-tree" aria-label="Topics"></nav>
+  </aside>
+  <div id="sidebar-scrim" class="scrim" hidden></div>
+
+  <section id="main" aria-label="Radicle content">
+    <div class="topbar">
+      <button id="sidebar-toggle" class="icon-btn" title="Toggle sidebar" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5h18M3 12h18M3 19h18"/></svg>
+      </button>
+      <div id="tabbar" class="tabbar" role="tablist"></div>
+      <button id="graph-toggle" class="icon-btn" title="Toggle graph view" aria-label="Toggle graph view">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="2.6"/><circle cx="18" cy="9" r="2.6"/><circle cx="10" cy="18" r="2.6"/><path d="M8.3 7.2l7 1.3M7 8.4l2 7.2M16.3 11l-4.6 5.3"/></svg>
+      </button>
+    </div>
+    <div id="content" class="content" tabindex="-1"></div>
+    <div class="statusbar"><span id="status-text"></span></div>
+  </section>
+
+  <aside id="graphpane" aria-label="Topic graph" hidden>
+    <div class="graph-head">
+      <span class="graph-title">Graph view</span>
+      <label class="local-toggle" title="Show only the current topic and its neighbours"><input type="checkbox" id="local-graph-toggle" checked> Local graph</label>
+      <label class="local-toggle" title="Also include neighbours of neighbours (2 hops out)"><input type="checkbox" id="graph-hops-toggle"> 2 hops</label>
+      <button id="graph-close" class="icon-btn" title="Close graph" aria-label="Close graph">&times;</button>
+    </div>
+    <div id="graph-canvas"></div>
+    <div class="graph-legend">
+      <span>Colour = domain</span>
+      <span><i class="ring ring-critical"></i>Critical gaps</span>
+      <span><i class="ring ring-mid"></i>Moderate</span>
+      <span>Size = projects</span>
+    </div>
+  </aside>
+</div>
+
+<div id="switcher" class="modal-overlay" hidden>
+  <div class="switcher-panel" role="dialog" aria-modal="true" aria-label="Quick search">
+    <input id="switcher-input" type="text" placeholder="Jump to a topic ... (type to search projects too)" autocomplete="off" spellcheck="false">
+    <div id="switcher-results" class="switcher-results"></div>
+    <div class="switcher-foot"><span><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate</span><span><kbd>&crarr;</kbd> open</span><span><kbd>esc</kbd> close</span></div>
   </div>
-</section>
-<div class="wrap kn" id="kn" aria-live="polite">
-  <p class="muted kn-loading">Loading ...</p>
-  <noscript><p>This section needs JavaScript and a member sign-in.</p></noscript>
+</div>
+
+<div id="auth-gate" class="modal-overlay auth-gate" hidden>
+  <div class="auth-card">
+    <div class="auth-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+    </div>
+    <h2>Sign in to open {KNOWLEDGE}</h2>
+    <p>For members of {ORG}.</p>
+    <button class="auth-link" type="button">Sign in</button>
+  </div>
+</div>
+<noscript><p class="wrap">This section needs JavaScript and a member sign-in.</p></noscript>
 </div>"""
     return shell(f"{KNOWLEDGE} | {ORG}", body, 1,
                  "Radicle: Swiss agro-food research topics, funded projects and a funding finder for members "
-                 f"of {ORG}.", tab="knowledge", scripts=("knowledge.js",))
+                 f"of {ORG}.", tab="knowledge", body_class="kn-page",
+                 styles=("knowledge/app.css",),
+                 scripts=("knowledge/vendor/marked.min.js", "knowledge/vendor/force-graph.min.js",
+                          "knowledge/app.js"))
 
 
 # --------------------------------------------------------------------------- build

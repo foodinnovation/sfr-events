@@ -59,3 +59,16 @@ def test_email_never_shown_as_speaker_name():
     out = b.public_speakers([{"name": "someone@example.org", "organisation": "Cosaic"},
                              {"name": "Matthias  Schultz", "organisation": "Givaudan"}])
     assert out == [{"name": "Cosaic", "organisation": ""}, {"name": "Matthias Schultz", "organisation": "Givaudan"}]
+
+
+def test_knowledge_page_is_an_empty_members_shell():
+    html = b.knowledge_page()
+    # radicle's layout: sidebar tree, tab bar, graph pane, quick switcher, sign-in gate
+    for el in ('id="topic-tree"', 'id="tabbar"', 'id="graphpane"', 'id="switcher"', 'id="auth-gate"',
+               'id="nav-funding-finder"'):
+        assert el in html
+    # libraries are bundled: no third-party requests
+    assert "knowledge/vendor/marked.min.js" in html and "knowledge/vendor/force-graph.min.js" in html
+    assert "fonts.googleapis" not in html and "cdn." not in html
+    assert 'class="kn-page"' in html
+    assert "—" not in html
