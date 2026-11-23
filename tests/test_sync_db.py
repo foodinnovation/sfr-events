@@ -201,3 +201,13 @@ def test_dry_run_changes_nothing(db, monkeypatch, tmp_path):
         EVENTS.pop()
     assert q(db, "select count(*) from events.event where title_src='Dry run event'")[0][0] == 0
     assert q(db, "select count(*) from events.sync_run")[0][0] == before
+
+
+def test_claim_dispatch_throttles_bursts(db):
+    with psycopg.connect(db, autocommit=True) as c:
+        claim = lambda: c.execute("select events.claim_dispatch('sync', '30 seconds')").fetchone()[0]
+        assert claim() is True
+        assert claim() is False                                  # second edit in the same burst
+        c.execute("update events.trigger_log set at = now() - interval '1 minute'")
+        assert claim() is True                                   # later edit starts a new run
+        assert c.execute("select events.claim_dispatch('health', '1 hour')").fetchone()[0] is True

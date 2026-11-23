@@ -1,8 +1,9 @@
 name: Sync and publish
 
 on:
-  schedule:
-    - cron: "7,37 * * * *"        # every 30 minutes
+  # Started by Supabase (supabase/functions/sync-trigger): at once when Events Planung changes on
+  # monday, and every 30 minutes by the Supabase scheduler. GitHub's own schedule never fired for
+  # this repository, so it is not used.
   workflow_dispatch:
     inputs:
       dry_run:

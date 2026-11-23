@@ -10,7 +10,7 @@ follows from there.
 
 ```
 monday: Events Planung ─┐
-monday: Events attendees ┼─► GitHub job (every 30 min) ─► Supabase ig-wiki, schema "events"
+monday: Events attendees ┼─► GitHub job (on change + every 30 min) ─► Supabase ig-wiki, schema "events"
 SharePoint decks (wiki) ─┘                                      │
                                                                ▼
                                       static page on GitHub Pages (phase 3)
@@ -42,8 +42,21 @@ SharePoint decks (wiki) ─┘                                      │
 
 ## Running it
 
-* Automatically every 30 minutes.
-* By hand: Actions > "Sync monday to Supabase" > Run workflow. Tick "Dry run" to see the
+* **On every change to Events Planung.** monday notifies the Supabase function `sync-trigger`
+  (12 webhooks: items, columns, names, groups, archive and delete, programme subitems), which
+  starts this workflow. Bursts of edits start one run: the function lets at most one start
+  through every 30 seconds, and GitHub queues at most one run behind the running one. A change
+  is live about four minutes later.
+* **Every 30 minutes as a backstop**, at :07 and :37, by the Supabase scheduler (pg_cron job
+  `sfr-events-sync`, see `supabase/scheduled/sync_schedule.sql`). It also catches changes on
+  the Events attendees board, which sends no notifications. The daily health check runs the
+  same way (`sfr-events-health`, 05:17 UTC).
+* GitHub's own schedule is not used: it never fired for this repository.
+* The function needs the Supabase secret `GITHUB_DISPATCH_TOKEN`: a fine-grained GitHub token
+  for this repository only, with the single permission "Actions: read and write". When it
+  expires, the sync stops; renew it and replace the secret. Status and the last starts:
+  `GET https://iudsjtrdtncqqhswcnfu.supabase.co/functions/v1/sync-trigger?status=1`.
+* By hand: Actions > "Sync and publish" > Run workflow. Tick "Dry run" to see the
   report without writing anything.
 * Each run writes a report (matches, published events, counts) to the run summary.
 

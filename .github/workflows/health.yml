@@ -1,9 +1,8 @@
 name: Health check
 
 on:
+  # Started daily at 05:17 UTC by the Supabase scheduler through supabase/functions/sync-trigger.
   workflow_dispatch:
-  schedule:
-    - cron: "17 5 * * *"     # daily
 
 jobs:
   deck:
