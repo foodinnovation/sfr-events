@@ -14,6 +14,35 @@
     setTimeout(function () { t.remove(); }, 3500);
   }
 
+  /* ------------------------------------------------------------------ ads (index) */
+  /* One ad in the upcoming list (config/ads.json): members and staff see a service, matched to
+     the Innovation Group filter or a general one; everyone else the membership ad. */
+  var adGroup = "", adRole = "public", adPick = null;
+  function placeAd() {
+    var list = $("#upcoming"); if (!list) return;
+    var ads = $$(".ad", list); if (!ads.length) return;
+    var choice = null;
+    if (adRole === "members") {
+      if (adGroup) choice = ads.filter(function (a) {
+        return (" " + (a.dataset.groups || "") + " ").indexOf(" " + adGroup + " ") >= 0;
+      })[0] || null;
+      if (!choice) {
+        var gen = ads.filter(function (a) { return a.hasAttribute("data-general"); });
+        if (!adPick && gen.length) adPick = gen[Math.floor(Math.random() * gen.length)];
+        choice = adPick;
+      }
+    } else {
+      choice = ads.filter(function (a) { return a.dataset.audience === "public"; })[0] || null;
+    }
+    var shown = $$(".item:not([hidden])", list);
+    ads.forEach(function (a) { a.hidden = true; });
+    if (!choice || !shown.length) return;
+    var slot = parseInt(list.dataset.adSlot, 10) || 3;
+    var after = shown[Math.min(slot - 1, shown.length) - 1];
+    after.parentNode.insertBefore(choice, after.nextSibling);
+    choice.hidden = false;
+  }
+
   /* ------------------------------------------------------------------ filters (index) */
   var filters = $("#filters");
   if (filters) {
@@ -47,6 +76,7 @@
       if (state.ig) u.set("group", state.ig);
       if (state.q) u.set("q", state.q);
       history.replaceState(null, "", location.pathname + (u.toString() ? "?" + u : "") + location.hash);
+      adGroup = state.ig; placeAd();
     };
     $$(".chip", filters).forEach(function (c) {
       c.addEventListener("click", function () { state.kind = c.dataset.kind; apply(); });
@@ -253,6 +283,8 @@
   /* other parts of the hub (the knowledge tab) listen for sign-in changes */
   window.SFR = { sb: sb, openDialog: openDialog, toast: toast };
   function announce(session) {
+    adRole = session && access && (access.access === "member" || access.access === "staff") ? "members" : "public";
+    placeAd();
     document.dispatchEvent(new CustomEvent("sfr:session", { detail: { session: session, access: access } }));
   }
 

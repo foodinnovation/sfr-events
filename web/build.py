@@ -354,7 +354,52 @@ def list_item(e: dict, today: date) -> str:
 </li>"""
 
 
-def index_page(events: list[dict], today: date) -> str:
+ADS_FILE = ROOT.parent / "config" / "ads.json"
+
+
+def load_ads(path: Path = ADS_FILE) -> dict:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {"enabled": False}
+
+
+def ad_cards(ads: dict) -> str:
+    """The events-list ads (config/ads.json), all hidden: app.js shows one. Members and staff
+    see a service, matched to the Innovation Group filter or a general one; everyone else sees
+    the membership ad. Nothing is shown when ads are switched off or JavaScript does not run."""
+    if not ads.get("enabled"):
+        return ""
+    services = {k: v for k, v in (ads.get("services") or {}).items() if v.get("enabled")}
+    groups: dict[str, list[str]] = defaultdict(list)
+    for ig, key in (ads.get("by_group") or {}).items():
+        if key in services:
+            groups[key].append(str(ig))
+    general = [k for k in ads.get("general") or [] if k in services]
+
+    def card(key: str, ad: dict, audience: str, attrs: str) -> str:
+        href = ad.get("href") or ""
+        ext = href.startswith("http")
+        target = ' target="_blank" rel="noopener"' if ext else ""
+        return f"""<li class="ad" hidden data-ad="{esc(key)}" data-audience="{audience}"{attrs}>
+  <p class="ad-label">{esc(ad.get("label"))}</p>
+  <p class="ad-head">{esc(ad.get("headline"))}</p>
+  <p class="ad-body">{esc(ad.get("body"))}</p>
+  <a class="btn btn-primary btn-sm" href="{esc(href)}"{target}>{esc(ad.get("cta"))}</a>
+</li>"""
+
+    out = []
+    m = ads.get("membership") or {}
+    if m.get("enabled"):
+        out.append(card("membership", m, "public", ""))
+    for key, ad in services.items():
+        attrs = f' data-groups="{" ".join(groups.get(key, []))}"' + (' data-general' if key in general else "")
+        out.append(card(key, ad, "members", attrs))
+    return "".join(out)
+
+
+def index_page(events: list[dict], today: date, ads: dict | None = None) -> str:
+    ads = load_ads() if ads is None else ads
     upcoming = [e for e in events if e["date"] and e["date"] >= today]
     past = [e for e in events if not (e["date"] and e["date"] >= today)]
     past.reverse()
@@ -391,7 +436,7 @@ def index_page(events: list[dict], today: date) -> str:
   </form>
   <section aria-labelledby="h-upcoming">
     <h2 id="h-upcoming" class="section-head">Upcoming</h2>
-    <ol class="list" id="upcoming">{''.join(list_item(e, today) for e in upcoming)}</ol>
+    <ol class="list" id="upcoming" data-ad-slot="{int(ads.get('slot') or 3)}">{''.join(list_item(e, today) for e in upcoming)}{ad_cards(ads)}</ol>
     <p class="empty" hidden>No upcoming events match your filters.</p>
   </section>
   <section aria-labelledby="h-archive">

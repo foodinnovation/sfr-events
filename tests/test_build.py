@@ -108,3 +108,31 @@ def test_joint_meeting_names_both_groups():
     html = b.event_page(_ev(igs={9, 7}), date(2026, 11, 23))
     assert "steering boards of the Innovation Groups Proteins4Future and Bioconversion" in html
     assert "Topic%20idea%20for%20Innovation%20Groups%20Proteins4Future%20and%20Bioconversion" in html
+
+
+def test_ads_follow_the_settings_file():
+    import json
+    from pathlib import Path
+    ads = json.loads(Path("config/ads.json").read_text())
+    html = b.ad_cards(ads)
+    assert 'data-ad="membership" data-audience="public"' in html
+    assert "https://www.swissfoodresearch.ch/en/membership-benefits/" in html and "280+" in html
+    assert 'data-ad="novel_food"' in html and 'data-groups="7 5 11 9"' in html
+    assert 'data-ad="coaching"' in html and "data-general" in html
+    assert html.count('class="ad" hidden') == 10
+    assert "—" not in html
+    # one service off: its card goes, its groups fall back to the general ads
+    ads["services"]["maas"]["enabled"] = False
+    assert 'data-ad="maas"' not in b.ad_cards(ads)
+    # all off
+    ads["enabled"] = False
+    assert b.ad_cards(ads) == ""
+
+
+def test_index_page_carries_ads_only_when_switched_on():
+    from datetime import date
+    on = b.index_page([], date(2026, 11, 23), ads={"enabled": True, "slot": 3, "membership": {
+        "enabled": True, "label": "L", "headline": "H", "body": "B", "cta": "C", "href": "https://x"}})
+    assert 'class="ad" hidden' in on and 'data-ad-slot="3"' in on
+    off = b.index_page([], date(2026, 11, 23), ads={"enabled": False})
+    assert 'class="ad"' not in off

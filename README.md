@@ -111,3 +111,19 @@ The tab runs radicle's own Obsidian-style reader (web/static/knowledge/, adapted
 * `supabase/functions/`: `deck` (access check, SharePoint link), `knowledge` (knowledge tab API),
   `sync-trigger` (starts the sync) and `send-email` (sign-in emails from contact@)
 * `docs/setup-sign-in.md`: one-off sign-in setup (Entra, Exchange, Supabase)
+
+## Ads on the events list
+
+`config/ads.json` holds every ad and its switches. One ad card sits in the upcoming list
+(`slot`, default 3rd place). Signed-in members and staff see a service: the one set in
+`by_group` when the list is filtered to that Innovation Group, otherwise one of `general` at
+random. Everyone else sees the membership ad.
+
+* All ads off: `"enabled": false` at the top.
+* One ad off: `"enabled": false` inside that ad. Groups that pointed to it fall back to the
+  general services.
+* Text and links: edit the ad's `label`, `headline`, `body`, `cta` and `href`. Copy comes from
+  the SFR Service Catalogue 2027.
+
+A push publishes the change in about 10 minutes.
+

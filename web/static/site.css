@@ -208,3 +208,14 @@ a.item-title:hover { color: var(--text-link); text-decoration: underline; }
   .hub-tabs { order: 3; width: 100%; border-left: 0; padding-left: 0; }
   .hero-compact h1 { font-size: var(--text-2xl); }
 }
+
+/* Ads in the events list (config/ads.json): one card in the upcoming list */
+.ad { margin: var(--space-4) 0; padding: var(--space-5) var(--space-6); border-radius: var(--radius-md);
+  background: var(--sfr-blue-01); color: var(--sfr-white); }
+.ad[hidden] { display: none; }
+.ad-label { margin: 0 0 var(--space-2); font-size: var(--text-3xs); font-weight: var(--weight-medium); text-transform: uppercase;
+  letter-spacing: var(--tracking-extended); color: var(--sfr-cyan); }
+.ad-head { margin: 0 0 var(--space-2); font-size: var(--text-lg); font-weight: var(--weight-bold); line-height: var(--leading-snug); color: var(--sfr-white); }
+.ad-body { margin: 0 0 var(--space-4); font-size: var(--text-sm); color: var(--sfr-paper-72); max-width: 60ch; }
+.ad .btn-primary { background: var(--sfr-cyan); color: var(--sfr-blue-01); border-color: var(--sfr-cyan); }
+.ad .btn-primary:hover { background: var(--sfr-white); border-color: var(--sfr-white); }

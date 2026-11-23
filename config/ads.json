@@ -1,0 +1,98 @@
+{
+  "_help": "Ads on the events list. 'enabled' switches all ads on or off; each ad has its own 'enabled'. Members (and staff) see a service, everyone else the membership ad. 'by_group' picks the service when the list is filtered to one Innovation Group (monday IG number); 'general' is shown otherwise, one at random. 'slot' is the position in the upcoming list. Text comes from the SFR Service Catalogue 2027.",
+  "enabled": true,
+  "slot": 3,
+  "membership": {
+    "enabled": true,
+    "label": "Swiss Food Research membership",
+    "headline": "Your organisation in 12 Innovation Groups, with 280+ member organisations",
+    "body": "Members join every Innovation Group meeting at no extra cost, open the presentations, and get coaching, funding support and Radicle – Knowledge. Non-members attend twice for free.",
+    "cta": "Become a member",
+    "href": "https://www.swissfoodresearch.ch/en/membership-benefits/"
+  },
+  "services": {
+    "coaching": {
+      "enabled": true,
+      "label": "1:1 Coaching",
+      "headline": "A neutral expert who sharpens your innovation question",
+      "body": "You leave with clear next steps, contacts and funding options.",
+      "cta": "Book a session",
+      "href": "https://www.swissfoodresearch.ch/de/agro-food-innovations-services/coaching/"
+    },
+    "funding": {
+      "enabled": true,
+      "label": "Funding Support",
+      "headline": "Over 100 funding instruments in Switzerland. We help you find the right one and win it",
+      "body": "Bring your project idea to a coaching session. We match it to the scheme and review your proposal before you submit.",
+      "cta": "Book a session",
+      "href": "https://www.swissfoodresearch.ch/de/agro-food-innovations-services/coaching/"
+    },
+    "novel_food": {
+      "enabled": true,
+      "label": "Novel-Food Check",
+      "headline": "Find out early whether your food needs novel-food authorisation",
+      "body": "Bring a short product description. We check it against the EU and Swiss rules and document the result.",
+      "cta": "Book a session",
+      "href": "https://www.swissfoodresearch.ch/de/agro-food-innovations-services/coaching/"
+    },
+    "maas": {
+      "enabled": true,
+      "label": "MaaS",
+      "headline": "A go, change or stop decision on your product, before the first production run",
+      "body": "From a short brief, we simulate about 300 customer interviews across three market scenarios.",
+      "cta": "Request MaaS",
+      "href": "mailto:contact@swissfoodresearch.ch?subject=Requesting%20MaaS"
+    },
+    "farmer": {
+      "enabled": true,
+      "label": "Farmer Support",
+      "headline": "Free, confidential support for farmers turning an idea into a funded project",
+      "body": "A first meeting on your farm clarifies the problem, the partners you need and the funding options.",
+      "cta": "Write to us",
+      "href": "mailto:contact@swissfoodresearch.ch?subject=Farmer%20Support"
+    },
+    "equipment": {
+      "enabled": true,
+      "label": "Equipment Sharing",
+      "headline": "Lend idle equipment, or find the machine you need, within the network",
+      "body": "Tell us what you offer or need. We propose matches; you agree the terms directly.",
+      "cta": "Offer or request equipment",
+      "href": "mailto:contact@swissfoodresearch.ch?subject=Equipment%20Sharing"
+    },
+    "innoloop": {
+      "enabled": true,
+      "label": "Innoloop",
+      "headline": "Professional chefs help you develop a product or improve a recipe",
+      "body": "Chefs test your product and give honest feedback on taste, handling and use, before launch.",
+      "cta": "Write to us",
+      "href": "mailto:contact@swissfoodresearch.ch?subject=Innoloop"
+    },
+    "route2market": {
+      "enabled": true,
+      "label": "Route2Market",
+      "headline": "Put your product in front of real buyers, shelves and kitchens before you spend heavily on launch",
+      "body": "Free for members: test your riskiest assumptions about customers, price and sales channels.",
+      "cta": "Write to us",
+      "href": "mailto:contact@swissfoodresearch.ch?subject=Route2Market"
+    },
+    "ecosystem": {
+      "enabled": true,
+      "label": "Ecosystem Map and Matchmaking",
+      "headline": "A map of the partners your idea needs, and warm introductions to them",
+      "body": "We break your idea into the roles it needs, find candidates for each and introduce you.",
+      "cta": "Book a session",
+      "href": "https://www.swissfoodresearch.ch/de/agro-food-innovations-services/coaching/"
+    }
+  },
+  "general": ["coaching", "funding"],
+  "by_group": {
+    "7": "novel_food", "5": "novel_food", "11": "novel_food", "9": "novel_food",
+    "14": "maas",
+    "12": "farmer", "15": "farmer", "16": "farmer", "17": "farmer",
+    "4": "equipment",
+    "2": "innoloop",
+    "3": "route2market", "10": "route2market",
+    "6": "ecosystem",
+    "1": "funding"
+  }
+}
