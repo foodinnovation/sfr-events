@@ -1,0 +1,26 @@
+name: Sign-in email test
+
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: "Address to send a sign-in link to (staff, a member domain or a registered participant)"
+        required: true
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request a sign-in link
+        env:
+          URL: https://iudsjtrdtncqqhswcnfu.supabase.co
+          KEY: sb_publishable_o-EAN8xKYr-dKhcoflQ5SQ_49go67yT   # public by design
+          EMAIL: ${{ inputs.email }}
+        run: |
+          echo "::add-mask::$EMAIL"
+          body=$(jq -n --arg e "$EMAIL" '{email:$e, create_user:true}')
+          code=$(curl -s -o resp.json -w '%{http_code}' -X POST \
+            "$URL/auth/v1/otp?redirect_to=https://foodinnovation.github.io/sfr-events/" \
+            -H "apikey: $KEY" -H "Content-Type: application/json" -d "$body")
+          echo "HTTP $code"; cat resp.json; echo
+          test "$code" = "200"
