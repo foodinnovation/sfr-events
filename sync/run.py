@@ -34,7 +34,7 @@ MAX_TRANSLATIONS_PER_RUN = int(os.environ.get("MAX_TRANSLATIONS_PER_RUN", "80"))
 
 # ig-wiki project, session pooler. Not secret; only the password is.
 DB_HOST = "aws-0-eu-central-2.pooler.supabase.com"
-DB_USER = "events_sync.iudsjtrdtncqqhswcnfu"
+DB_USER = "events_job.iudsjtrdtncqqhswcnfu"
 
 
 def db_params() -> dict:
@@ -48,7 +48,7 @@ def db_params() -> dict:
     if not pw and url:
         pw = url      # a bare password pasted into SUPABASE_DB_URL
     if not pw:
-        raise SystemExit("Set the secret SUPABASE_DB_PASSWORD (the events_sync password).")
+        raise SystemExit("Set the secret SUPABASE_DB_PASSWORD (the events_job password).")
     pw = pw.removeprefix("[").removesuffix("]")
     return {"conninfo": "", "host": DB_HOST, "port": 5432, "dbname": "postgres",
             "user": DB_USER, "password": pw, "sslmode": "require"}
