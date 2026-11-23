@@ -45,7 +45,7 @@ SharePoint decks (wiki) ─┘                                      │
 * **On every change to Events Planung.** monday notifies the Supabase function `sync-trigger`
   (12 webhooks: items, columns, names, groups, archive and delete, programme subitems), which
   starts this workflow. Bursts of edits start one run: the function lets at most one start
-  through every 30 seconds, and GitHub queues at most one run behind the running one. A change
+  through every 15 seconds (shorter than the test step that runs before monday is read, so no edit is missed), and GitHub queues at most one run behind the running one. A change
   is live about four minutes later.
 * **Every 30 minutes as a backstop**, at :07 and :37, by the Supabase scheduler (pg_cron job
   `sfr-events-sync`, see `supabase/scheduled/sync_schedule.sql`). It also catches changes on

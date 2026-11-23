@@ -211,3 +211,17 @@ def test_claim_dispatch_throttles_bursts(db):
         c.execute("update events.trigger_log set at = now() - interval '1 minute'")
         assert claim() is True                                   # later edit starts a new run
         assert c.execute("select events.claim_dispatch('health', '1 hour')").fetchone()[0] is True
+
+
+def test_page_builds_from_synced_data(db, tmp_path):
+    """The builder must run end to end on real synced data (load, slugs, pages)."""
+    from datetime import date as _date
+    from web import build as b
+    with psycopg.connect(db) as c:
+        b.assign_slugs(c, False)
+        events = b.load(c)
+    assert events, "the earlier sync tests should have left events to build"
+    b.build(tmp_path / "site", events, _date(2026, 11, 23))
+    pages = list((tmp_path / "site" / "events").glob("*/index.html"))
+    assert pages and (tmp_path / "site" / "index.html").is_file()
+    assert any("Presentations" in p.read_text() for p in pages)

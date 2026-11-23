@@ -109,8 +109,8 @@ def load(conn) -> list[dict]:
         for eid, st, title, speakers in cur.fetchall():
             if eid in by_id:
                 by_id[eid]["sessions"].append(dict(time=clock(st), title=title, speakers=public_speakers(speakers)))
-    for e in events:
-        e["sessions"] = tidy_programme(e["sessions"])
+        for e in events:
+            e["sessions"] = tidy_programme(e["sessions"])
 
         cur.execute("""select d.id, d.event_id, coalesce(nullif(d.title, ''), d.filename), d.is_programme,
                               d.filename

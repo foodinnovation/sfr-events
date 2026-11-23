@@ -17,7 +17,7 @@ const TOKEN = Deno.env.get("GITHUB_DISPATCH_TOKEN") ?? "";
 const REPO = "foodinnovation/sfr-events";
 const BOARDS = new Set([1689148147]);                       // Events Planung
 const WORKFLOWS: Record<string, { file: string; gap: string }> = {
-  sync: { file: "sync.yml", gap: "30 seconds" },
+  sync: { file: "sync.yml", gap: "15 seconds" },   // < the ~25 s test job, so a held-back edit is still read
   health: { file: "health.yml", gap: "1 hour" },
 };
 
