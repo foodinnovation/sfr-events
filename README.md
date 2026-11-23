@@ -37,7 +37,7 @@ SharePoint decks (wiki) ─┘                                      │
 | Name | What |
 |---|---|
 | `MONDAY_TOKEN` | monday API token (read access to Events Planung and Events attendees) |
-| `SUPABASE_DB_URL` | Postgres connection string of the ig-wiki project (session pooler) |
+| `SUPABASE_DB_PASSWORD` | Password of the database login `events_sync` (set in the ig-wiki SQL editor with `alter role events_sync with login password '...'`) |
 | `ANTHROPIC_API_KEY` | Claude API key for the English translations (optional; without it texts stay in the original language) |
 
 ## Running it

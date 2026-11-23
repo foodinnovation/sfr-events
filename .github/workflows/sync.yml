@@ -55,10 +55,11 @@ jobs:
         env:
           MONDAY_TOKEN: ${{ secrets.MONDAY_TOKEN }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          if [ -z "$MONDAY_TOKEN" ] || [ -z "$SUPABASE_DB_URL" ]; then
-            echo "::warning::Secrets MONDAY_TOKEN and SUPABASE_DB_URL are not set yet; nothing to do."
+          if [ -z "$MONDAY_TOKEN" ] || { [ -z "$SUPABASE_DB_URL" ] && [ -z "$SUPABASE_DB_PASSWORD" ]; }; then
+            echo "::warning::Secrets MONDAY_TOKEN and SUPABASE_DB_PASSWORD are not set yet; nothing to do."
             exit 0
           fi
           python -m sync.run ${{ inputs.dry_run && '--dry-run' || '' }}

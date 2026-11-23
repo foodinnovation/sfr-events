@@ -5,7 +5,8 @@ Usage:
     python -m sync.run --dry-run       # do everything, then roll back
     python -m sync.run --no-translate  # skip the Claude translation step
 
-Environment: MONDAY_TOKEN, SUPABASE_DB_URL, optional ANTHROPIC_API_KEY.
+Environment: MONDAY_TOKEN, SUPABASE_DB_PASSWORD (or a full SUPABASE_DB_URL),
+optional ANTHROPIC_API_KEY.
 Writes report.md and report.json (event names and match results only, no
 personal data) to the working directory.
 """
@@ -31,6 +32,27 @@ from .rules import (
 
 MAX_TRANSLATIONS_PER_RUN = int(os.environ.get("MAX_TRANSLATIONS_PER_RUN", "80"))
 
+# ig-wiki project, session pooler. Not secret; only the password is.
+DB_HOST = "aws-0-eu-central-2.pooler.supabase.com"
+DB_USER = "events_sync.iudsjtrdtncqqhswcnfu"
+
+
+def db_params() -> dict:
+    """Connection from SUPABASE_DB_PASSWORD (preferred) or a full SUPABASE_DB_URL.
+    Stray spaces, line breaks and quotes from copy-pasting are removed."""
+    clean = lambda v: (v or "").strip().strip("'\"").strip()  # noqa: E731
+    url = clean(os.environ.get("SUPABASE_DB_URL"))
+    pw = clean(os.environ.get("SUPABASE_DB_PASSWORD"))
+    if url.startswith(("postgresql://", "postgres://")) or "=" in url:
+        return {"conninfo": url}
+    if not pw and url:
+        pw = url      # a bare password pasted into SUPABASE_DB_URL
+    if not pw:
+        raise SystemExit("Set the secret SUPABASE_DB_PASSWORD (the events_sync password).")
+    pw = pw.removeprefix("[").removesuffix("]")
+    return {"conninfo": "", "host": DB_HOST, "port": 5432, "dbname": "postgres",
+            "user": DB_USER, "password": pw, "sslmode": "require"}
+
 
 def main() -> int:
     ap = argparse.ArgumentParser()
@@ -47,7 +69,7 @@ def main() -> int:
           f"{len(attendees)} registrations", flush=True)
 
     report: dict = {"today": date.today().isoformat(), "dry_run": args.dry_run}
-    with psycopg.connect(os.environ["SUPABASE_DB_URL"], autocommit=False) as conn:
+    with psycopg.connect(**db_params(), autocommit=False) as conn:
         run_id = None
         if not args.dry_run:
             with conn.cursor() as cur:

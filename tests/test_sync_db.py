@@ -18,7 +18,10 @@ DB = os.environ.get("TEST_DB_URL")
 pytestmark = pytest.mark.skipif(not DB, reason="TEST_DB_URL not set")
 
 STUB = """
-create role anon; create role authenticated;
+do $$ begin
+  if not exists (select 1 from pg_roles where rolname='anon') then create role anon; end if;
+  if not exists (select 1 from pg_roles where rolname='authenticated') then create role authenticated; end if;
+end $$;
 create schema private;
 create table public.ig_groups (id int primary key, name text, crm_label text);
 create table public.meetings (id int primary key, ig_id int, meeting_date date);
