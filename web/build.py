@@ -108,7 +108,9 @@ def load(conn) -> list[dict]:
                        from events.session order by event_id, start_time nulls last, title_src""")
         for eid, st, title, speakers in cur.fetchall():
             if eid in by_id:
-                by_id[eid]["sessions"].append(dict(time=st, title=title, speakers=speakers or []))
+                by_id[eid]["sessions"].append(dict(time=clock(st), title=title, speakers=public_speakers(speakers)))
+    for e in events:
+        e["sessions"] = tidy_programme(e["sessions"])
 
         cur.execute("""select d.id, d.event_id, coalesce(nullif(d.title, ''), d.filename), d.is_programme,
                               d.filename
@@ -131,6 +133,40 @@ def load(conn) -> list[dict]:
     # year-only archive entries sort to the end of their year in the (reversed) archive
     events.sort(key=lambda e: (e["date"] or date(e["year"], 1, 1), e["date"] is not None, e["id"]))
     return events
+
+
+# --------------------------------------------------------------------------- programme rows
+
+def clock(raw: str | None) -> str | None:
+    """monday programme times arrive as typed: '9.30', '10', '14:00', '9h30'. Normalise to HH:MM."""
+    m = re.match(r"^\s*(\d{1,2})(?:\s*[.:h]\s*(\d{2}))?\s*$", raw or "")
+    if not m or int(m.group(1)) > 23 or int(m.group(2) or 0) > 59:
+        return (raw or "").strip() or None
+    return f"{int(m.group(1)):02d}:{m.group(2) or '00'}"
+
+
+def public_speakers(speakers: list | None) -> list[dict]:
+    """Never print an email address on the public page: if a speaker's name is an address
+    (the People record has no proper name), show the organisation only."""
+    out = []
+    for p in speakers or []:
+        name = re.sub(r"\s+", " ", (p.get("name") or "")).strip()
+        org = (p.get("organisation") or "").strip()
+        if "@" in name:
+            name = ""
+        if name or org:
+            out.append({"name": name or org, "organisation": org if name else ""})
+    return out
+
+
+def tidy_programme(rows: list[dict]) -> list[dict]:
+    """Sort by time, untimed rows last. Staff number rows on monday to order them ('2 Welcome',
+    '92 Break'); when every row carries such a number, strip it."""
+    numbered = re.compile(r"^\d{1,3}\s+(?=\S)")
+    if rows and all(numbered.match(r["title"] or "") for r in rows):
+        rows = [dict(r, title=numbered.sub("", r["title"])) for r in rows]
+    key = lambda r: (r["time"] is None or not re.match(r"^\d{2}:\d{2}$", r["time"]), r["time"] or "")
+    return sorted(rows, key=key)
 
 
 # --------------------------------------------------------------------------- formatting
