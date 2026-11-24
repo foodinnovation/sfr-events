@@ -86,6 +86,37 @@
     apply();
   }
 
+  /* ------------------------------------------------------------------ email buttons */
+  /* A mailto button does nothing when the browser has no mail app set up (Outlook or Gmail in
+     the browser, for example). The button still tries the mail app, and a small panel offers the
+     same email in Outlook on the web or Gmail, or copies it. */
+  $$('a.btn[href^="mailto:"]').forEach(function (a) {
+    a.addEventListener("click", function () {
+      var u = new URL(a.href), to = decodeURIComponent(u.pathname);
+      var subject = u.searchParams.get("subject") || "", body = u.searchParams.get("body") || "";
+      var q = function (o) { return Object.keys(o).filter(function (k) { return o[k]; })
+        .map(function (k) { return k + "=" + encodeURIComponent(o[k]); }).join("&"); };
+      var panel = a.parentNode.querySelector(".mail-alt");
+      if (!panel) {
+        panel = document.createElement("div");
+        panel.className = "mail-alt";
+        panel.innerHTML = '<p>No email window opened? Write it here instead:</p>' +
+          '<a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" data-k="outlook">Outlook on the web</a>' +
+          '<a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" data-k="gmail">Gmail</a>' +
+          '<button type="button" class="btn btn-ghost btn-sm" data-k="copy">Copy address and text</button>';
+        a.insertAdjacentElement("afterend", panel);
+        $('[data-k="outlook"]', panel).href = "https://outlook.office.com/mail/deeplink/compose?" + q({ to: to, subject: subject, body: body });
+        $('[data-k="gmail"]', panel).href = "https://mail.google.com/mail/?" + q({ view: "cm", to: to, su: subject, body: body });
+        $('[data-k="copy"]', panel).addEventListener("click", function () {
+          var text = "To: " + to + (subject ? "\nSubject: " + subject : "") + (body ? "\n\n" + body : "");
+          if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { toast("Copied: " + to); });
+          else prompt("Copy this:", text);
+        });
+      }
+      panel.hidden = false;
+    });
+  });
+
   /* ------------------------------------------------------------------ share */
   $$("[data-share]").forEach(function (b) {
     b.addEventListener("click", function () {
