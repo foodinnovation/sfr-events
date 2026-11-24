@@ -1,11 +1,12 @@
 # sfr-events
 
-The Swiss Food Research hub (planned address: hub.swissfoodresearch.ch), with two tabs:
+The Swiss Food Research hub (planned address: hub.swissfoodresearch.ch), with three tabs:
 
 * **Events**: upcoming events, the archive back to 2015, and the presentation decks for
   members and participants.
 * **Radicle – Knowledge**: radicle's topic articles, the ~6,600 relevant funded projects
   and a funding finder, for members and staff only.
+* **Pulse**: AI-curated agro-food news with links to the originals (staff only until opened, see below).
 
 Staff edit events in one place only: the monday board **Events Planung**. Everything else
 follows from there.
@@ -99,6 +100,24 @@ A failure here never stops the event sync: it shows as a warning on the run and 
 
 The tab runs radicle's own Obsidian-style reader (web/static/knowledge/, adapted from agro-food-intelligence src/api/static/wiki): topic tree with gap-severity dots and project counts, a tab per opened topic, Cmd+K / Ctrl+K quick switcher across topics and projects, graph view, research gaps on each topic page and the funding finder. The members-only function functions/v1/knowledge speaks radicle's wiki API through `?path=`.
 
+## Pulse
+
+The tab (`/pulse/`) shows AI-curated agro-food news: an English summary of each story, the original title
+and a link to every report, sorted by Innovation Group and region, with an "Added today / n days ago" note.
+Members can mark a story useful (one vote each, withdrawable). There are no comments.
+
+* **Stories** come from schema `pulse` in ig-wiki, filled every three hours by
+  [foodinnovation/sfr-pulse](https://github.com/foodinnovation/sfr-pulse) (open feeds and the free newsletters
+  at newsletters@). The page is an empty shell; the edge function `pulse` serves the stories
+  (`pulse.hub_stories`: relevant items only, newsletter items only with a checked link, original title,
+  no click-trackers and no mailbox ids in links) and records votes (`pulse.hub_vote`, table `pulse.vote`).
+* **Staff only until opened.** While `config/pulse.json` has `"public": false` the tab is hidden for everyone
+  but signed-in staff and the page is not indexed; while `pulse.setting` `public` is not `true` the function
+  serves staff only. To open Pulse to everyone, do both:
+  `update pulse.setting set value = 'true', updated_at = now() where key = 'public';` in the ig-wiki SQL
+  editor, and `"public": true` in `config/pulse.json` (a push republishes the site).
+* Funding calls and tenders appear as a members-only teaser for now.
+
 ## Layout
 
 * `sync/rules.py`: business rules (types, publishing, access statuses, matching)
@@ -108,7 +127,7 @@ The tab runs radicle's own Obsidian-style reader (web/static/knowledge/, adapted
 * `web/`: page build (`build.py`) and static assets (styles, script, logo, fonts)
 * `supabase/migrations/`: the `events` schema and access functions
 * `sync/knowledge.py`: copy for the knowledge tab (radicle, Funding Schemes, contacts)
-* `supabase/functions/`: `deck` (access check, SharePoint link), `knowledge` (knowledge tab API),
+* `supabase/functions/`: `deck` (access check, SharePoint link), `knowledge` (knowledge tab API), `pulse` (Pulse tab),
   `sync-trigger` (starts the sync) and `send-email` (sign-in emails from contact@)
 * `docs/setup-sign-in.md`: one-off sign-in setup (Entra, Exchange, Supabase)
 

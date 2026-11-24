@@ -189,3 +189,32 @@ def test_privacy_and_statistics_pages():
     page = b.index_page([], date(2026, 11, 24), ads={"enabled": False})
     assert '<a hidden data-staff-only class="hub-tab" href="stats/">Statistics</a>' in page
     assert '<a href="privacy/">Privacy</a>' in page
+
+
+def test_pulse_page_and_tab_follow_the_settings_file(tmp_path, monkeypatch):
+    from datetime import date
+    cfg = tmp_path / "pulse.json"
+    monkeypatch.setattr(b, "PULSE_FILE", cfg)
+    # no file or public false: staff-only tab, page not indexed
+    cfg.write_text('{"public": false}')
+    monkeypatch.setattr(b, "load_pulse", lambda path=cfg: __import__("json").loads(cfg.read_text()))
+    page = b.index_page([], date(2026, 11, 24), ads={"enabled": False})
+    assert '<a hidden data-staff-only class="hub-tab" href="pulse/">Pulse</a>' in page
+    pl = b.pulse_page()
+    assert 'name="robots" content="noindex"' in pl
+    assert "assets/pulse.js" in pl and 'id="pl-list"' in pl and 'id="pl-story"' in pl
+    assert 'class="hub-tab is-on" href="../pulse/" aria-current="page"' in pl
+    # what the user asked to leave out: feed counts, the relevance cut-off
+    for gone in ("57 ", "4 or 5", "rated 4", "every three hours"):
+        assert gone not in pl
+    assert "—" not in pl and "fonts.googleapis" not in pl
+    # public: an ordinary tab, indexable
+    cfg.write_text('{"public": true}')
+    page = b.index_page([], date(2026, 11, 24), ads={"enabled": False})
+    assert '<a class="hub-tab" href="pulse/">Pulse</a>' in page
+    assert 'name="robots"' not in b.pulse_page()
+
+
+def test_privacy_page_explains_pulse_votes():
+    priv = b.privacy_page()
+    assert "<h2>Pulse</h2>" in priv and "marks a story as useful" in priv

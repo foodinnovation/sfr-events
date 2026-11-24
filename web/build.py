@@ -248,6 +248,15 @@ def signup(url: str | None) -> dict | None:
 # --------------------------------------------------------------------------- page shell
 
 KNOWLEDGE = "Radicle \u2013 Knowledge"
+PULSE_FILE = ROOT.parent / "config" / "pulse.json"
+
+
+def load_pulse(path: Path = PULSE_FILE) -> dict:
+    """config/pulse.json: {"public": false} keeps the Pulse tab for staff only (shadow run)."""
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {"public": False}
 
 
 def shell(title: str, body: str, depth: int, description: str = "", tab: str = "events",
@@ -259,6 +268,9 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
         cur = ' aria-current="page"' if on else ""
         return f'<a class="{cls}" href="{href}"{cur}>{label}</a>'
     tabs = tab_link("events", up or "./", "Events") + tab_link("knowledge", f"{up}knowledge/", KNOWLEDGE)
+    pulse_tab = tab_link("pulse", f"{up}pulse/", "Pulse")
+    # Pulse: visible to everyone once config/pulse.json says public, before that to signed-in staff only
+    tabs += pulse_tab if load_pulse().get("public") else pulse_tab.replace('<a class="', '<a hidden data-staff-only class="', 1)
     # Statistics: in every page but hidden; app.js shows it to signed-in staff only
     tabs += tab_link("stats", f"{up}stats/", "Statistics").replace('<a class="', '<a hidden data-staff-only class="', 1)
     extra = "".join(f'<script src="{up}assets/{js}"></script>' for js in scripts)
@@ -691,6 +703,77 @@ def knowledge_page() -> str:
                           "knowledge/app.js"))
 
 
+# --------------------------------------------------------------------------- pulse tab
+
+def pulse_page() -> str:
+    """Pulse: AI-curated agro-food news. An empty shell; stories load in the browser from
+    functions/v1/pulse, which serves staff only until pulse.setting 'public' is 'true'."""
+    public = bool(load_pulse().get("public"))
+    body = f"""
+<section class="hero pl-hero"><div class="wrap">
+  <p class="sfr-sub01 eyebrow">Pulse</p>
+  <h1>What moved in agro-food this week.</h1>
+  <p class="lead">Stories from open sources and the newsletters we read, summarised in English, linked to the
+  original and sorted by Innovation Group.</p>
+  <p class="pl-ai"><span class="pl-badge">AI curated</span> Selected and summarised by AI, with no editor. Each summary
+  links to its source: read the original before you quote it.</p>
+</div></section>
+<div class="wrap pl-wrap" id="pulse">
+  <div class="pl-main">
+    <div id="pl-feed">
+      <form class="filters pl-filters" id="pl-filters" role="search" onsubmit="return false" hidden>
+        <div class="chips" role="group" aria-label="Region">
+          <button type="button" class="chip is-on" data-scope="all" aria-pressed="true">All regions</button>
+          <button type="button" class="chip" data-scope="swiss" aria-pressed="false">Switzerland</button>
+          <button type="button" class="chip" data-scope="europe" aria-pressed="false">Europe</button>
+          <button type="button" class="chip" data-scope="global" aria-pressed="false">Global</button>
+        </div>
+        <label class="visually-hidden" for="pl-q">Search Pulse</label>
+        <input id="pl-q" type="search" placeholder="Search stories, companies, topics">
+        <label class="visually-hidden" for="pl-sort">Sort</label>
+        <select id="pl-sort">
+          <option value="new">Newest</option>
+          <option value="rel">Most relevant</option>
+          <option value="votes">Most useful</option>
+        </select>
+      </form>
+      <div class="chips pl-igs" id="pl-igs" role="group" aria-label="Innovation Group" hidden></div>
+      <div id="pl-lead"></div>
+      <h2 class="section-head pl-list-head" id="pl-list-head" hidden>More this week</h2>
+      <ol class="list pl-list" id="pl-list"></ol>
+      <p class="empty" id="pl-empty" hidden>No story matches these filters. Try another Innovation Group or region.</p>
+    </div>
+    <article id="pl-story" hidden></article>
+    <p class="muted" id="pl-note" role="status">Loading Pulse\u2026</p>
+  </div>
+  <aside class="pl-side">
+    <section class="pl-card pl-dark">
+      <span class="pl-badge pl-badge-inv">Members only</span>
+      <h2>Funding calls and tenders</h2>
+      <p>Open calls and public tenders matched to your Innovation Groups are coming to Pulse for members.</p>
+      <button class="btn btn-sm pl-cyan" type="button" data-pl-signin>Sign in</button>
+      <a class="pl-member" href="https://www.swissfoodresearch.ch/en/membership-benefits/">Become a member</a>
+    </section>
+    <section class="pl-card">
+      <h2>How Pulse works</h2>
+      <ol class="pl-how">
+        <li>We read open news feeds and the free newsletters sent to {ORG}.</li>
+        <li>AI selects what matters for SFR members, writes a short English summary and groups reports of the same event.</li>
+        <li>Every summary links to the original article.</li>
+      </ol>
+      <p class="pl-small"><a href="mailto:{CONTACT}?subject=Pulse%3A%20wrong%20summary">Report a wrong summary</a></p>
+    </section>
+  </aside>
+</div>
+<noscript><p class="wrap">Pulse needs JavaScript.</p></noscript>"""
+    page = shell(f"Pulse | {ORG}", body, 1,
+                 "Pulse: what moved in Swiss and European agro-food, summarised in English with links to the originals.",
+                 tab="pulse", scripts=("pulse.js",))
+    if not public:
+        page = page.replace("<head>", '<head>\n<meta name="robots" content="noindex">', 1)
+    return page
+
+
 # --------------------------------------------------------------------------- statistics (staff only)
 
 def stats_page() -> str:
@@ -735,7 +818,7 @@ def privacy_page() -> str:
   <h1>Privacy on the SFR hub</h1>
 </div></section>
 <div class="wrap block"><div class="prose">
-<p class="lead">This page explains what the SFR hub (Events, Radicle \u2013 Knowledge and the presentation
+<p class="lead">This page explains what the SFR hub (Events, Radicle \u2013 Knowledge, Pulse and the presentation
 archive) does with personal data. It adds to the general
 <a href="https://www.swissfoodresearch.ch/en/privacy-policy/">privacy policy of {ORG}</a>, which applies too.</p>
 
@@ -791,6 +874,11 @@ privacy policies then apply. Links to Google Maps open Google Maps only when you
 database. The articles,
 projects and funding programmes come from public sources and from {ORG}'s own records.</p>
 
+<h2>Pulse</h2>
+<p>Pulse shows short summaries of public news articles, written by AI, with a link to each original. When a
+member marks a story as useful, the hub stores the member's email address with the story, so that each
+member counts once and can withdraw the vote. Others see only the number of votes. Votes are deleted on request.</p>
+
 <h2>Where data is kept</h2>
 <p>The hub's database and functions run on Supabase, in its Zurich data centre. Event data comes from
 monday.com. Presentations are held in Microsoft SharePoint. Like any web service, Supabase keeps
@@ -837,6 +925,8 @@ def build(out: Path, events: list[dict], today: date, attending: dict | None = N
             (out / "assets" / "members" / name).write_bytes(data)
     (out / "knowledge").mkdir()
     (out / "knowledge" / "index.html").write_text(knowledge_page())
+    (out / "pulse").mkdir()
+    (out / "pulse" / "index.html").write_text(pulse_page())
     (out / "stats").mkdir()
     (out / "stats" / "index.html").write_text(stats_page())
     (out / "privacy").mkdir()
