@@ -742,7 +742,12 @@ def main() -> int:
         assign_slugs(conn, args.dry_run)
         events = load(conn)
         wall = att.load_config()
-        attending = att.collect(conn, today, wall)
+        try:
+            with conn.transaction():
+                attending = att.collect(conn, today, wall)
+        except Exception as exc:  # noqa: BLE001  the logo block must never stop the site
+            print(f"::warning::attending member organisations not read ({exc}); no logo blocks this run")
+            attending = {}
     logos: dict[str, bytes] = {}
     if attending and os.environ.get("MONDAY_TOKEN"):
         from sync.monday import Monday
