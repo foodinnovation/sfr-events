@@ -3,6 +3,7 @@
 Runs only when TEST_DB_URL points at an empty database, e.g.
     TEST_DB_URL="host=/tmp/pgtest port=55432 user=postgres dbname=sfrtest" pytest tests/test_sync_db.py
 """
+import json
 import os
 from datetime import date, time
 from pathlib import Path
@@ -53,6 +54,13 @@ insert into public.presentations (meeting_id, onedrive_drive_id, onedrive_item_i
 update public.presentations set doc_type = 'participant_list' where onedrive_item_id = 'i7';
 insert into public.crm_members (domain, status, item_id, name) values ('member.ch','active',1,'Member AG'),('gone.ch','cancelled',2,'Gone AG');
 insert into public.staff values ('staff.test@swissfoodresearch.ch', true);
+-- schema pulse belongs to foodinnovation/sfr-pulse; the hub's Pulse migration only reads it
+create schema pulse;
+create table pulse.items (id text primary key, origin text, source_id text, news_item_id text, inbox_allowed boolean,
+  url text, title text, published_at timestamptz, lang text, excerpt text, summary_en text, relevance int,
+  igs text[], scope text, event_key text, story_id text);
+create table pulse.sources (id text primary key, name text);
+create table public.news_items (id text primary key, link_resolved text, link_title text, link_status text);
 """
 
 IG, SFR, EXT, OTHER = "new_group76309", "new_group80213", "neue_gruppe8981__1", "neue_gruppe__1"
@@ -307,3 +315,41 @@ def test_usage_counts_expire_after_13_months(db):
         cur.execute("select page from events.metric order by page")
         assert [r[0] for r in cur.fetchall()] == ["/kept/"]
         cur.execute("delete from events.metric")
+
+
+def test_pulse_shows_only_clean_relevant_stories_and_counts_votes(db):
+    with psycopg.connect(db, autocommit=True) as c:
+        c.execute("""
+          insert into pulse.sources values ('lid', 'LID Landwirtschaftlicher Informationsdienst');
+          insert into public.news_items values
+            ('n1', 'https://www.bioaktuell.ch/a', 'Bio Suisse Richtlinien 2027', 'verified'),
+            ('n2', 'https://example.org/wrong', 'Wrong page', 'mismatch');
+          insert into pulse.items (id, origin, source_id, news_item_id, inbox_allowed, url, title, published_at, lang,
+                                   summary_en, relevance, igs, scope, story_id) values
+            ('o:1', 'open', 'lid', null, null, 'https://lid.ch/a', 'Digitaler Bauernhof', now() - interval '1 day', 'de',
+             'Farm data needs consent.', 5, '{zgl,digitalization}', 'swiss', 's:a'),
+            ('o:2', 'open', 'lid', null, null, 'https://lid.ch/b', 'Same event, second report', now(), 'de',
+             'Second report.', 4, '{zgl}', 'swiss', 's:a'),
+            ('n:1', 'inbox', 'bioaktuell.ch', 'n1', true, 'https://newsletter.adnz.co/click/2/1/newsletters%40swissfoodresearch.ch/x',
+             'English headline', now(), null, 'Organic rules for 2027.', 4, '{zgl}', 'swiss', null),
+            ('n:2', 'inbox', 'x.ch', 'n2', true, 'https://x.ch/a', 'Mismatched link', now(), null, 'Should not show.', 5, '{}', 'swiss', null),
+            ('n:3', 'inbox', 'paywall.com', null, false, 'https://paywall.com/a', 'Licensed', now(), null, 'Excluded sender.', 5, '{}', 'europe', null),
+            ('o:3', 'open', 'lid', null, null, 'https://lid.ch/c', 'Not relevant', now(), 'de', 'Low score.', 3, '{}', 'swiss', null);
+        """)
+        stories = c.execute("select pulse.hub_stories(14)").fetchone()[0]
+        titles = [s["title"] for s in stories]
+        assert titles[0] == "Digitaler Bauernhof"                  # grouped: one story for o:1 and o:2
+        assert len(stories[0]["sources"]) == 2 and stories[0]["source"].startswith("LID")
+        assert "Bio Suisse Richtlinien 2027" in titles              # newsletter item: checked link, original title
+        bio = next(s for s in stories if s["title"].startswith("Bio Suisse"))
+        assert bio["url"] == "https://www.bioaktuell.ch/a" and "%40" not in json.dumps(stories)
+        assert not {"Mismatched link", "Licensed", "Not relevant", "English headline"} & set(titles)
+        assert all(len(s["id"]) == 16 and ":" not in s["id"] for s in stories)
+        sid = stories[0]["id"]
+        assert c.execute("select pulse.hub_vote(%s, 'A@member.ch', true)", (sid,)).fetchone()[0] == 1
+        assert c.execute("select pulse.hub_vote(%s, 'a@member.ch', true)", (sid,)).fetchone()[0] == 1   # once per person
+        assert c.execute("select pulse.hub_vote(%s, 'b@member.ch', true)", (sid,)).fetchone()[0] == 2
+        one = c.execute("select pulse.hub_stories(14, 'a@member.ch', %s)", (sid,)).fetchone()[0]
+        assert len(one) == 1 and one[0]["votes"] == 2 and one[0]["mine"] is True
+        assert c.execute("select pulse.hub_vote(%s, 'a@member.ch', false)", (sid,)).fetchone()[0] == 1
+        assert c.execute("select value from pulse.setting where key = 'public'").fetchone()[0] == "false"
