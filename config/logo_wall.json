@@ -1,0 +1,8 @@
+{
+  "_help": "Logos of the member organisations registered for an upcoming event, in the right-hand column of its page. Registrations are matched to members by exact email domain; cancellations and no-shows do not count. Non-member organisations are only counted. 'min_members': the block shows from this many member organisations. 'max_logos': logos shown before 'and N more'. 'exclude': member names or email domains never to show.",
+  "enabled": true,
+  "heading": "Member organisations attending",
+  "min_members": 5,
+  "max_logos": 12,
+  "exclude": []
+}

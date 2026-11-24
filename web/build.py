@@ -33,6 +33,7 @@ from urllib.parse import quote, quote_plus
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT.parent))
 from sync.run import db_params  # noqa: E402
+from web import attending as att  # noqa: E402
 
 SUPABASE_URL = "https://iudsjtrdtncqqhswcnfu.supabase.co"
 PUBLISHABLE_KEY = "sb_publishable_o-EAN8xKYr-dKhcoflQ5SQ_49go67yT"   # public by design
@@ -468,9 +469,37 @@ def programme_pending(e: dict, igs: list[str]) -> str:
 </section>"""
 
 
+# --------------------------------------------------------------------------- who is coming
+
+def attending_block(a: "att.Attending | None", wall: dict) -> str:
+    """Logos of the member organisations registered for an upcoming event (config/logo_wall.json).
+    Non-members are only counted. Nothing is shown below the configured minimum."""
+    if not a or not a.members:
+        return ""
+    cap = int(wall.get("max_logos") or 12)
+    shown, rest = a.members[:cap], len(a.members) - cap
+    tiles = []
+    for o in shown:
+        cls = "lw-tile lw-dark" if o.dark else "lw-tile"
+        inner = (f'<img src="{SITE_BASE}assets/members/{esc(o.logo)}" alt="{esc(o.name)}" loading="lazy">'
+                 if o.logo else f'<span class="lw-name">{esc(o.name)}</span>')
+        tiles.append(f'<li class="{cls}" title="{esc(o.name)}">{inner}</li>')
+    more = []
+    if rest > 0:
+        more.append(f"and {rest} more member organisation{'s' if rest != 1 else ''}")
+    if a.others:
+        more.append(f"plus {a.others} other organisation{'s' if a.others != 1 else ''}")
+    lines = "".join(f'<p class="lw-more">{m}</p>' for m in more)
+    return f"""<section class="logo-wall" aria-labelledby="lw-h">
+      <h2 class="lw-head" id="lw-h">{esc(wall.get("heading") or "Member organisations attending")}</h2>
+      <ul class="lw-grid">{"".join(tiles)}</ul>
+      {lines}
+    </section>"""
+
+
 # --------------------------------------------------------------------------- event page
 
-def event_page(e: dict, today: date) -> str:
+def event_page(e: dict, today: date, attending: "att.Attending | None" = None, wall: dict | None = None) -> str:
     up = "../../"
     igs = ig_labels(e)
     upcoming = bool(e["date"] and e["date"] >= today)
@@ -558,6 +587,7 @@ def event_page(e: dict, today: date) -> str:
     <dl class="facts">{facts_html}</dl>
     {register}
     <button type="button" class="btn btn-ghost btn-sm share" data-share>Copy link to this event</button>
+    {attending_block(attending, wall or {}) if upcoming else ""}
   </aside>
 </div>"""
     desc = (e["summary"] or "").strip().split("\n")[0][:200]
@@ -670,7 +700,9 @@ def public_json(events: list[dict]) -> list[dict]:
             for e in events]
 
 
-def build(out: Path, events: list[dict], today: date) -> str:
+def build(out: Path, events: list[dict], today: date, attending: dict | None = None,
+          logos: dict[str, bytes] | None = None, wall: dict | None = None) -> str:
+    attending = attending or {}
     if out.exists():
         shutil.rmtree(out)
     (out / "assets").mkdir(parents=True)
@@ -680,7 +712,11 @@ def build(out: Path, events: list[dict], today: date) -> str:
         if e["kind"] != "external" and e["slug"]:
             p = out / "events" / e["slug"]
             p.mkdir(parents=True, exist_ok=True)
-            (p / "index.html").write_text(event_page(e, today))
+            (p / "index.html").write_text(event_page(e, today, attending.get(str(e["id"])), wall))
+    if logos:
+        (out / "assets" / "members").mkdir(exist_ok=True)
+        for name, data in logos.items():
+            (out / "assets" / "members" / name).write_bytes(data)
     (out / "knowledge").mkdir()
     (out / "knowledge" / "index.html").write_text(knowledge_page())
     (out / "404.html").write_text(shell(f"Not found | {ORG}", '<div class="wrap block"><h1>Page not found</h1>'
@@ -705,7 +741,18 @@ def main() -> int:
     with psycopg.connect(**db_params()) as conn:
         assign_slugs(conn, args.dry_run)
         events = load(conn)
-    digest = build(Path(args.out), events, today)
+        wall = att.load_config()
+        attending = att.collect(conn, today, wall)
+    logos: dict[str, bytes] = {}
+    if attending and os.environ.get("MONDAY_TOKEN"):
+        from sync.monday import Monday
+        try:
+            logos = att.fetch_logos(Monday(), attending)
+        except Exception as exc:  # noqa: BLE001
+            print(f"::warning::member logos not fetched ({exc}); attending blocks show names only")
+    print(f"logo wall: {len(attending)} upcoming events with {wall.get('min_members', 5)}+ member organisations, "
+          f"{len(logos)} logos")
+    digest = build(Path(args.out), events, today, attending, logos, wall)
     data = Path(args.data)
     data.parent.mkdir(parents=True, exist_ok=True)
     data.write_text(json.dumps(public_json(events), indent=1, ensure_ascii=False) + "\n")

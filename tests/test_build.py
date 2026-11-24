@@ -136,3 +136,41 @@ def test_index_page_carries_ads_only_when_switched_on():
     assert 'class="ad" hidden' in on and 'data-ad-slot="3"' in on
     off = b.index_page([], date(2026, 11, 23), ads={"enabled": False})
     assert 'class="ad"' not in off
+
+
+def test_attending_block():
+    from datetime import date
+    from web import attending as att
+    orgs = [att.Org(f"m{i}.ch", [f"Member {i:02d}"], [i], logo=f"member-{i:02d}.webp" if i % 2 else None, dark=i == 3)
+            for i in range(14)]
+    a = att.Attending(orgs, 9)
+    html = b.attending_block(a, {"max_logos": 12})
+    assert html.count('class="lw-tile') == 12
+    assert "and 2 more member organisations" in html and "plus 9 other organisations" in html
+    assert 'class="lw-tile lw-dark"' in html and "assets/members/member-01.webp" in html
+    assert '<span class="lw-name">Member 00</span>' in html     # no logo: name tile
+    assert "@" not in html                                         # no addresses, no people
+    # upcoming pages carry it, past pages never
+    e = _ev()
+    assert "Member organisations attending" in b.event_page(e, date(2026, 11, 23), a, {})
+    assert "Member organisations attending" not in b.event_page(e, date(2026, 12, 4), a, {})
+
+
+def test_web_logo_and_light_detection():
+    import io
+    from PIL import Image
+    from web import attending as att
+    white = Image.new("RGBA", (200, 100), (0, 0, 0, 0))
+    for x in range(40, 160):
+        for y in range(30, 70):
+            white.putpixel((x, y), (255, 255, 255, 255))
+    buf = io.BytesIO(); white.save(buf, "PNG")
+    data, ext, dark = att.web_logo(buf.getvalue(), "png")
+    assert ext == "webp" and dark
+    black = Image.new("RGB", (200, 100), (20, 20, 20)); buf = io.BytesIO(); black.save(buf, "JPEG")
+    assert att.web_logo(buf.getvalue(), "jpg")[2] is False
+    assert att.svg_is_light(b'<svg><path fill="#fff"/><path style="fill:white"/></svg>')
+    assert not att.svg_is_light(b'<svg><path fill="#204e82"/><path fill="#fff"/></svg>')
+    import pytest
+    with pytest.raises(ValueError):
+        att.web_logo(b'<svg onload="alert(1)"></svg>', "svg")

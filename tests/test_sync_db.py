@@ -29,7 +29,7 @@ create table public.meetings (id int primary key, ig_id int, meeting_date date, 
 create table public.presentations (id uuid primary key default gen_random_uuid(), meeting_id int,
   onedrive_drive_id text, onedrive_item_id text, filename text, title text, file_path text,
   doc_type text, removed_at timestamptz, duplicate_of uuid);
-create table public.crm_members (domain text, status text);
+create table public.crm_members (domain text, status text, item_id bigint, name text);
 create table public.staff (email text, active boolean);
 insert into public.ig_groups values (3,'Kaffee','Coffee'),(5,'Insekten','Insects'),(7,'Proteins4Future','Proteins4Future'),(10,'Schokolade','Chocolate');
 insert into public.meetings values
@@ -51,7 +51,7 @@ insert into public.presentations (meeting_id, onedrive_drive_id, onedrive_item_i
   (8,'d','i6','f.pdf','03_Kaffee/Treffen/2015/Präsentationen WEB/f.pdf'),
   (1,'d','i7','Teilnehmerliste.pdf','05_Insekten/Treffen/2026/T2 - Präsentationen WEB/Teilnehmerliste.pdf');
 update public.presentations set doc_type = 'participant_list' where onedrive_item_id = 'i7';
-insert into public.crm_members values ('member.ch','active'),('gone.ch','cancelled');
+insert into public.crm_members (domain, status, item_id, name) values ('member.ch','active',1,'Member AG'),('gone.ch','cancelled',2,'Gone AG');
 insert into public.staff values ('staff.test@swissfoodresearch.ch', true);
 """
 
@@ -261,3 +261,38 @@ def test_knowledge_write_and_access(db):
         cur.execute("select count(*) from knowledge.instrument")
         assert cur.fetchone()[0] == 1
         c.rollback()
+
+
+def test_attending_matches_members_by_domain(db):
+    """Members by exact domain, departments merged, cancellations and freemail left out,
+    non-members only counted, nothing below the minimum."""
+    from datetime import date as _date
+    from web import attending as att
+    with psycopg.connect(db, autocommit=True) as c, c.cursor() as cur:
+        cur.execute("""insert into events.event (id, source, monday_item_id, kind, title_src, event_date, published)
+                       overriding system value values (990001, 'monday', 990001, 'ig', 'Future meeting', '2027-03-01', true)
+                       on conflict (id) do nothing""")
+        cur.execute("""insert into events.attendee_group (monday_group_id, title, group_date, event_id, match_method)
+                       values ('g_future', '2027-03-01 / Future meeting', '2027-03-01',
+                               990001, 'manual') on conflict do nothing""")
+        cur.execute("""insert into public.crm_members (domain, status, item_id, name) values
+            ('zhaw.ch','active',11,'ZHAW Life Sciences'),('zhaw.ch','active',12,'ZHAW Food Technology'),
+            ('a.ch','active',13,'Alpha'),('b.ch','active',14,'Beta'),('c.ch','active',15,'Gamma'),
+            ('d.ch','foundations - no voting rights',16,'Delta')""")
+        rows = [(901,'x@zhaw.ch',None),(902,'y@zhaw.ch',None),(903,'a@a.ch',None),(904,'b@b.ch','Not Attending'),
+                (905,'c@c.ch',None),(906,'d@d.ch',None),(907,'m@member.ch',None),(908,'p@gmail.com',None),
+                (909,'q@nonmember.ch',None),(910,'r@nonmember.ch',None),(911,'s@other.org',None),
+                (912,'t@swissfoodresearch.ch',None)]
+        for i, email, st in rows:
+            cur.execute("insert into events.attendee (monday_item_id, group_id, email, status_raw) values (%s,'g_future',%s,%s)",
+                        [i, email, st])
+    with psycopg.connect(db) as c:
+        got = att.collect(c, _date(2026, 11, 24), {"enabled": True, "min_members": 5})
+        a = got["990001"]
+        assert [o.name for o in a.members] == ["Alpha", "Delta", "Gamma", "Member AG", "ZHAW"]
+        assert a.others == 2                      # nonmember.ch and other.org; gmail and SFR left out
+        assert att.collect(c, _date(2026, 11, 24), {"enabled": True, "min_members": 6}) == {}
+        assert att.collect(c, _date(2026, 11, 24), {"enabled": False}) == {}
+        ex = att.collect(c, _date(2026, 11, 24), {"enabled": True, "min_members": 4, "exclude": ["alpha"]})
+        assert "Alpha" not in [o.name for o in ex["990001"].members]
+        assert att.collect(c, _date(2027, 3, 2), {"enabled": True, "min_members": 5}) == {}   # after the event

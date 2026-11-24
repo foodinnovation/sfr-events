@@ -127,3 +127,21 @@ random. Everyone else sees the membership ad.
 
 A push publishes the change in about 10 minutes.
 
+## Member organisations attending
+
+Upcoming event pages show the logos of the member organisations registered for the event, in
+the right-hand column (`web/attending.py`, settings in `config/logo_wall.json`).
+
+* Registrations on the Events attendees board are matched to members by exact email domain,
+  the rule that gives members access to presentations. Departments sharing a domain get one
+  tile. Cancellations and no-shows do not count; freemail and SFR's own domain are left out.
+* Non-member organisations are only counted ("plus 20 other organisations"). No person,
+  address or head count per organisation is published.
+* The block shows from `min_members` (5) member organisations, at most `max_logos` (12)
+  logos, and disappears once the event date has passed.
+* Logos come from the Logo column of the monday board Mitglieder (the source of the SFR Design
+  System 2026 member logos), downloaded at build time for upcoming events only and served from
+  the hub. White logos get a dark tile. A logo that cannot be used becomes a name tile.
+* To hide an organisation, add its member name or email domain to `exclude`. To switch the
+  block off, set `enabled` to false.
+
