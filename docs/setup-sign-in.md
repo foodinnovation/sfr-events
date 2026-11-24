@@ -83,7 +83,7 @@ hour or two before the permission works.
    Click **Generate secret**, copy it (starts with `v1,whsec_`), enable the hook.
 3. Edge Functions > **Secrets**: add `SEND_EMAIL_HOOK_SECRET` with that value.
 4. Authentication > **URL Configuration**
-   * Site URL: `https://foodinnovation.github.io/sfr-events/`
+   * Site URL: `https://hub.swissfoodresearch.ch/`
    * Redirect URLs: `https://foodinnovation.github.io/sfr-events/**`,
      `https://hub.swissfoodresearch.ch/**`, `http://localhost:8000/**`
 

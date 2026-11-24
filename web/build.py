@@ -37,7 +37,7 @@ from web import attending as att  # noqa: E402
 
 SUPABASE_URL = "https://iudsjtrdtncqqhswcnfu.supabase.co"
 PUBLISHABLE_KEY = "sb_publishable_o-EAN8xKYr-dKhcoflQ5SQ_49go67yT"   # public by design
-SITE_BASE = os.environ.get("SITE_BASE", "/sfr-events/")   # path of the site root on its host
+SITE_BASE = os.environ.get("SITE_BASE", "/")   # path of the site root on its host (hub.swissfoodresearch.ch)
 ORG = "Swiss Food Research"
 CONTACT = "contact@swissfoodresearch.ch"
 

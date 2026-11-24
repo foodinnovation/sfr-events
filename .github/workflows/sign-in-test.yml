@@ -20,7 +20,7 @@ jobs:
           echo "::add-mask::$EMAIL"
           body=$(jq -n --arg e "$EMAIL" '{email:$e, create_user:true}')
           code=$(curl -s -o resp.json -w '%{http_code}' -X POST \
-            "$URL/auth/v1/otp?redirect_to=https://foodinnovation.github.io/sfr-events/" \
+            "$URL/auth/v1/otp?redirect_to=https://hub.swissfoodresearch.ch/" \
             -H "apikey: $KEY" -H "Content-Type: application/json" -d "$body")
           echo "HTTP $code"; cat resp.json; echo
           test "$code" = "200"
