@@ -296,3 +296,14 @@ def test_attending_matches_members_by_domain(db):
         ex = att.collect(c, _date(2026, 11, 24), {"enabled": True, "min_members": 4, "exclude": ["alpha"]})
         assert "Alpha" not in [o.name for o in ex["990001"].members]
         assert att.collect(c, _date(2027, 3, 2), {"enabled": True, "min_members": 5}) == {}   # after the event
+
+
+def test_usage_counts_expire_after_13_months(db):
+    with psycopg.connect(db, autocommit=True) as c, c.cursor() as cur:
+        cur.execute("""insert into events.metric (at, kind, page, role) values
+                       (now() - interval '14 months', 'view', '/old/', 'visitor'),
+                       (now() - interval '12 months', 'view', '/kept/', 'visitor')""")
+        cur.execute("select events.purge_old_usage()")
+        cur.execute("select page from events.metric order by page")
+        assert [r[0] for r in cur.fetchall()] == ["/kept/"]
+        cur.execute("delete from events.metric")

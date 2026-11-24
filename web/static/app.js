@@ -7,6 +7,43 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
+  /* ------------------------------------------------------------------ usage counting */
+  /* Cookieless counting (functions/v1/metric): action, page, a short reference, the visitor's role,
+     the referring site and mobile or not. No cookie, no visitor id, nothing about the person.
+     Sent in the background with sendBeacon; waits up to 2.5 s for the sign-in check so the role
+     is known. Browsers driven by automation are not counted. */
+  var MFN = cfg.supabaseUrl + "/functions/v1/metric";
+  var mRole = "visitor", mReady = false, mQueue = [], mTimer = null;
+  var mOn = !!(cfg.supabaseUrl && navigator.sendBeacon && !navigator.webdriver);
+  var mMobile = window.matchMedia ? window.matchMedia("(max-width: 760px)").matches : false;
+  function mFlush() {
+    mTimer = null;
+    if (!mOn || !mQueue.length) return;
+    var batch = mQueue.splice(0, 20);
+    batch.forEach(function (e) { e.o = mRole; });
+    try { navigator.sendBeacon(MFN, JSON.stringify(batch)); } catch (e) { /* counting never breaks the page */ }
+    if (mQueue.length) mFlush();
+  }
+  function track(kind, ref, withSource) {
+    if (!mOn) return;
+    var e = { k: kind, p: location.pathname, r: ref || null, m: mMobile };
+    if (withSource && document.referrer) { try { e.s = new URL(document.referrer).origin; } catch (x) { /* none */ } }
+    mQueue.push(e);
+    if (!mReady) return;
+    if (/click|register/.test(kind)) { clearTimeout(mTimer); mFlush(); }   // the visitor may be leaving
+    else if (!mTimer) mTimer = setTimeout(mFlush, 800);
+  }
+  function mSetRole(access) {
+    var a = access && access.access;
+    mRole = a === "staff" || a === "member" || a === "participant" ? a : "visitor";
+    if (!mReady) { mReady = true; mFlush(); }
+  }
+  function mReadyNow() { if (!mReady) { mReady = true; mFlush(); } countAd(); }
+  setTimeout(function () { mReadyNow(); }, 2500);
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") mFlush(); });
+  var mSlug = (location.pathname.match(/\/events\/([^/]+)\/?$/) || [])[1] || null;
+  track("view", mSlug, true);
+
   function toast(msg) {
     var t = document.createElement("div");
     t.className = "toast"; t.setAttribute("role", "status"); t.textContent = msg;
@@ -17,7 +54,12 @@
   /* ------------------------------------------------------------------ ads (index) */
   /* One ad in the upcoming list (config/ads.json): members and staff see a service, matched to
      the Innovation Group filter or a general one; everyone else the membership ad. */
-  var adGroup = "", adRole = "public", adPick = null;
+  var adGroup = "", adRole = "public", adPick = null, adShown = null;
+  function countAd() {   // an ad counts as shown only once we know who sees it
+    if (mReady && adShown && !adShown.hidden && !adShown.dataset.counted) {
+      adShown.dataset.counted = "1"; track("ad_view", adShown.dataset.ad);
+    }
+  }
   function placeAd() {
     var list = $("#upcoming"); if (!list) return;
     var ads = $$(".ad", list); if (!ads.length) return;
@@ -41,6 +83,7 @@
     var after = shown[Math.min(slot - 1, shown.length) - 1];
     after.parentNode.insertBefore(choice, after.nextSibling);
     choice.hidden = false;
+    adShown = choice; countAd();
   }
 
   /* ------------------------------------------------------------------ filters (index) */
@@ -78,13 +121,44 @@
       history.replaceState(null, "", location.pathname + (u.toString() ? "?" + u : "") + location.hash);
       adGroup = state.ig; placeAd();
     };
+    var lastTerm = "", termTimer = null;
     $$(".chip", filters).forEach(function (c) {
-      c.addEventListener("click", function () { state.kind = c.dataset.kind; apply(); });
+      c.addEventListener("click", function () {
+        state.kind = c.dataset.kind; apply();
+        if (state.kind !== "all") track("filter", "type: " + c.textContent.trim());
+      });
     });
-    $("#f-ig").addEventListener("change", function (e) { state.ig = e.target.value; apply(); });
-    $("#f-q").addEventListener("input", function (e) { state.q = e.target.value; apply(); });
+    $("#f-ig").addEventListener("change", function (e) {
+      state.ig = e.target.value; apply();
+      if (state.ig) track("filter", "group: " + e.target.options[e.target.selectedIndex].text);
+    });
+    $("#f-q").addEventListener("input", function (e) {
+      state.q = e.target.value; apply();
+      clearTimeout(termTimer);
+      termTimer = setTimeout(function () {
+        var t = state.q.trim().toLowerCase();
+        if (t.length >= 3 && t !== lastTerm && t.indexOf("@") < 0) { lastTerm = t; track("search", t); }
+      }, 1500);
+    });
     apply();
   }
+
+  /* ------------------------------------------------------------------ counted clicks */
+  var mRegistered = false;
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest && ev.target.closest("a, button");
+    if (!a) return;
+    var ad = a.closest(".ad");
+    if (ad && a.tagName === "A") track("ad_click", ad.dataset.ad);
+    var href = a.getAttribute("href") || "";
+    if (href.indexOf("mailto:") === 0 || a.closest(".mail-alt")) {
+      var what = ad ? "ad: " + ad.dataset.ad : a.closest(".programme-pending") ? "suggest a topic" : "contact address";
+      if (!a.closest(".mail-alt")) track("mail_click", what);
+    }
+    if (!mRegistered && (a.hasAttribute("data-register") || (a.closest(".event-side") && a.classList.contains("btn-primary")))) {
+      mRegistered = true; track("register", mSlug);       // once per page view
+    }
+  }, true);
 
   /* ------------------------------------------------------------------ email buttons */
   /* A mailto button does nothing when the browser has no mail app set up (Outlook or Gmail in
@@ -312,8 +386,10 @@
   if (reg && location.hash === "#register") openRegistration();
 
   /* other parts of the hub (the knowledge tab) listen for sign-in changes */
-  window.SFR = { sb: sb, openDialog: openDialog, toast: toast };
+  window.SFR = { sb: sb, openDialog: openDialog, toast: toast, track: track };
   function announce(session) {
+    mSetRole(session ? access : null);
+    $$("[data-staff-only]").forEach(function (t) { t.hidden = !(session && access && access.access === "staff"); });
     adRole = session && access && (access.access === "member" || access.access === "staff") ? "members" : "public";
     placeAd();
     document.dispatchEvent(new CustomEvent("sfr:session", { detail: { session: session, access: access } }));

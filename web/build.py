@@ -259,6 +259,8 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
         cur = ' aria-current="page"' if on else ""
         return f'<a class="{cls}" href="{href}"{cur}>{label}</a>'
     tabs = tab_link("events", up or "./", "Events") + tab_link("knowledge", f"{up}knowledge/", KNOWLEDGE)
+    # Statistics: in every page but hidden; app.js shows it to signed-in staff only
+    tabs += tab_link("stats", f"{up}stats/", "Statistics").replace('<a class="', '<a hidden data-staff-only class="', 1)
     extra = "".join(f'<script src="{up}assets/{js}"></script>' for js in scripts)
     extra_css = "".join(f'<link rel="stylesheet" href="{up}assets/{css}">' for css in styles)
     body_attr = f' class="{body_class}"' if body_class else ""
@@ -295,7 +297,7 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
     <img src="{up}assets/img/logo-sfr-white.svg" alt="{ORG}" height="48">
     <p>Presentations are available to members of {ORG} and to registered participants of each event.
     Questions: <a href="mailto:{CONTACT}">{CONTACT}</a></p>
-    <p class="sfr-note"><a href="https://www.swissfoodresearch.ch/">{ORG}</a></p>
+    <p class="sfr-note"><a href="{up}privacy/">Privacy</a> &middot; <a href="https://www.swissfoodresearch.ch/">{ORG}</a></p>
   </div>
 </footer>
 <dialog id="signin" class="dialog" aria-labelledby="signin-title">
@@ -689,6 +691,122 @@ def knowledge_page() -> str:
                           "knowledge/app.js"))
 
 
+# --------------------------------------------------------------------------- statistics (staff only)
+
+def stats_page() -> str:
+    """Empty shell: figures load in the browser for signed-in staff (functions/v1/stats)."""
+    body = f"""
+<section class="hero hero-compact"><div class="wrap">
+  <p class="sfr-sub01 eyebrow">For Swiss Food Research staff</p>
+  <h1>Statistics</h1>
+</div></section>
+<div class="wrap block" id="stats" data-ad-names="{esc(json.dumps({k: v.get("label") or k for k, v in [("membership", load_ads().get("membership") or {})] + list((load_ads().get("services") or {}).items())}))}">
+  <form class="st-controls" onsubmit="return false">
+    <label for="st-period">Period</label>
+    <select id="st-period">
+      <option value="7">Last 7 days</option>
+      <option value="30" selected>Last 30 days</option>
+      <option value="90">Last 90 days</option>
+      <option value="365">Last 12 months</option>
+      <option value="custom">Choose dates</option>
+    </select>
+    <span id="st-custom" hidden>
+      <label class="visually-hidden" for="st-from">From</label><input type="date" id="st-from">
+      <label class="visually-hidden" for="st-to">To</label><input type="date" id="st-to">
+      <button type="button" class="btn btn-secondary btn-sm" id="st-apply">Show</button>
+    </span>
+  </form>
+  <p class="muted" id="stats-note" role="status">Sign in with your Swiss Food Research address to see the statistics.</p>
+  <div id="stats-out"></div>
+</div>"""
+    return shell(f"Statistics | {ORG}", body, 1, "Usage statistics of the SFR hub, for staff.", tab="stats",
+                 scripts=("stats.js",)).replace("<head>", '<head>\n<meta name="robots" content="noindex">', 1)
+
+
+# --------------------------------------------------------------------------- privacy
+
+PRIVACY_UPDATED = "24 November 2026"
+
+
+def privacy_page() -> str:
+    body = f"""
+<section class="hero hero-compact"><div class="wrap">
+  <p class="sfr-sub01 eyebrow">{ORG}</p>
+  <h1>Privacy on the SFR hub</h1>
+</div></section>
+<div class="wrap block"><div class="prose">
+<p class="lead">This page explains what the SFR hub (Events, Radicle \u2013 Knowledge and the presentation
+archive) does with personal data. It adds to the general
+<a href="https://www.swissfoodresearch.ch/en/privacy-policy/">privacy policy of {ORG}</a>, which applies too.</p>
+
+<h2>Who is responsible</h2>
+<p>{ORG}, Technoparkstrasse 1, Postfach 140, 8005 Z\u00fcrich, Switzerland.
+Questions and requests: <a href="mailto:{CONTACT}">{CONTACT}</a>.</p>
+
+<h2>Browsing without signing in</h2>
+<p>The hub sets no cookies and loads no fonts, scripts or images from other websites: they all come
+from the hub itself. The pages are served by GitHub Pages (GitHub, Inc., USA), whose
+servers record technical access data such as IP addresses under
+<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub's privacy statement</a>.</p>
+
+<h2>Usage counting</h2>
+<p>To learn which events and services interest visitors, the hub counts a few actions: page views,
+clicks on Register, on ads and on email buttons, searches and filters on the events list, and in
+Radicle \u2013 Knowledge the topics opened and how often the quick search and the Funding Finder are used.</p>
+<p>Each count holds only the time, the page, the action, a short reference (for example the event, the ad
+or a search term), the visitor's role (visitor, participant, member or staff), the website the visitor
+came from (domain only) and whether the device is mobile. No IP address, email address, cookie or
+identifier is stored, so counts cannot be linked to a person or to each other. Text typed into
+Radicle \u2013 Knowledge, including project ideas, is never counted. Counts are deleted after 13 months.
+Only {ORG} staff can see the totals.</p>
+
+<h2>Signing in</h2>
+<p>To open presentations or Radicle \u2013 Knowledge you sign in with Microsoft or with a link or code sent
+to your email address. The hub then stores your email address and the times you signed in. Your
+sign-in is kept in your browser's local storage (not a cookie) until you sign out. With Microsoft
+sign-in, Microsoft confirms your address under its own privacy terms. The sign-in service also keeps
+a record of sign-ins with the network (IP) address used, to protect accounts against misuse.
+To delete your account, write to us.</p>
+
+<h2>Presentations</h2>
+<p>Presentations stay on the SharePoint site of {ORG}. When you open one, the hub checks whether you may:
+members of {ORG} by the domain of their email address, participants by their registration. Each
+request is logged with your email address, the presentation, the result and the time, so that misuse
+can be traced. This log is deleted after 13 months. The presentation itself opens through a
+time-limited Microsoft link.</p>
+
+<h2>Registrations</h2>
+<p>Registrations made through ti.to or Eventbrite reach {ORG}'s event planning in monday.com. The hub
+copies only the email address and the registration status, to give participants access to the
+presentations of their event. A registration leaves the hub when it is removed there.</p>
+<p>On the page of an upcoming event, the hub shows the logos of member organisations whose people have
+registered, once at least five member organisations have. Registrations from other organisations are
+only counted. No person is named. A member organisation that does not want to appear can write to
+<a href="mailto:{CONTACT}">{CONTACT}</a>.</p>
+<p>The ti.to and Eventbrite sign-up forms load only when you open them on an event page; their own
+privacy policies then apply. Links to Google Maps open Google Maps only when you click them.</p>
+
+<h2>Radicle \u2013 Knowledge</h2>
+<p>Searches and Funding Finder requests are processed to show results and are not saved in the hub's
+database. The articles,
+projects and funding programmes come from public sources and from {ORG}'s own records.</p>
+
+<h2>Where data is kept</h2>
+<p>The hub's database and functions run on Supabase, in its Zurich data centre. Event data comes from
+monday.com. Presentations are held in Microsoft SharePoint. Like any web service, Supabase keeps
+technical request logs for a few days, which can include IP addresses and the addresses of the
+requests; {ORG} uses them only to fix faults.</p>
+
+<h2>Your rights</h2>
+<p>You can ask what data the hub holds about you, have it corrected or deleted, and withdraw from
+signing in at any time: write to <a href="mailto:{CONTACT}">{CONTACT}</a>. You may also complain to the
+Federal Data Protection and Information Commissioner (FDPIC).</p>
+
+<p class="muted">Last updated {PRIVACY_UPDATED}.</p>
+</div></div>"""
+    return shell(f"Privacy | {ORG}", body, 1, f"How the SFR hub of {ORG} handles personal data.", tab="")
+
+
 # --------------------------------------------------------------------------- build
 
 def public_json(events: list[dict]) -> list[dict]:
@@ -719,6 +837,10 @@ def build(out: Path, events: list[dict], today: date, attending: dict | None = N
             (out / "assets" / "members" / name).write_bytes(data)
     (out / "knowledge").mkdir()
     (out / "knowledge" / "index.html").write_text(knowledge_page())
+    (out / "stats").mkdir()
+    (out / "stats" / "index.html").write_text(stats_page())
+    (out / "privacy").mkdir()
+    (out / "privacy" / "index.html").write_text(privacy_page())
     (out / "404.html").write_text(shell(f"Not found | {ORG}", '<div class="wrap block"><h1>Page not found</h1>'
                                         f'<p><a href="{SITE_BASE}">Back to all events</a></p></div>', 0))
     (out / ".nojekyll").write_text("")

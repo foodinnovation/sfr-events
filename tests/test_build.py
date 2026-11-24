@@ -174,3 +174,18 @@ def test_web_logo_and_light_detection():
     import pytest
     with pytest.raises(ValueError):
         att.web_logo(b'<svg onload="alert(1)"></svg>', "svg")
+
+
+def test_privacy_and_statistics_pages():
+    from datetime import date
+    priv = b.privacy_page()
+    for part in ("Usage counting", "No IP address, email address, cookie or", "13 months", "Technoparkstrasse 1",
+                 "privacy-policy", "Federal Data Protection and Information Commissioner"):
+        assert part in priv
+    assert "—" not in priv
+    st = b.stats_page()
+    assert 'name="robots" content="noindex"' in st and "assets/stats.js" in st and 'id="stats-out"' in st
+    # every page: the Statistics tab exists but stays hidden until app.js sees staff; footer links privacy
+    page = b.index_page([], date(2026, 11, 24), ads={"enabled": False})
+    assert '<a hidden data-staff-only class="hub-tab" href="stats/">Statistics</a>' in page
+    assert '<a href="privacy/">Privacy</a>' in page

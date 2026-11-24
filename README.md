@@ -145,3 +145,19 @@ the right-hand column (`web/attending.py`, settings in `config/logo_wall.json`).
 * To hide an organisation, add its member name or email domain to `exclude`. To switch the
   block off, set `enabled` to false.
 
+## Usage counting and the Statistics tab
+
+`app.js` counts a few actions without cookies or personal data and sends them in the background
+(`navigator.sendBeacon`) to the edge function `metric`, which stores them in `events.metric`:
+page views, Register clicks, ads shown and clicked, email-button clicks, events-list searches and
+filters, and in Radicle – Knowledge topics opened, quick searches and Funding Finder runs (no text).
+Each row holds time, action, page, a short reference, role (visitor, participant, member, staff),
+referring domain and mobile or not. No IP address, email address or visitor id. Browsers driven
+by automation and known bots are not counted. Rows older than 13 months, and presentation-access
+log entries of the same age, are deleted nightly (`events.purge_old_usage`, pg_cron
+`sfr-hub-usage-purge`).
+
+The Statistics tab (`/stats/`) is visible to signed-in staff only and reads aggregates from the
+edge function `stats`, which checks staff access itself. The Privacy page (`/privacy/`) describes
+all of this; keep it in step with any change.
+

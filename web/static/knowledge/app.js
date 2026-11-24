@@ -440,9 +440,12 @@
     return t ? str(t.label) : humanize(slug);
   }
 
+  function count(kind, ref) { if (window.SFR && window.SFR.track) window.SFR.track(kind, ref); }
+
   function openTopic(slug, opts) {
     if (!slug) return;
     opts = opts || {};
+    if (slug !== state.activeSlug) count('kn_topic', slug);
     var existing = state.tabs.find(function (t) { return t.slug === slug; });
     if (!existing) state.tabs.push({ slug: slug, label: labelFor(slug) });
     state.activeSlug = slug;
@@ -742,6 +745,7 @@
       $('#finder-results').innerHTML = finderResultsHtml();
       go.disabled = true; go.textContent = 'Matching…';
       function resetBtn() { if (go) { go.disabled = false; go.textContent = 'Find matches'; } }
+      count('kn_finder');   // the idea itself is never sent anywhere but the finder
       apiPost('/funding-finder', { idea: text, active_only: state.finder.activeOnly, min_severity: state.finder.minSev })
         .then(function (res) {
           state.finder.result = res; state.finder.loading = false;
@@ -1124,6 +1128,7 @@
      ============================================================ */
   function openSwitcher() {
     state.switcherOpen = true;
+    state.swCounted = false;
     el.switcher.hidden = false;
     el.switcherInput.value = '';
     renderSwitcherResults('', null);
@@ -1171,6 +1176,7 @@
     if (q.trim().length >= 2) {
       state.swSearchTimer = setTimeout(function () {
         var seq = ++state.swSearchSeq;
+        if (!state.swCounted) { state.swCounted = true; count('kn_search'); }   // once per opening, no text
         api('/search?q=' + encodeURIComponent(q.trim()) + '&limit=8').then(function (res) {
           if (seq !== state.swSearchSeq || !state.switcherOpen) return;
           if (el.switcherInput.value === q) renderSwitcherResults(q, res || {});
