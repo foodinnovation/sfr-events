@@ -4,6 +4,8 @@ The Swiss Food Research hub at hub.swissfoodresearch.ch: a home page and three t
 
 * **Home** (`/`): the next three SFR and Innovation Group events, Pulse's top three of the week,
   a free 1:1 session with a Calendly calendar, Radicle and the newsletter. See "The home page" below.
+* **Services** (`/services/`): the SFR services, found by need ("What do you need?"), with a detail
+  view per service, all services by pillar and the free 1:1. See "The Services page" below.
 * **Events** (`/events/`): upcoming events, the archive back to 2015, and the presentation decks for
   members and participants. One page per event at `/events/<slug>/`.
 * **Radicle – Knowledge**: radicle's topic articles, the ~6,600 relevant funded projects
@@ -166,6 +168,29 @@ links sit in `config/home.json`; a push republishes the site in about 10 minutes
 * **Counting**: clicks on the home page's buttons (`home_click`) and the calendar being shown
   (`booking_open`) appear in the Statistics tab under "Home page". Page views of `/` before
   26 November 2026 were views of the events list.
+
+## The Services page
+
+`/services/` (`services_page` in `web/build.py`, script `web/static/services.js`) shows the SFR
+services. Its texts are not written in this repo: the website's service finder
+(`foodinnovation/sfr-service-finder`) publishes the public, English texts of the **SFR Service
+Catalogue 2027** with their structure and icons, and each sync copies them into `data/services/`
+(`python -m web.services --refresh data/services`). A copy is kept only when it is complete; if the
+finder is unreachable or half-published, the last good copy stays. So to change a service, change the
+catalogue and let the `service-finder-sync` skill update the finder; the hub follows within about
+30 minutes.
+
+* **What do you need?**: the finder's six questions; the first service of each is the best match.
+  `?q=<question>&s=<service>` opens the page on a question and service.
+* **Detail**: what it is, when, how it works, who it is for, financing, the main button and the next
+  step. Buttons: coaching and every service without its own button lead to the free 1:1 (`#book`,
+  Calendly on click); Radicle to `/knowledge/`, Innovation Groups to `/events/?type=ig`, Events to
+  `/events/`, Newsletter to the form in `config/home.json`, Booster and MaaS as on the website
+  (`service_cta`).
+* **Your member advantages**: signed-in members and staff see the services marked
+  `member_advantage`; visitors see the badges only.
+* **Counting**: question choices, opened services and their buttons (`svc_click`) and the 1:1 calendar
+  shown there appear in the Statistics tab under "Services page".
 
 ## Open items
 

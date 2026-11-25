@@ -310,3 +310,70 @@ def test_events_list_lives_under_events(tmp_path):
 def test_privacy_page_explains_calendly():
     priv = b.privacy_page()
     assert "<h2>Booking a 1:1 session</h2>" in priv and "loads only when you click" in priv
+
+
+# ---------------------------------------------------------------- services page
+
+def _svc_data():
+    from web import services as sv
+    return sv.load()
+
+
+def test_services_copy_is_complete_and_checked():
+    from web import services as sv
+    d = _svc_data()
+    assert sv.problems(d["text"], d["structure"], d["icons"]) == []
+    assert len(d["structure"]["services"]) == 16
+    broken = {"services": dict(d["text"]["services"])}
+    broken["services"].pop("maas")
+    assert any("maas" in p for p in sv.problems({**d["text"], **broken}, d["structure"], d["icons"]))
+    assert 'fill="currentColor"' in d["icons"]["rocket"] and 'aria-hidden="true"' in d["icons"]["rocket"]
+
+
+def test_services_refresh_keeps_last_copy_when_finder_is_down(tmp_path):
+    from web import services as sv
+    issues = sv.refresh(tmp_path / "svc", base="http://127.0.0.1:9/")   # nothing listens there
+    assert issues and not (tmp_path / "svc").exists()
+
+
+def test_services_page_content_and_buttons():
+    d = _svc_data()
+    page = b.services_page(d)
+    t, st = d["text"], d["structure"]
+    for k, x in t["services"].items():                        # every service: card and detail
+        assert f'data-item="{k}"' in page and b.esc(x["title"]) in page
+    for q in st["questions"]:                                 # every question
+        assert f'data-q="{q["id"]}"' in page
+    default = st["default_question"]
+    assert f'class="svc-q is-on" data-q="{default}"' in page
+    assert f'<div class="svc-panel" data-panel="{default}">' in page          # default panel open
+    assert 'href="#book" data-book data-svc-cta="coach">Book a free 1:1' in page
+    assert 'href="../knowledge/" data-svc-cta="radicle"' in page
+    assert 'href="../events/?type=ig" data-svc-cta="ig"' in page
+    assert 'href="../events/" data-svc-cta="events"' in page
+    assert b.load_home()["newsletter"]["url"] in page
+    assert 'data-svc-cta="amp">Talk to us' in page                            # no button of its own
+    assert 'id="svc-mine" aria-labelledby="h-mine" hidden' in page            # members only, via JS
+    assert "As a member you get better terms for these 9 services." in page
+    assert "<h2 id=\"h-all\" class=\"section-head\">All 16 services at a glance</h2>" in page
+    assert 'id="cal-load"' in page and "<iframe" not in page                  # Calendly on click only
+    assert "assets/services.js" in page and "assets/booking.js" in page
+    import re
+    # no prices; the only amount allowed is the Booster grant (funding, not a price)
+    assert all(page[m.end():m.end() + 3] == " 39" for m in re.finditer("CHF", page))
+    assert "—" not in page
+    assert '<a class="hub-tab is-on" href="../services/" aria-current="page">Services</a>' in page
+
+
+def test_services_tab_and_home_link():
+    from datetime import date
+    home = b.home_page([], date(2026, 11, 25))
+    assert '<a class="hub-tab" href="services/">Services</a>' in home
+    assert 'href="services/" data-home="services">Or browse all our services' in home
+    assert "assets/booking.js" in home
+
+
+def test_build_writes_services_page(tmp_path):
+    from datetime import date
+    b.build(tmp_path / "s", [], date(2026, 11, 25))
+    assert 'id="svc-detail"' in (tmp_path / "s" / "services" / "index.html").read_text()

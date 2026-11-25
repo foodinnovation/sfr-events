@@ -273,7 +273,8 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
         cls = "hub-tab is-on" if on else "hub-tab"
         cur = ' aria-current="page"' if on else ""
         return f'<a class="{cls}" href="{href}"{cur}>{label}</a>'
-    tabs = tab_link("events", f"{up}events/", "Events") + tab_link("knowledge", f"{up}knowledge/", KNOWLEDGE)
+    tabs = (tab_link("events", f"{up}events/", "Events") + tab_link("services", f"{up}services/", "Services")
+            + tab_link("knowledge", f"{up}knowledge/", KNOWLEDGE))
     pulse_tab = tab_link("pulse", f"{up}pulse/", "Pulse")
     # Pulse: visible to everyone once config/pulse.json says public, before that to signed-in staff only
     tabs += pulse_tab if load_pulse().get("public") else pulse_tab.replace('<a class="', '<a hidden data-staff-only class="', 1)
@@ -480,6 +481,144 @@ def index_page(events: list[dict], today: date, ads: dict | None = None) -> str:
     return shell(f"Events | {ORG}", body, 1, EVENTS_DESCRIPTION)
 
 
+# --------------------------------------------------------------------------- services page
+
+def service_cta(key: str, svc: dict, text: dict, links: dict, newsletter: str) -> tuple[str, str, str]:
+    """Label, address and extra attributes of a service's main button on the hub. Coaching and every
+    service without a button of its own lead to the hub's free 1:1 session (#book)."""
+    ext = ' target="_blank" rel="noopener"'
+    link = svc.get("link")
+    if key == "events":
+        return "See upcoming events", "../events/", ""
+    if key == "news":
+        return "Subscribe", newsletter, ext
+    if link == "radicle":
+        return f"Open {KNOWLEDGE}", "../knowledge/", ""
+    if link == "ig":
+        return "See upcoming IG meetings", "../events/?type=ig", ""
+    if link == "booster" and links.get("booster"):
+        return text.get("button") or "Visit the Booster", links["booster"], ext
+    if link == "maasRequest" and links.get("maasRequest"):
+        return text.get("button") or "Request MaaS", links["maasRequest"], ""
+    if link == "coaching":
+        return "Book a free 1:1", "#book", " data-book"
+    return "Talk to us", "#book", " data-book"
+
+
+def services_page(data: dict | None = None, home: dict | None = None) -> str:
+    """/services/: the catalogue's public texts as the website's service finder publishes them
+    (web/services.py copies them). Six questions lead to the matching services; every service has a
+    detail view; all services by pillar below; the free 1:1 at the end. Signed-in members also see
+    the services where they get better terms (services.js)."""
+    from web.services import load as load_services
+    data = load_services() if data is None else data
+    home = load_home() if home is None else home
+    t, st, icons = data["text"], data["structure"], data["icons"]
+    ui, txt, svcs, links = t["ui"], t["services"], st["services"], t.get("links", {})
+    default_q = st["default_question"]
+
+    def icon_of(k: str) -> str:
+        return f'<span class="svc-icon svc-{svcs[k]["pillar"]}">{icons[svcs[k]["icon"]]}</span>'
+
+    def badges(k: str, best: bool = False) -> str:
+        out = []
+        if best:
+            out.append(f'<span class="svc-badge svc-badge-best">{esc(ui["best_match"])}</span>')
+        if svcs[k].get("member_advantage"):
+            out.append(f'<span class="svc-badge svc-badge-member">{esc(ui["member_badge"])}</span>')
+        if svcs[k].get("pilot"):
+            out.append('<span class="svc-badge svc-badge-pilot">Pilot</span>')
+        return f'<span class="svc-badges">{"".join(out)}</span>' if out else ""
+
+    def card(k: str, best: bool = False, compact: bool = False, plain: bool = False) -> str:
+        line = "" if compact else f'<span class="svc-line">{esc(txt[k]["line"])}</span>'
+        return (f'<li><button type="button" class="svc-card{" is-compact" if compact else ""}" data-svc="{k}">'
+                f'{icon_of(k)}<span class="svc-card-body"><span class="svc-title">{esc(txt[k]["title"])}</span>'
+                f'{line}{"" if plain else badges(k, best)}</span></button></li>')
+
+    qtexts = t["questions"]
+    qbuttons = "".join(
+        f'<button type="button" class="svc-q{" is-on" if q["id"] == default_q else ""}" data-q="{q["id"]}" '
+        f'aria-pressed="{"true" if q["id"] == default_q else "false"}"><span class="svc-q-label">'
+        f'{esc(qtexts[q["id"]]["label"])}</span><span class="svc-q-hint">{esc(qtexts[q["id"]]["hint"])}</span></button>'
+        for q in st["questions"])
+    panels = "".join(
+        f'<div class="svc-panel" data-panel="{q["id"]}"{"" if q["id"] == default_q else " hidden"}>'
+        f'<h3 class="svc-panel-head">{esc(qtexts[q["id"]]["heading"])}</h3>'
+        f'<ol class="svc-cards">{"".join(card(k, best=(i == 0)) for i, k in enumerate(q["services"]))}</ol></div>'
+        for q in st["questions"])
+    first = next(q["services"][0] for q in st["questions"] if q["id"] == default_q)
+
+    def detail(k: str) -> str:
+        x, sv = txt[k], svcs[k]
+        label, href, attrs = service_cta(k, sv, x, links, home["newsletter"]["url"])
+        parts = [f'<p class="svc-blurb">{esc(x["blurb"])}</p>']
+        if x.get("when"):
+            parts.append(f'<p class="svc-when">{esc(x["when"])}</p>')
+        if x.get("steps"):
+            parts.append(f'<p class="svc-sub">{esc(ui["how_it_works"])}</p><ol class="svc-steps">'
+                         + "".join(f"<li>{esc(step)}</li>" for step in x["steps"]) + "</ol>")
+        parts.append(f'<p class="svc-sub">{esc(ui["for_whom"])}</p><p class="svc-aud">{esc(x["audience"])}</p>')
+        if x.get("financing"):
+            parts.append(f'<p class="svc-fin">{esc(x["financing"])}</p>')
+        acts = [f'<a class="btn btn-primary btn-sm" href="{esc(href)}"{attrs} data-svc-cta="{k}">{esc(label)}</a>']
+        if sv.get("next"):
+            nxt = txt[sv["next"]]["title"].split(":")[0]
+            acts.append(f'<button type="button" class="btn btn-secondary btn-sm" data-svc="{sv["next"]}">'
+                        f'{esc(ui["next_step"])}{esc(nxt)}</button>')
+        return (f'<article class="svc-item" id="s-{k}" data-item="{k}"{"" if k == first else " hidden"} '
+                f'aria-labelledby="t-{k}"><div class="svc-item-head">{icon_of(k)}<div>'
+                f'<p class="svc-pillar">{esc(t["pillars"][sv["pillar"]])}</p>'
+                f'<h3 id="t-{k}">{esc(x["title"])}</h3>{badges(k)}</div></div>'
+                + "".join(parts) + f'<div class="svc-actions">{"".join(acts)}</div></article>')
+
+    details = "".join(detail(k) for k in svcs)
+    n = len(svcs)
+    cols = "".join(
+        f'<div class="svc-col svc-col-{c["pillar"]}"><h3>{esc(t["pillars"][c["pillar"]])}</h3>'
+        f'<ol class="svc-cards">{"".join(card(k, compact=True) for k in c["services"])}</ol></div>'
+        for c in st["overview"])
+    mine = [k for k in svcs if svcs[k].get("member_advantage")]
+    mine_cards = "".join(card(k, compact=True, plain=True) for k in mine)
+    values = "".join(f"<li>{esc(v)}</li>" for v in ui.get("values", []))
+    body = f"""
+<noscript><style>.svc-panel, .svc-item {{ display: block !important; }}</style></noscript>
+<section class="hero svc-hero">
+  <div class="wrap">
+    <p class="sfr-sub01 eyebrow">Services</p>
+    <h1>{esc(ui['title'])}</h1>
+    <p class="lead">{esc(ui['lead'])}</p>
+    <ul class="svc-values">{values}</ul>
+  </div>
+</section>
+<div class="wrap">
+  <section class="svc-mine" id="svc-mine" aria-labelledby="h-mine" hidden>
+    <h2 id="h-mine" class="section-head">Your member advantages</h2>
+    <p>As a member you get better terms for these {len(mine)} services.</p>
+    <ol class="svc-cards svc-cards-grid">{mine_cards}</ol>
+  </section>
+
+  <section class="svc-finder" aria-labelledby="h-need">
+    <h2 id="h-need" class="section-head">What do you need?</h2>
+    <div class="svc-questions" role="group" aria-label="Choose what you need">{qbuttons}</div>
+    <div class="svc-layout">
+      <div class="svc-matches"><p class="svc-sub">{esc(ui['matches'])}</p>{panels}</div>
+      <div class="svc-detail" id="svc-detail" aria-live="polite">{details}</div>
+    </div>
+  </section>
+
+  <section class="svc-all" aria-labelledby="h-all">
+    <h2 id="h-all" class="section-head">{esc(ui['overview_heading'].replace('{n}', str(n)))}</h2>
+    <p class="svc-note">{esc(ui['overview_note'])} {esc(ui.get('financing_note', ''))}</p>
+    <div class="svc-cols">{cols}</div>
+  </section>
+
+  {booking_block(home['booking'], '../')}
+</div>"""
+    return shell(f"Services | {ORG}", body, 1, t.get("about", {}).get("summary", ""), tab="services",
+                 scripts=("services.js", "booking.js"))
+
+
 # --------------------------------------------------------------------------- home page
 
 HOME_FILE = ROOT.parent / "config" / "home.json"
@@ -512,6 +651,34 @@ def home_event(e: dict) -> str:
 </li>"""
 
 
+def booking_block(book: dict, up: str, more: bool = False) -> str:
+    """The free 1:1 session with its click-to-load Calendly calendar (home page and /services/).
+    Calendly is contacted only after the click (web/static/booking.js)."""
+    topics = "".join(f"<li>{esc(t)}</li>" for t in book["topics"])
+    link = (f'<p class="home-browse"><a href="{up}services/" data-home="services">Or browse all our services &rarr;</a></p>'
+            if more else "")
+    return f"""<section class="home-book" id="book" aria-labelledby="h-book">
+    <div class="home-book-text">
+      <p class="sfr-sub01 home-kicker">Free 1:1 session</p>
+      <h2 id="h-book">{esc(book['title'])}</h2>
+      <p>{esc(book['lead'])}</p>
+      <ul class="home-topics">{topics}</ul>
+      <p class="home-facts">{esc(book['facts'])}</p>
+      {link}
+    </div>
+    <div class="home-book-cal" id="book-cal">
+      <div class="home-cal-gate" id="cal-gate">
+        <p class="home-cal-head">Pick a time that suits you</p>
+        <button class="btn btn-primary" type="button" id="cal-load" data-url="{esc(book['url'])}">Show available slots</button>
+        <p class="home-cal-note">The calendar is provided by Calendly, a third-party booking service. It loads only after
+        you click, and Calendly may then set cookies. <a href="{up}privacy/">Privacy</a></p>
+        <p class="home-cal-alt"><a href="{esc(book['url'])}" target="_blank" rel="noopener" data-home="calendly-tab">Open in Calendly
+        <span aria-hidden="true">&#8599;</span></a></p>
+      </div>
+    </div>
+  </section>"""
+
+
 def home_page(events: list[dict], today: date, cfg: dict | None = None) -> str:
     """The hub's front door: next three SFR and Innovation Group events, Pulse's top three of the
     week (shown only while Pulse serves the visitor: staff until it opens), the free 1:1 session
@@ -523,7 +690,6 @@ def home_page(events: list[dict], today: date, cfg: dict | None = None) -> str:
         '<li class="empty">No meetings are scheduled yet. The full list includes partner events.</li>'
     pulse_public = bool(load_pulse().get("public"))
     hero, book, news = cfg["hero"], cfg["booking"], cfg["newsletter"]
-    topics = "".join(f"<li>{esc(t)}</li>" for t in book["topics"])
     body = f"""
 <script>(function () {{ var q = new URLSearchParams(location.search);
   if (q.has("group") || q.has("type") || q.has("q")) location.replace("events/" + location.search + location.hash); }})();</script>
@@ -553,25 +719,7 @@ def home_page(events: list[dict], today: date, cfg: dict | None = None) -> str:
     </section>
   </div>
 
-  <section class="home-book" id="book" aria-labelledby="h-book">
-    <div class="home-book-text">
-      <p class="sfr-sub01 home-kicker">Free 1:1 session</p>
-      <h2 id="h-book">{esc(book['title'])}</h2>
-      <p>{esc(book['lead'])}</p>
-      <ul class="home-topics">{topics}</ul>
-      <p class="home-facts">{esc(book['facts'])}</p>
-    </div>
-    <div class="home-book-cal" id="book-cal">
-      <div class="home-cal-gate" id="cal-gate">
-        <p class="home-cal-head">Pick a time that suits you</p>
-        <button class="btn btn-primary" type="button" id="cal-load" data-url="{esc(book['url'])}">Show available slots</button>
-        <p class="home-cal-note">The calendar is provided by Calendly, a third-party booking service. It loads only after
-        you click, and Calendly may then set cookies. <a href="privacy/">Privacy</a></p>
-        <p class="home-cal-alt"><a href="{esc(book['url'])}" target="_blank" rel="noopener" data-home="calendly-tab">Open in Calendly
-        <span aria-hidden="true">&#8599;</span></a></p>
-      </div>
-    </div>
-  </section>
+  {booking_block(book, "", more=True)}
 
   <div class="home-pair">
     <section class="pl-card pl-dark home-radicle" aria-labelledby="h-radicle">
@@ -591,7 +739,7 @@ def home_page(events: list[dict], today: date, cfg: dict | None = None) -> str:
     </section>
   </div>
 </div>"""
-    return shell(f"{ORG} hub", body, 0, tab="home", scripts=("home.js",))
+    return shell(f"{ORG} hub", body, 0, tab="home", scripts=("home.js", "booking.js"))
 
 
 # --------------------------------------------------------------------------- programme not yet out
@@ -1104,6 +1252,8 @@ def build(out: Path, events: list[dict], today: date, attending: dict | None = N
     (out / "index.html").write_text(home_page(events, today))
     (out / "events").mkdir()
     (out / "events" / "index.html").write_text(index_page(events, today))
+    (out / "services").mkdir()
+    (out / "services" / "index.html").write_text(services_page())
     for e in events:
         if e["kind"] != "external" and e["slug"]:
             p = out / "events" / e["slug"]

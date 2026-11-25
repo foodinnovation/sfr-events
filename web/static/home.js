@@ -1,6 +1,5 @@
-/* SFR hub home page: Pulse's top three of the week, the click-to-load Calendly calendar, the
-   members/visitors switch on the Radicle card, and counting of the home page's buttons.
-   Calendly is contacted only after the visitor clicks "Show available slots". Stores nothing. */
+/* SFR hub home page: Pulse's top three of the week, the members/visitors switch on the Radicle card, and counting of the home page's buttons.
+   The Calendly calendar is in booking.js. Stores nothing. */
 (function () {
   "use strict";
   var cfg = window.SFR_EVENTS || {};
@@ -16,20 +15,6 @@
   /* ------------------------------------------------------------------ counting */
   $$("[data-home]").forEach(function (a) {
     a.addEventListener("click", function () { track("home_click", a.dataset.home + (a.dataset.ref ? ": " + a.dataset.ref : "")); });
-  });
-
-  /* ------------------------------------------------------------------ Calendly, on request only */
-  var load = $("#cal-load");
-  if (load) load.addEventListener("click", function () {
-    var u = new URL(load.dataset.url);
-    u.searchParams.set("embed_type", "Inline");
-    u.searchParams.set("embed_domain", location.hostname);
-    u.searchParams.set("hide_gdpr_banner", "1");
-    u.searchParams.set("hide_event_type_details", "1");
-    var box = $("#book-cal");
-    box.innerHTML = '<iframe class="home-cal-frame" title="Book a free 1:1 session" src="' + esc(u.toString()) + '"></iframe>';
-    box.classList.add("is-loaded");
-    track("booking_open", "calendly");
   });
 
   /* ------------------------------------------------------------------ Pulse: top 3 this week */

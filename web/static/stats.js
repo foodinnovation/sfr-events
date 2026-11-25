@@ -12,10 +12,16 @@
   var adNames = {};
   try { adNames = JSON.parse(root.getAttribute("data-ad-names") || "{}"); } catch (e) { adNames = {}; }
   function adName(k) { return adNames[k] || k; }
+  function svcAction(r) {
+    if (r === "calendar-shown") return "1:1 calendar shown";
+    var m = /^(question|service|cta|next): (.+)$/.exec(r || "");
+    if (!m) return r;
+    return { question: "Question chosen: ", service: "Service opened: ", cta: "Service button: ", next: "Next step: " }[m[1]] + m[2];
+  }
   var HOME = { "hero-book": "Hero: Book a free 1:1", "hero-events": "Hero: See upcoming events", "all-events": "All events",
     "register": "Register (next events)", "event": "Event details (next events)", "pulse": "More in Pulse",
     "pulse-story": "Pulse story", "calendar-shown": "1:1 calendar shown", "calendly-tab": "Open in Calendly",
-    "radicle-open": "Open Radicle", "radicle-member": "Radicle: Become a member", "newsletter": "Newsletter: Subscribe" };
+    "radicle-open": "Open Radicle", "radicle-member": "Radicle: Become a member", "newsletter": "Newsletter: Subscribe", "services": "Browse all services" };
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -100,6 +106,10 @@
         { label: "Button", get: function (r) { return HOME[r.button] || r.button; } },
         { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
       ], d.home || [], "No clicks on the home page in this period.") +
+      table("Services page", [
+        { label: "Action", get: function (r) { return svcAction(r.action); } },
+        { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
+      ], d.services || [], "No clicks on the Services page in this period.") +
       table("Searches on the events list", [
         { label: "Search term", get: function (r) { return r.term; } },
         { label: "Times", num: true, get: function (r) { return fmt(r.n); } }

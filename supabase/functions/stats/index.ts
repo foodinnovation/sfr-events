@@ -63,7 +63,12 @@ Deno.serve(async (req: Request) => {
       where kind='mail_click' and ${W} group by 1 order by 2 desc limit 20`;
     const home = await sql`select case when kind = 'booking_open' then 'calendar-shown' else split_part(ref, ': ', 1) end button,
         count(*)::int clicks from events.metric
-      where kind in ('home_click','booking_open') and ${W} group by 1 order by 2 desc limit 20`;
+      where (kind = 'home_click' or (kind = 'booking_open' and coalesce(ref, 'home') = 'home')) and ${W}
+      group by 1 order by 2 desc limit 20`;
+    const services = await sql`select case when kind = 'booking_open' then 'calendar-shown' else ref end action,
+        count(*)::int clicks from events.metric
+      where (kind = 'svc_click' or (kind = 'booking_open' and ref = 'services')) and ${W}
+      group by 1 order by 2 desc limit 40`;
     const searches = await sql`select lower(ref) term, count(*)::int n from events.metric
       where kind='search' and ${W} group by 1 order by 2 desc limit 20`;
     const filters = await sql`select ref filter, count(*)::int n from events.metric
@@ -79,7 +84,7 @@ Deno.serve(async (req: Request) => {
       where kind='view' and source is not null and ${W} group by 1 order by 2 desc limit 10`;
     const [dev] = await sql`select count(*) filter (where mobile)::int mobile, count(*) filter (where not mobile)::int desktop
       from events.metric where kind='view' and ${W}`;
-    return json(req, 200, { from, to, totals, daily, roles, events, ads, mail, home, searches, filters,
+    return json(req, 200, { from, to, totals, daily, roles, events, ads, mail, home, services, searches, filters,
       knowledge: { ...kn, topics }, sources, devices: dev });
   } catch (e) {
     console.error("stats failed", (e as Error).message);
