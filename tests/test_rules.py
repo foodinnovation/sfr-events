@@ -204,3 +204,20 @@ def test_slots():
     assert pick_slot_event(16, 2025, 1, zgl).name == "2. IG ZGL JU"
     assert pick_slot_event(16, 2025, 2, zgl).name == "3. Treffen IG ZGL Jura"
     assert not is_ig_meeting("Swiss Coffee Festival")
+
+
+def test_speakers_take_their_own_company_not_the_mirror_order():
+    """The slot's mirror lists companies in its own order; each speaker's company comes from their
+    People record (Workshop B, IG ZGL Luzern, 19.11.2026)."""
+    from sync.monday import Monday
+    sc = {"boards_verbinden__1": {"display_value": "Hélène Iven, Peter Gloor, Katarzyna Geiger", "linked_items": [
+        {"id": "1", "name": "Hélène Iven", "column_values": [{"text": "Digit Soil AG"}]},
+        {"id": "2", "name": "Peter Gloor", "column_values": [{"text": "Galaxy Advisory"}]},
+        {"id": "3", "name": "Katarzyna Geiger", "column_values": [{"text": ""}]}]},
+        "status": {"text": "Zugesagt"}, "prio_mkkcr5f0": {"text": "20:10"}, "checkbox__1": {"text": ""}}
+    item = {"id": "9", "name": "Treffen", "group": {"id": "g", "title": "G"}, "column_values": [],
+            "subitems": [{"id": "5", "name": "Workshop B", "column_values": [{"id": k, **v} for k, v in sc.items()]}]}
+    ev = Monday._event(item)
+    assert ev.sessions[0].speakers == [{"name": "Hélène Iven", "organisation": "Digit Soil AG"},
+                                       {"name": "Peter Gloor", "organisation": "Galaxy Advisory"},
+                                       {"name": "Katarzyna Geiger", "organisation": None}]

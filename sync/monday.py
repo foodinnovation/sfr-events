@@ -17,7 +17,8 @@ EVENT_COLS = [
     "date4", "hour_mm6kjj7w", "hour_mm6kwxn2", "standort__1", "long_text",
     "link_mm1k2xn3", "color_mm6k7es5",
 ]
-SUB_COLS = ["prio_mkkcr5f0", "boards_verbinden__1", "spiegel8__1", "status", "checkbox__1"]
+SUB_COLS = ["prio_mkkcr5f0", "boards_verbinden__1", "status", "checkbox__1"]
+PEOPLE_COMPANY = "text8__1"   # People board: the person's company
 ATT_COLS = ["email_mm06mp9t", "text_mm06eddp"]
 
 
@@ -112,7 +113,8 @@ class Monday:
             column_values(ids:{cols}) {{ id text value }}
             subitems {{ id name column_values(ids:{subcols}) {{
                 id text value
-                ... on BoardRelationValue {{ display_value }}
+                ... on BoardRelationValue {{ display_value
+                    linked_items {{ id name column_values(ids:["{PEOPLE_COMPANY}"]) {{ text }} }} }}
                 ... on MirrorValue {{ display_value }} }} }}"""
         return [self._event(i) for i in self._items(EVENTS_BOARD, fields)]
 
@@ -124,10 +126,7 @@ class Monday:
             sc = {c["id"]: c for c in s["column_values"]}
             if (sc.get("status", {}).get("text") or "") != "Zugesagt":
                 continue
-            names = _split(sc.get("boards_verbinden__1", {}).get("display_value"))
-            orgs = _split(sc.get("spiegel8__1", {}).get("display_value"))
-            speakers = [{"name": n, "organisation": orgs[i] if i < len(orgs) else None}
-                        for i, n in enumerate(names)]
+            speakers = _speakers(sc)
             sessions.append(Session(
                 monday_subitem_id=int(s["id"]),
                 start_time=(sc.get("prio_mkkcr5f0", {}).get("text") or None),
@@ -164,6 +163,24 @@ class Monday:
 
 
 # ---------------------------------------------------------------------- parsing helpers
+
+def _speakers(sc: dict) -> list[dict]:
+    """Speakers of a programme slot with their own organisation.
+
+    Each speaker's company is read from that person's People record (column "Company"). The slot's
+    mirror column "Organisation" lists the companies in an order of its own (and merges duplicates),
+    so pairing it with the names by position put people behind the wrong company."""
+    rel = sc.get("boards_verbinden__1", {})
+    linked = rel.get("linked_items")
+    if linked is not None:
+        out = []
+        for li in linked:
+            company = next((c.get("text") for c in li.get("column_values") or [] if c.get("text")), None)
+            out.append({"name": (li.get("name") or "").strip(), "organisation": (company or "").strip() or None})
+        return [x for x in out if x["name"]]
+    # older API answers without linked items: names only, no guessing of companies
+    return [{"name": n, "organisation": None} for n in _split(rel.get("display_value"))]
+
 
 def _split(display: str | None) -> list[str]:
     return [p.strip() for p in (display or "").split(",") if p.strip()]
