@@ -403,6 +403,7 @@ a.pl-tile:hover { color: var(--sfr-white); transform: translateY(-4px); box-shad
   text-decoration: none; margin-bottom: var(--space-2); }
 .pl-row .pl-summary { margin-bottom: var(--space-2); }
 .pl-row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0; }
+.pl-also { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-2) 0 0; }
 .pl-igchip { display: inline-flex; align-items: center; font-size: var(--text-3xs); font-weight: var(--weight-medium); text-transform: uppercase;
   letter-spacing: .06em; padding: 3px 9px; border-radius: var(--radius-pill); background: var(--sfr-chip); color: var(--sfr-black); }
 .pl-igchip .ig-icon { width: 12px; height: 12px; margin: 0 5px 0 0; }

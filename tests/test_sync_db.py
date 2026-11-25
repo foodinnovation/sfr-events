@@ -359,6 +359,7 @@ def test_pulse_shows_only_clean_relevant_stories_and_counts_votes(db):
         titles = [s["title"] for s in stories]
         assert titles[0] == "Digitaler Bauernhof"                  # grouped: one story for o:1 and o:2
         assert len(stories[0]["sources"]) == 2 and stories[0]["source"].startswith("LID")
+        assert stories[0]["igs"] == ["zgl", "digitalization"]      # groups of the best report, main group first
         assert "Bio Suisse Richtlinien 2027" in titles              # newsletter item: checked link, original title
         bio = next(s for s in stories if s["title"].startswith("Bio Suisse"))
         assert bio["url"] == "https://www.bioaktuell.ch/a" and "%40" not in json.dumps(stories)

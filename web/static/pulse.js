@@ -138,6 +138,12 @@
       return '<span class="pl-igchip">' + icon(IG[g][1]) + (also ? "Also " : "") + esc(IG[g][0]) + "</span>";
     }).join("");
   }
+  function alsoChips(s) {   // the story's other groups, after the one on the picture
+    var m = mainIg(s), c = igsOf(s).filter(function (g) { return g !== m; }).map(function (g) {
+      return '<span class="pl-igchip">' + icon(IG[g][1]) + "Also " + esc(IG[g][0]) + "</span>";
+    }).join("");
+    return c ? '<p class="item-meta pl-also">' + c + "</p>" : "";
+  }
   function leadHtml(s) {
     var g = mainIg(s);
     return '<article class="pl-lead pl-in">' +
@@ -148,6 +154,7 @@
       '<a class="pl-lead-title" href="' + storyHref(s) + '" data-open="' + esc(s.id) + '">' + esc(s.title) + "</a>" +
       '<p class="item-meta">' + meta(s) + ' · <span class="pl-added">' + added(s.added) + "</span></p>" +
       '<p class="pl-lead-summary">' + esc(s.summary) + "</p>" +
+      alsoChips(s) +
       '<div class="pl-actions">' + original(s, "Read the original") + voteBtn(s) + "</div></div></article>";
   }
   function cardHtml(s, i) {
@@ -156,6 +163,7 @@
       ' · <span class="pl-added">' + added(s.added) + "</span></p>" +
       '<a class="pl-tcard-title" href="' + storyHref(s) + '" data-open="' + esc(s.id) + '">' + esc(s.title) + "</a>" +
       '<p class="pl-clamp">' + esc(s.summary) + "</p>" +
+      alsoChips(s) +
       '<div class="pl-actions">' + original(s) + voteBtn(s) + "</div></div></article>";
   }
   function rowHtml(s, i) {
