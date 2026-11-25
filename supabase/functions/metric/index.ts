@@ -8,7 +8,7 @@ import postgres from "npm:postgres@3.4.5";
 
 const sql = postgres(Deno.env.get("SUPABASE_DB_URL")!, { max: 2, prepare: false });
 const KINDS = new Set(["view", "register", "ad_view", "ad_click", "mail_click", "search", "filter",
-  "kn_topic", "kn_search", "kn_finder"]);
+  "kn_topic", "kn_search", "kn_finder", "home_click", "booking_open"]);
 const ROLES = new Set(["visitor", "participant", "member", "staff"]);
 const BOT = /bot|crawl|spider|slurp|headless|lighthouse|preview|facebookexternalhit|embedly|monitor/i;
 const HOSTS = /^(foodinnovation\.github\.io|hub\.swissfoodresearch\.ch|localhost(:\d+)?)$/;

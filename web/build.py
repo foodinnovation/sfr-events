@@ -3,7 +3,8 @@
     python web/build.py --out _site
 
 Reads published events, programmes and decks; writes:
-    _site/index.html                    upcoming events and the archive, with filters
+    _site/index.html                    hub home: next events, Pulse picks, free 1:1, Radicle, newsletter
+    _site/events/index.html             upcoming events and the archive, with filters
     _site/events/<slug>/index.html      one page per SFR or Innovation Group event
     _site/assets/...                    styles, script, logo, fonts, supabase-js
     data/events.json                    public event list (committed; keeps the repo active)
@@ -40,6 +41,11 @@ PUBLISHABLE_KEY = "sb_publishable_o-EAN8xKYr-dKhcoflQ5SQ_49go67yT"   # public by
 SITE_BASE = os.environ.get("SITE_BASE", "/")   # path of the site root on its host (hub.swissfoodresearch.ch)
 ORG = "Swiss Food Research"
 CONTACT = "contact@swissfoodresearch.ch"
+MEMBERSHIP_URL = "https://www.swissfoodresearch.ch/en/membership-benefits/"
+HUB_DESCRIPTION = ("The Swiss Food Research hub: upcoming Innovation Group meetings and SFR events, "
+                   "agro-food news, Radicle \u2013 Knowledge and a free 1:1 session for your idea or project.")
+EVENTS_DESCRIPTION = ("Events of Swiss Food Research: Innovation Group meetings, SFR events and partner events, "
+                      "with presentations for members and participants.")
 
 IG_NAMES = {   # English display names; wiki names are German
     1: "Aquaculture", 2: "Grains & Baked Goods", 3: "Coffee", 4: "Packaging", 5: "Insects",
@@ -267,7 +273,7 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
         cls = "hub-tab is-on" if on else "hub-tab"
         cur = ' aria-current="page"' if on else ""
         return f'<a class="{cls}" href="{href}"{cur}>{label}</a>'
-    tabs = tab_link("events", up or "./", "Events") + tab_link("knowledge", f"{up}knowledge/", KNOWLEDGE)
+    tabs = tab_link("events", f"{up}events/", "Events") + tab_link("knowledge", f"{up}knowledge/", KNOWLEDGE)
     pulse_tab = tab_link("pulse", f"{up}pulse/", "Pulse")
     # Pulse: visible to everyone once config/pulse.json says public, before that to signed-in staff only
     tabs += pulse_tab if load_pulse().get("public") else pulse_tab.replace('<a class="', '<a hidden data-staff-only class="', 1)
@@ -282,7 +288,7 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(title)}</title>
-<meta name="description" content="{esc(description or 'Events of Swiss Food Research: Innovation Group meetings, SFR events and partner events, with presentations for members and participants.')}">
+<meta name="description" content="{esc(description or HUB_DESCRIPTION)}">
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:site_name" content="{ORG}">
 <link rel="stylesheet" href="{up}assets/fonts.css">
@@ -294,7 +300,7 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
 <body{body_attr}>
 <header class="site-header">
   <div class="wrap header-row">
-    <a class="logo" href="{up}" aria-label="{ORG} events, home"><img src="{up}assets/img/logo-sfr-black.svg" alt="{ORG}" height="52"></a>
+    <a class="logo" href="{up}" aria-label="{ORG} hub, home"><img src="{up}assets/img/logo-sfr-black.svg" alt="{ORG}" height="52"></a>
     <nav class="hub-tabs" aria-label="Sections">{tabs}</nav>
     <div class="account" id="account">
       <button class="btn btn-secondary btn-sm" id="signin-open" type="button">Sign in</button>
@@ -352,7 +358,8 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
 
 # --------------------------------------------------------------------------- listing
 
-def list_item(e: dict, today: date) -> str:
+def list_item(e: dict, today: date, base: str = "") -> str:
+    """One row of the events list. base: path from the page to /events/ ("" on /events/ itself)."""
     day, mon, yr = fmt_short(e["date"], e["year"])
     igs = ig_labels(e)
     tags = [f'<span class="tag tag-{e["kind"]}">{KIND_LABEL[e["kind"]]}</span>']
@@ -366,7 +373,7 @@ def list_item(e: dict, today: date) -> str:
                 f'<span class="ext" aria-label="opens the partner\'s website"> &#8599;</span></a>'
                 if href else f'<span class="item-title">{esc(e["title"])}</span>')
     else:
-        link = f'<a class="item-title" href="events/{esc(e["slug"])}/">{esc(e["title"])}</a>'
+        link = f'<a class="item-title" href="{base}{esc(e["slug"])}/">{esc(e["title"])}</a>'
     extra = '<span class="item-flag">Presentations</span>' if has_decks else ""
     search = " ".join([e["title"] or "", e["location"] or "", " ".join(igs), KIND_LABEL[e["kind"]]]).lower()
     return f"""<li class="item" data-kind="{e['kind']}" data-igs="{' '.join(str(i) for i in sorted(e['igs']))}" data-search="{esc(search)}">
@@ -470,7 +477,121 @@ def index_page(events: list[dict], today: date, ads: dict | None = None) -> str:
     <p class="empty" hidden>No past events match your filters.</p>
   </section>
 </div>"""
-    return shell(f"Events | {ORG}", body, 0)
+    return shell(f"Events | {ORG}", body, 1, EVENTS_DESCRIPTION)
+
+
+# --------------------------------------------------------------------------- home page
+
+HOME_FILE = ROOT.parent / "config" / "home.json"
+
+
+def load_home(path: Path = HOME_FILE) -> dict:
+    """config/home.json: hero text, the 1:1 booking link and topics, the newsletter link."""
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def home_event(e: dict) -> str:
+    """One upcoming SFR or Innovation Group event on the home page."""
+    day, mon, yr = fmt_short(e["date"], e["year"])
+    igs = [i for i in sorted(e["igs"]) if i in IG_NAMES]
+    tags = [f'<span class="tag tag-{e["kind"]}">{KIND_LABEL[e["kind"]]}</span>']
+    tags += [f'<span class="tag">{icon(IG_ASSET[i]) if i in IG_ASSET else ""}{esc(IG_NAMES[i])}</span>' for i in igs]
+    meta = [x for x in (time_range(e), e["location"]) if x]
+    href = f'events/{esc(e["slug"])}/'
+    action = (f'<a class="btn btn-primary btn-sm" href="{href}#register" data-home="register" data-ref="{esc(e["slug"])}">Register</a>'
+              if signup(e["url"]) else
+              f'<a class="btn btn-secondary btn-sm" href="{href}" data-home="event" data-ref="{esc(e["slug"])}">Details</a>')
+    return f"""<li class="item home-item">
+  <div class="datebox datebox-sfr"><span class="d">{day}</span><span class="m">{mon}</span><span class="y">{yr}</span></div>
+  <div class="item-body">
+    <div class="tags">{''.join(tags)}</div>
+    <a class="item-title" href="{href}">{esc(e['title'])}</a>
+    {'<p class="item-meta">' + esc(' · '.join(meta)) + '</p>' if meta else ''}
+    <div class="home-item-cta">{action}</div>
+  </div>
+</li>"""
+
+
+def home_page(events: list[dict], today: date, cfg: dict | None = None) -> str:
+    """The hub's front door: next three SFR and Innovation Group events, Pulse's top three of the
+    week (shown only while Pulse serves the visitor: staff until it opens), the free 1:1 session
+    with a click-to-load Calendly calendar, Radicle and the newsletter. Old events-list links
+    (/?group=..&type=..&q=..) are forwarded to /events/."""
+    cfg = load_home() if cfg is None else cfg
+    nxt = [e for e in events if e["kind"] in ("ig", "sfr") and e["date"] and e["date"] >= today and e["slug"]][:3]
+    items = "".join(home_event(e) for e in nxt) or \
+        '<li class="empty">No meetings are scheduled yet. The full list includes partner events.</li>'
+    pulse_public = bool(load_pulse().get("public"))
+    hero, book, news = cfg["hero"], cfg["booking"], cfg["newsletter"]
+    topics = "".join(f"<li>{esc(t)}</li>" for t in book["topics"])
+    body = f"""
+<script>(function () {{ var q = new URLSearchParams(location.search);
+  if (q.has("group") || q.has("type") || q.has("q")) location.replace("events/" + location.search + location.hash); }})();</script>
+<section class="hero hero-photo home-hero" style="--hero-img:url({SITE_BASE}assets/img/ig-art/{esc(hero.get('image') or 'general-dark')}-wide.jpg)">
+  <div class="wrap">
+    <p class="sfr-sub01 eyebrow">{ORG}</p>
+    <h1>{esc(hero['title'])}</h1>
+    <p class="lead">{esc(hero['lead'])}</p>
+    <div class="home-hero-actions">
+      <a class="btn pl-cyan" href="#book" data-home="hero-book">Book a free 1:1</a>
+      <a class="btn btn-inverse" href="events/" data-home="hero-events">See upcoming events</a>
+    </div>
+  </div>
+</section>
+<div class="wrap">
+  <div class="home-split is-solo" id="home-split">
+    <section class="home-events" aria-labelledby="h-next">
+      <div class="home-head"><h2 id="h-next" class="section-head">Next events</h2>
+        <a class="home-more" href="events/" data-home="all-events">All events &rarr;</a></div>
+      <ol class="list">{items}</ol>
+    </section>
+    <section class="home-news" id="home-news" aria-labelledby="h-news" data-public="{'1' if pulse_public else '0'}" hidden>
+      <div class="home-head"><h2 id="h-news" class="section-head">Pulse: top 3 this week</h2>
+        <a class="home-more" href="pulse/" data-home="pulse">More in Pulse &rarr;</a></div>
+      <ol class="home-stories" id="home-stories"></ol>
+      <p class="pl-ai home-ai"><span class="pl-badge">AI curated</span> Selected and summarised by AI. Each story links to its original.</p>
+    </section>
+  </div>
+
+  <section class="home-book" id="book" aria-labelledby="h-book">
+    <div class="home-book-text">
+      <p class="sfr-sub01 home-kicker">Free 1:1 session</p>
+      <h2 id="h-book">{esc(book['title'])}</h2>
+      <p>{esc(book['lead'])}</p>
+      <ul class="home-topics">{topics}</ul>
+      <p class="home-facts">{esc(book['facts'])}</p>
+    </div>
+    <div class="home-book-cal" id="book-cal">
+      <div class="home-cal-gate" id="cal-gate">
+        <p class="home-cal-head">Pick a time that suits you</p>
+        <button class="btn btn-primary" type="button" id="cal-load" data-url="{esc(book['url'])}">Show available slots</button>
+        <p class="home-cal-note">The calendar is provided by Calendly, a third-party booking service. It loads only after
+        you click, and Calendly may then set cookies. <a href="privacy/">Privacy</a></p>
+        <p class="home-cal-alt"><a href="{esc(book['url'])}" target="_blank" rel="noopener" data-home="calendly-tab">Open in Calendly
+        <span aria-hidden="true">&#8599;</span></a></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="home-pair">
+    <section class="pl-card pl-dark home-radicle" aria-labelledby="h-radicle">
+      <span class="pl-badge pl-badge-inv">Members only</span>
+      <h2 id="h-radicle">{KNOWLEDGE}</h2>
+      <p>Topic articles on Swiss agro-food research, about 6,600 funded projects with their research gaps, and a
+      funding finder that matches your idea to the right programme.</p>
+      <div data-for="members" hidden><a class="btn btn-sm pl-cyan" href="knowledge/" data-home="radicle-open">Open Radicle</a></div>
+      <div data-for="public"><a class="btn btn-sm pl-cyan" href="{esc(MEMBERSHIP_URL)}" data-home="radicle-member">Become a member</a>
+        <button class="pl-member home-signin" type="button" data-home-signin>Members: sign in</button></div>
+    </section>
+    <section class="pl-card home-newsletter" aria-labelledby="h-newsletter">
+      <h2 id="h-newsletter">{esc(news['title'])}</h2>
+      <p>{esc(news['lead'])}</p>
+      <a class="btn btn-secondary btn-sm" href="{esc(news['url'])}" target="_blank" rel="noopener" data-home="newsletter">Subscribe
+      <span aria-hidden="true">&#8599;</span></a>
+    </section>
+  </div>
+</div>"""
+    return shell(f"{ORG} hub", body, 0, tab="home", scripts=("home.js",))
 
 
 # --------------------------------------------------------------------------- programme not yet out
@@ -593,7 +714,7 @@ def event_page(e: dict, today: date, attending: "att.Attending | None" = None, w
     body = f"""
 <section class="hero hero-event{' hero-photo' if has_picture else ''}"{hero_style}>
   <div class="wrap">
-    <p class="crumbs"><a href="{up}">All events</a></p>
+    <p class="crumbs"><a href="{up}events/">All events</a></p>
     {hero_icon}
     <p class="sfr-sub01 eyebrow">{KIND_LABEL[e['kind']]}{(' &middot; ' + esc(igs[0])) if len(igs) == 1 else ''}</p>
     <h1>{esc(e['title'])}</h1>
@@ -823,7 +944,7 @@ def stats_page() -> str:
 
 # --------------------------------------------------------------------------- privacy
 
-PRIVACY_UPDATED = "24 November 2026"
+PRIVACY_UPDATED = "25 November 2026"
 
 
 def privacy_page() -> str:
@@ -849,7 +970,7 @@ servers record technical access data such as IP addresses under
 
 <h2>Usage counting</h2>
 <p>To learn which events and services interest visitors, the hub counts a few actions: page views,
-clicks on Register, on ads and on email buttons, searches and filters on the events list, and in
+clicks on Register, on ads, on email buttons and on the home page's buttons, whether the 1:1 booking calendar was opened, searches and filters on the events list, and in
 Radicle \u2013 Knowledge the topics opened and how often the quick search and the Funding Finder are used.</p>
 <p>Each count holds only the time, the page, the action, a short reference (for example the event, the ad
 or a search term), the visitor's role (visitor, participant, member or staff), the website the visitor
@@ -883,6 +1004,13 @@ only counted. No person is named. A member organisation that does not want to ap
 <a href="mailto:{CONTACT}">{CONTACT}</a>.</p>
 <p>The ti.to and Eventbrite sign-up forms load only when you open them on an event page; their own
 privacy policies then apply. Links to Google Maps open Google Maps only when you click them.</p>
+
+<h2>Booking a 1:1 session</h2>
+<p>The home page offers a free 1:1 session booked through Calendly (Calendly LLC, USA). The booking calendar
+loads only when you click "Show available slots"; until then the page contacts no Calendly server. Once it
+loads, Calendly's own <a href="https://calendly.com/legal/privacy-notice">privacy notice</a> applies and Calendly
+may set cookies. The details you enter in the booking form go to Calendly and to {ORG} staff, who use them
+only to prepare and hold the session. The newsletter link opens a monday.com form, whose privacy terms apply.</p>
 
 <h2>Radicle \u2013 Knowledge</h2>
 <p>Searches and Funding Finder requests are processed to show results and are not saved in the hub's
@@ -973,7 +1101,9 @@ def build(out: Path, events: list[dict], today: date, attending: dict | None = N
         shutil.rmtree(out)
     (out / "assets").mkdir(parents=True)
     shutil.copytree(ROOT / "static", out / "assets", dirs_exist_ok=True)
-    (out / "index.html").write_text(index_page(events, today))
+    (out / "index.html").write_text(home_page(events, today))
+    (out / "events").mkdir()
+    (out / "events" / "index.html").write_text(index_page(events, today))
     for e in events:
         if e["kind"] != "external" and e["slug"]:
             p = out / "events" / e["slug"]
@@ -994,7 +1124,7 @@ def build(out: Path, events: list[dict], today: date, attending: dict | None = N
     (out / "privacy").mkdir()
     (out / "privacy" / "index.html").write_text(privacy_page())
     (out / "404.html").write_text(shell(f"Not found | {ORG}", '<div class="wrap block"><h1>Page not found</h1>'
-                                        f'<p><a href="{SITE_BASE}">Back to all events</a></p></div>', 0))
+                                        f'<p><a href="{SITE_BASE}events/">All events</a> &middot; <a href="{SITE_BASE}">Hub home</a></p></div>', 0))
     (out / ".nojekyll").write_text("")
     h = hashlib.sha256()
     for f in sorted(out.rglob("*")):

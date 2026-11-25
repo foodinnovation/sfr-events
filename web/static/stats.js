@@ -12,6 +12,10 @@
   var adNames = {};
   try { adNames = JSON.parse(root.getAttribute("data-ad-names") || "{}"); } catch (e) { adNames = {}; }
   function adName(k) { return adNames[k] || k; }
+  var HOME = { "hero-book": "Hero: Book a free 1:1", "hero-events": "Hero: See upcoming events", "all-events": "All events",
+    "register": "Register (next events)", "event": "Event details (next events)", "pulse": "More in Pulse",
+    "pulse-story": "Pulse story", "calendar-shown": "1:1 calendar shown", "calendly-tab": "Open in Calendly",
+    "radicle-open": "Open Radicle", "radicle-member": "Radicle: Become a member", "newsletter": "Newsletter: Subscribe" };
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -92,6 +96,10 @@
         } },
         { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
       ], d.mail || []) +
+      table("Home page", [
+        { label: "Button", get: function (r) { return HOME[r.button] || r.button; } },
+        { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
+      ], d.home || [], "No clicks on the home page in this period.") +
       table("Searches on the events list", [
         { label: "Search term", get: function (r) { return r.term; } },
         { label: "Times", num: true, get: function (r) { return fmt(r.n); } }

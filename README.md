@@ -1,9 +1,11 @@
 # sfr-events
 
-The Swiss Food Research hub (planned address: hub.swissfoodresearch.ch), with three tabs:
+The Swiss Food Research hub at hub.swissfoodresearch.ch: a home page and three tabs.
 
-* **Events**: upcoming events, the archive back to 2015, and the presentation decks for
-  members and participants.
+* **Home** (`/`): the next three SFR and Innovation Group events, Pulse's top three of the week,
+  a free 1:1 session with a Calendly calendar, Radicle and the newsletter. See "The home page" below.
+* **Events** (`/events/`): upcoming events, the archive back to 2015, and the presentation decks for
+  members and participants. One page per event at `/events/<slug>/`.
 * **Radicle – Knowledge**: radicle's topic articles, the ~6,600 relevant funded projects
   and a funding finder, for members and staff only.
 * **Pulse**: AI-curated agro-food news with links to the originals (staff only until opened, see below).
@@ -77,9 +79,9 @@ MONDAY_TOKEN=... SUPABASE_DB_URL=... python -m sync.run --dry-run
 
 ## The page
 
-`web/build.py` writes the static page from Supabase after each sync: the listing with filters
-(type, Innovation Group, search), one page per SFR and Innovation Group event (programme,
-presentations), and the archive back to 2015. Partner events link to the partner's page.
+`web/build.py` writes the static site from Supabase after each sync: the home page (`/`), the
+listing with filters (type, Innovation Group, search) at `/events/`, one page per SFR and Innovation
+Group event at `/events/<slug>/` (programme, presentations), and the archive back to 2015. Partner events link to the partner's page.
 Fonts and the sign-in library are bundled; the page loads nothing from third parties.
 Published by the same workflow to GitHub Pages whenever something changed.
 
@@ -128,12 +130,45 @@ Members can mark a story useful (one vote each, withdrawable). There are no comm
 * `sync/monday.py`: reads the two monday boards (read-only)
 * `sync/translate.py`: English translation via the Claude API
 * `sync/run.py`: the sync itself
-* `web/`: page build (`build.py`) and static assets (styles, script, logo, fonts)
+* `web/`: page build (`build.py`) and static assets (styles, scripts incl. `home.js`, logo, fonts)
+* `config/`: `home.json` (home page), `ads.json` (events-list ads), `logo_wall.json`, `pulse.json`
 * `supabase/migrations/`: the `events` schema and access functions
 * `sync/knowledge.py`: copy for the knowledge tab (radicle, Funding Schemes, contacts)
 * `supabase/functions/`: `deck` (access check, SharePoint link), `knowledge` (knowledge tab API), `pulse` (Pulse tab),
   `sync-trigger` (starts the sync) and `send-email` (sign-in emails from contact@)
 * `docs/setup-sign-in.md`: one-off sign-in setup (Entra, Exchange, Supabase)
+
+## The home page
+
+`/` is the hub's front door (`home_page` in `web/build.py`, script `web/static/home.js`). Text and
+links sit in `config/home.json`; a push republishes the site in about 10 minutes.
+
+* **Hero**: headline, lead line and two buttons ("Book a free 1:1", "See upcoming events"). The
+  picture is a Design System 2026 visual from `web/static/img/ig-art` (`hero.image`, now `farming`).
+* **Next events**: the next three SFR and Innovation Group events with a date. Partner events are
+  only on `/events/`. Register appears when the event has a sign-up link, otherwise Details.
+* **Pulse: top 3 this week**: the three best-scored stories of the last 7 days from the edge function
+  `pulse`. The block shows only when the function serves the visitor, so staff only until Pulse opens
+  (see Pulse below); the events column then takes the full width.
+* **Free 1:1 session**: the Calendly page in `booking.url`. Calendly loads only after a click on
+  "Show available slots" (an iframe, no Calendly script), so the hub stays free of third-party
+  content and cookies until the visitor asks. "Open in Calendly" links out.
+* **Radicle – Knowledge** card for everyone: members and staff get "Open Radicle", others "Become a
+  member" and a sign-in link. **Newsletter**: a link to the sign-up form in `newsletter.url`.
+* **Old links**: the events list used to be at `/`. Requests to `/` with `group`, `type` or `q` (the
+  list's filters) are forwarded to `/events/` with the same filters.
+* **Counting**: clicks on the home page's buttons (`home_click`) and the calendar being shown
+  (`booking_open`) appear in the Statistics tab under "Home page". Page views of `/` before
+  26 November 2026 were views of the events list.
+
+## Open items
+
+* Newsletter sign-up: replace the monday form with a proper sign-up (double opt-in, straight into
+  the newsletter list).
+* Calendly address: the account slug is spelled `swissfoodreseach`. Renaming it breaks existing links,
+  so decide before printing or mailing it widely.
+* Home page: add a block on the network (member organisations, member page) once the member page exists.
+* www.swissfoodresearch.ch: point the menu link to the hub's root.
 
 ## Ads on the events list
 
@@ -172,7 +207,7 @@ the right-hand column (`web/attending.py`, settings in `config/logo_wall.json`).
 
 `app.js` counts a few actions without cookies or personal data and sends them in the background
 (`navigator.sendBeacon`) to the edge function `metric`, which stores them in `events.metric`:
-page views, Register clicks, ads shown and clicked, email-button clicks, events-list searches and
+page views, home-page button clicks and the 1:1 calendar being shown, Register clicks, ads shown and clicked, email-button clicks, events-list searches and
 filters, and in Radicle – Knowledge topics opened, quick searches and Funding Finder runs (no text).
 Each row holds time, action, page, a short reference, role (visitor, participant, member, staff),
 referring domain and mobile or not. No IP address, email address or visitor id. Browsers driven
