@@ -8,6 +8,13 @@
   'use strict';
 
   var CFG = window.SFR_EVENTS || {};
+  // the app takes the window height under the hub header (which is taller on phones)
+  function fitHeader() {
+    var h = document.querySelector('.site-header');
+    if (h) document.documentElement.style.setProperty('--kn-header', h.offsetHeight + 'px');
+  }
+  fitHeader();
+  window.addEventListener('resize', fitHeader);
   var FN = CFG.supabaseUrl + '/functions/v1/knowledge';
   var COACHING = 'https://www.swissfoodresearch.ch/de/agro-food-innovations-services/coaching/';
   var session = null;

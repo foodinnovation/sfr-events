@@ -33,10 +33,9 @@
   --font: var(--font-sans);
 }
 
-/* the knowledge page fills the window under the hub header */
-body.kn-page { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-body.kn-page > main { flex: 1; min-height: 0; display: flex; }
-body.kn-page .site-footer { display: none; }
+/* the knowledge app fills the window under the hub header; the partner band and the hub footer
+   follow below it as on every other page. --kn-header is set from the real header height (app.js). */
+body.kn-page > main { display: flex; height: calc(100vh - var(--kn-header, 77px)); height: calc(100dvh - var(--kn-header, 77px)); min-height: 480px; }
 body.kn-page .partner-banner { margin-top: 0; }
 
 .kn-app { position: relative; flex: 1; min-width: 0; min-height: 0; display: flex; font-family: var(--font); background: var(--bg);
