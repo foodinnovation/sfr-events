@@ -2984,6 +2984,21 @@
   "presentations": 0
  },
  {
+  "id": 58,
+  "slug": "2027-04-13-17-treffen-ig-coffee",
+  "kind": "ig",
+  "title": "17. Treffen IG Coffee",
+  "date": "2027-04-13",
+  "year": 2027,
+  "location": null,
+  "url": null,
+  "innovation_groups": [
+   "Coffee"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
   "id": 373,
   "slug": null,
   "kind": "external",
