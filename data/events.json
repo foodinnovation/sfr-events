@@ -2997,6 +2997,21 @@
   "presentations": 0
  },
  {
+  "id": 59,
+  "slug": "2027-04-29-60th-cocoa-chocolate",
+  "kind": "ig",
+  "title": "60th Cocoa & Chocolate",
+  "date": "2027-04-29",
+  "year": 2027,
+  "location": "Lindt Home of Chocolate, Seestrasse, Kilchberg, Suisse",
+  "url": null,
+  "innovation_groups": [
+   "Cocoa & Chocolate"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
   "id": 374,
   "slug": null,
   "kind": "external",
