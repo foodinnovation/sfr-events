@@ -720,43 +720,48 @@ def pulse_page() -> str:
     functions/v1/pulse, which serves staff only until pulse.setting 'public' is 'true'."""
     public = bool(load_pulse().get("public"))
     body = f"""
-<section class="hero pl-hero"><div class="wrap">
-  <p class="sfr-sub01 eyebrow">Pulse</p>
-  <h1>What moved in agro-food this week.</h1>
-  <p class="lead">Stories from open sources and the newsletters we read, summarised in English, linked to the
-  original and sorted by Innovation Group.</p>
-  <p class="pl-ai"><span class="pl-badge">AI curated</span> Selected and summarised by AI, with no editor. Each summary
-  links to its source: read the original before you quote it.</p>
-</div></section>
-<div class="wrap pl-wrap" id="pulse">
-  <div class="pl-main">
-    <div id="pl-feed">
-      <form class="filters pl-filters" id="pl-filters" role="search" onsubmit="return false" hidden>
-        <div class="chips" role="group" aria-label="Region">
-          <button type="button" class="chip is-on" data-scope="all" aria-pressed="true">All regions</button>
-          <button type="button" class="chip" data-scope="swiss" aria-pressed="false">Switzerland</button>
-          <button type="button" class="chip" data-scope="europe" aria-pressed="false">Europe</button>
-          <button type="button" class="chip" data-scope="global" aria-pressed="false">Global</button>
-        </div>
-        <label class="visually-hidden" for="pl-q">Search Pulse</label>
-        <input id="pl-q" type="search" placeholder="Search stories, companies, topics">
-        <label class="visually-hidden" for="pl-sort">Sort</label>
-        <select id="pl-sort">
-          <option value="new">Newest</option>
-          <option value="rel">Most relevant</option>
-          <option value="votes">Most useful</option>
-        </select>
-      </form>
-      <div class="chips pl-igs" id="pl-igs" role="group" aria-label="Innovation Group" hidden></div>
-      <div id="pl-lead"></div>
-      <h2 class="section-head pl-list-head" id="pl-list-head" hidden>More this week</h2>
-      <ol class="list pl-list" id="pl-list"></ol>
-      <p class="empty" id="pl-empty" hidden>No story matches these filters. Try another Innovation Group or region.</p>
+<section class="hero pl-hero" id="pl-hero">
+  <img class="pl-hero-art" id="pl-hero-art" alt="" hidden>
+  <div class="wrap pl-hero-in">
+    <div class="pl-hero-head" id="pl-hero-head">
+      <div class="pl-hero-text">
+        <p class="sfr-sub01 eyebrow">Pulse \u00b7 the week at a glance</p>
+        <h1>What moved in agro-food this week.</h1>
+      </div>
+      <p class="pl-ai"><span class="pl-badge">AI curated</span> Selected and summarised by AI, with no editor. Each summary
+      links to its original: read it before you quote.</p>
     </div>
-    <article id="pl-story" hidden></article>
-    <p class="muted" id="pl-note" role="status">Loading Pulse\u2026</p>
+    <div class="pl-tiles" id="pl-tiles"></div>
   </div>
-  <aside class="pl-side">
+</section>
+<div class="wrap pl-wrap" id="pulse">
+  <div id="pl-feed">
+    <form class="filters pl-filters" id="pl-filters" role="search" onsubmit="return false" hidden>
+      <div class="chips" role="group" aria-label="Region">
+        <button type="button" class="chip is-on" data-scope="all" aria-pressed="true">All regions</button>
+        <button type="button" class="chip" data-scope="swiss" aria-pressed="false">Switzerland</button>
+        <button type="button" class="chip" data-scope="europe" aria-pressed="false">Europe</button>
+        <button type="button" class="chip" data-scope="global" aria-pressed="false">Global</button>
+      </div>
+      <label class="visually-hidden" for="pl-q">Search Pulse</label>
+      <input id="pl-q" type="search" placeholder="Search stories, companies, topics">
+      <label class="visually-hidden" for="pl-sort">Sort</label>
+      <select id="pl-sort">
+        <option value="new">Newest</option>
+        <option value="rel">Most relevant</option>
+        <option value="votes">Most useful</option>
+      </select>
+    </form>
+    <div class="chips pl-igs" id="pl-igs" role="group" aria-label="Innovation Group" hidden></div>
+    <div id="pl-lead"></div>
+    <h2 class="section-head pl-list-head" id="pl-grid-head" hidden>More this week</h2>
+    <div class="pl-grid" id="pl-grid"></div>
+    <div id="pl-list"></div>
+    <p class="empty" id="pl-empty" hidden>No story matches these filters. Try another Innovation Group or region.</p>
+  </div>
+  <article id="pl-story" hidden></article>
+  <p class="muted" id="pl-note" role="status">Loading Pulse\u2026</p>
+  <div class="pl-bottom">
     <section class="pl-card pl-dark">
       <span class="pl-badge pl-badge-inv">Members only</span>
       <h2>Funding calls and tenders</h2>
@@ -769,11 +774,11 @@ def pulse_page() -> str:
       <ol class="pl-how">
         <li>We read open news feeds and the free newsletters sent to {ORG}.</li>
         <li>AI selects what matters for SFR members, writes a short English summary and groups reports of the same event.</li>
-        <li>Every summary links to the original article.</li>
+        <li>Every summary links to the original article. Pictures are SFR's own Innovation Group art.</li>
       </ol>
       <p class="pl-small"><a href="mailto:{CONTACT}?subject=Pulse%3A%20wrong%20summary">Report a wrong summary</a></p>
     </section>
-  </aside>
+  </div>
 </div>
 <noscript><p class="wrap">Pulse needs JavaScript.</p></noscript>"""
     page = shell(f"Pulse | {ORG}", body, 1,

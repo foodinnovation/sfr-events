@@ -203,6 +203,13 @@ def test_pulse_page_and_tab_follow_the_settings_file(tmp_path, monkeypatch):
     pl = b.pulse_page()
     assert 'name="robots" content="noindex"' in pl
     assert "assets/pulse.js" in pl and 'id="pl-list"' in pl and 'id="pl-story"' in pl
+    assert 'id="pl-tiles"' in pl and 'id="pl-grid"' in pl and 'id="pl-hero-art"' in pl
+    # every Innovation Group art file the page script asks for ships with the site
+    js = (b.ROOT / "static" / "pulse.js").read_text()
+    import re
+    for art in set(re.findall(r'"([a-z0-9-]+)",\n\s+"[A-Z]', js)) | {"general-dark"}:
+        for size in ("card", "wide"):
+            assert (b.ROOT / "static" / "img" / "ig-art" / f"{art}-{size}.jpg").exists(), art
     assert 'class="hub-tab is-on" href="../pulse/" aria-current="page"' in pl
     # what the user asked to leave out: feed counts, the relevance cut-off
     for gone in ("57 ", "4 or 5", "rated 4", "every three hours"):
