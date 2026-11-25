@@ -39,6 +39,12 @@ SharePoint decks (wiki) ─┘                                      │
 * **Attendee groups** are matched to events by the date in the group title, with the name as
   tie-breaker. Unclear cases are left unmatched for review.
 
+  Member domains come from the Mitglieder board (column "Email Domain", else the website), mirrored
+  into `public.crm_members` by the n8n workflow "IG Wiki - CRM mirror" every Monday at 04:47. Free
+  email domains (`events.free_mail_domain`: gmail.com, outlook.com, bluewin.ch, posteo.net and so on)
+  never make anyone a member, even if one is entered there. Registered participants keep access to
+  their event's slides with the exact address they registered with, free email or not.
+
 ## Secrets (Settings > Secrets and variables > Actions)
 
 | Name | What |

@@ -97,6 +97,7 @@ ATTENDEES = [
     mon.Attendee(3, "g1", "cleo@extern.ch", "Not Attending"),
     mon.Attendee(4, "g1", "dora@extern.ch", None),
     mon.Attendee(5, "g2", "emil@extern.ch", "Attending"),
+    mon.Attendee(6, "g1", "fritz@gmail.com", "Attending"),
 ]
 
 
@@ -176,6 +177,8 @@ def test_full_sync_twice(db, monkeypatch, tmp_path):
     ("someone@MEMBER.ch", "i4", "member"),            # archive deck, member
     ("staff.test@swissfoodresearch.ch", "i1", "staff"),
     ("anna@extern.ch", "i1", "participant"),           # attended
+    ("fritz@gmail.com", "i1", "participant"),          # free email domain: still a participant
+    ("fritz@gmail.com", "i4", None),                   # ... but never a member
     ("dora@extern.ch", "i1", "participant"),           # blank status keeps access
     ("bert@extern.ch", "i1", None),                    # no show
     ("cleo@extern.ch", "i1", None),                    # cancelled
@@ -198,6 +201,22 @@ def test_sign_up_gate(db):
     ok = lambda e: q(db, "select events.may_sign_up(%s)", e)[0][0]  # noqa: E731
     assert ok("a@member.ch") and ok("anna@extern.ch") and ok("staff.test@swissfoodresearch.ch")
     assert not ok("bert@extern.ch") and not ok("random@gmail.com")
+
+
+def test_free_mail_domain_never_makes_a_member(db):
+    """A gmail.com or bluewin.ch entry in the member list must not open member access to everyone."""
+    member = lambda e: q(db, "select events.is_member_email(%s)", e)[0][0]  # noqa: E731
+    with psycopg.connect(db, autocommit=True) as c:
+        c.execute("""insert into public.crm_members (domain, status, item_id, name) values
+            ('gmail.com','active',901,'Startup on gmail'), ('BLUEWIN.CH','active',902,'Person on bluewin')""")
+    try:
+        assert not member("anyone@gmail.com") and not member("someone@bluewin.ch")
+        assert member("someone@member.ch")                       # company domains still work
+        assert not q(db, "select events.may_sign_up('anyone@gmail.com')")[0][0]
+        assert q(db, "select events.may_sign_up('fritz@gmail.com')")[0][0]   # registered participant
+    finally:
+        with psycopg.connect(db, autocommit=True) as c:
+            c.execute("delete from public.crm_members where item_id in (901, 902)")
 
 
 def test_dry_run_changes_nothing(db, monkeypatch, tmp_path):
