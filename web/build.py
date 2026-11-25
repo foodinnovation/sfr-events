@@ -274,7 +274,7 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
         cur = ' aria-current="page"' if on else ""
         return f'<a class="{cls}" href="{href}"{cur}>{label}</a>'
     tabs = (tab_link("events", f"{up}events/", "Events") + tab_link("services", f"{up}services/", "Services")
-            + tab_link("knowledge", f"{up}knowledge/", KNOWLEDGE))
+            + tab_link("knowledge", f"{up}knowledge/", "Knowledge"))
     pulse_tab = tab_link("pulse", f"{up}pulse/", "Pulse")
     # Pulse: visible to everyone once config/pulse.json says public, before that to signed-in staff only
     tabs += pulse_tab if load_pulse().get("public") else pulse_tab.replace('<a class="', '<a hidden data-staff-only class="', 1)

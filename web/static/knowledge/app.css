@@ -37,6 +37,7 @@
 body.kn-page { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 body.kn-page > main { flex: 1; min-height: 0; display: flex; }
 body.kn-page .site-footer { display: none; }
+body.kn-page .partner-banner { margin-top: 0; }
 
 .kn-app { position: relative; flex: 1; min-width: 0; min-height: 0; display: flex; font-family: var(--font); background: var(--bg);
   color: var(--text); font-size: 15px; line-height: 1.6; }
@@ -288,6 +289,7 @@ body.kn-page .site-footer { display: none; }
   overflow-y: auto;
   background: var(--panel);
   border: 1px solid var(--border);
+  border-bottom: 0;
   border-radius: 0 var(--radius) 0 0;
   margin: 0 10px;
   box-shadow: var(--shadow);
@@ -300,6 +302,7 @@ body.kn-page .site-footer { display: none; }
 }
 
 /* -------- status bar -------- */
+/* the bottom row of the article panel, so the panel ends level with the topic list */
 .statusbar {
   display: flex;
   justify-content: flex-end;
@@ -307,6 +310,10 @@ body.kn-page .site-footer { display: none; }
   font-size: 11.5px;
   color: var(--muted);
   min-height: 24px;
+  margin: 0 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-top-color: var(--hover);
 }
 
 /* -------- article typography -------- */

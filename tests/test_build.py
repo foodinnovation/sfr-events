@@ -377,3 +377,10 @@ def test_build_writes_services_page(tmp_path):
     from datetime import date
     b.build(tmp_path / "s", [], date(2026, 11, 25))
     assert 'id="svc-detail"' in (tmp_path / "s" / "services" / "index.html").read_text()
+
+
+def test_knowledge_tab_is_called_knowledge():
+    from datetime import date
+    page = b.home_page([], date(2026, 11, 25))
+    assert '<a class="hub-tab" href="knowledge/">Knowledge</a>' in page
+    assert "Radicle \u2013 Knowledge" in page          # the Radicle card keeps the full name
