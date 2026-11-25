@@ -13,7 +13,7 @@ const ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ??
 
 function json(req: Request, status: number, body: unknown) {
   const origin = req.headers.get("origin") ?? "";
-  return new Response(JSON.stringify(body), { status, headers: {
+  return new Response(status === 204 ? null : JSON.stringify(body), { status, headers: {
     "Access-Control-Allow-Origin": ORIGINS.includes(origin) ? origin : ORIGINS[0],
     "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
     "Access-Control-Allow-Methods": "GET, OPTIONS", "Vary": "Origin",
