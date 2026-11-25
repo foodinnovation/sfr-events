@@ -354,7 +354,8 @@ def test_services_page_content_and_buttons():
     assert b.load_home()["newsletter"]["url"] in page
     assert 'data-svc-cta="amp">Talk to us' in page                            # no button of its own
     assert 'id="svc-mine" aria-labelledby="h-mine" hidden' in page            # members only, via JS
-    assert "As a member you get better terms for these 9 services." in page
+    n_member = sum(1 for v in st["services"].values() if v.get("member_advantage"))
+    assert f"As a member you get better terms for these {n_member} services." in page
     assert "<h2 id=\"h-all\" class=\"section-head\">All 16 services at a glance</h2>" in page
     assert 'id="cal-load"' in page and "<iframe" not in page                  # Calendly on click only
     assert "assets/services.js" in page and "assets/booking.js" in page
