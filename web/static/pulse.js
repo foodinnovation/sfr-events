@@ -90,6 +90,7 @@
     var l = LANG[String(code || "").slice(0, 2).toLowerCase()];
     return l ? "original in " + l : "";
   }
+  function sc(s) { return s.score != null ? s.score : (s.rel || 0) * 20; }   // finer 0-100 score, else the 1-5 rating
   function igsOf(s) { return (s.igs || []).filter(function (g) { return IG[g]; }); }
   function meta(s) {
     var m = [esc(srcName(s.source))];
@@ -171,14 +172,14 @@
   /* ------------------------------------------------------------------ hero and tiles */
   function best(list, scope) {
     return list.filter(function (s) { return s.scope === scope; })
-      .sort(function (a, b) { return b.rel - a.rel || (a.added < b.added ? 1 : -1); })[0];
+      .sort(function (a, b) { return sc(b) - sc(a) || (a.added < b.added ? 1 : -1); })[0];
   }
   function tiles() {   // the week at a glance: top story per region and the most useful; follows the group filter
     var pool = data.stories.filter(function (s) { return !state.ig || (s.igs || []).indexOf(state.ig) >= 0; });
     var span = state.ig ? data.days : 7;
     pool = pool.filter(function (s) { return dayDiff(s.added) < span; });
     var useful = pool.filter(function (s) { return (s.votes || 0) > 0; })
-      .sort(function (a, b) { return b.votes - a.votes || b.rel - a.rel; })[0];
+      .sort(function (a, b) { return b.votes - a.votes || sc(b) - sc(a); })[0];
     var what = state.ig ? " on " + IG[state.ig][0] : "";
     var when = state.ig ? " in the last two weeks." : " this week.";
     return [
@@ -223,9 +224,9 @@
   /* ------------------------------------------------------------------ feed */
   function sorted(list) {
     var l = list.slice();
-    if (state.sort === "new") l.sort(function (a, b) { return a.added.slice(0, 10) < b.added.slice(0, 10) ? 1 : a.added.slice(0, 10) > b.added.slice(0, 10) ? -1 : b.rel - a.rel; });
-    else if (state.sort === "votes") l.sort(function (a, b) { return (b.votes || 0) - (a.votes || 0) || b.rel - a.rel || (a.added < b.added ? 1 : -1); });
-    return l;   // "rel": the server's order (relevance, then newest)
+    if (state.sort === "new") l.sort(function (a, b) { return a.added.slice(0, 10) < b.added.slice(0, 10) ? 1 : a.added.slice(0, 10) > b.added.slice(0, 10) ? -1 : sc(b) - sc(a); });
+    else if (state.sort === "votes") l.sort(function (a, b) { return (b.votes || 0) - (a.votes || 0) || sc(b) - sc(a) || (a.added < b.added ? 1 : -1); });
+    return l;   // "rel": the server's order (score, then newest)
   }
   function matches(s) {
     if (state.scope !== "all" && s.scope !== state.scope) return false;
@@ -238,7 +239,7 @@
   }
   function pickLead(list, skip) {   // the most relevant story of the last three days, newest first
     var recent = list.filter(function (s) { return dayDiff(s.added) <= 3 && !skip[s.id]; });
-    recent.sort(function (a, b) { return b.rel - a.rel || (a.added < b.added ? 1 : -1); });
+    recent.sort(function (a, b) { return sc(b) - sc(a) || (a.added < b.added ? 1 : -1); });
     return recent[0] || null;
   }
   function renderIgChips() {

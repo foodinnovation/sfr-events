@@ -353,3 +353,24 @@ def test_pulse_shows_only_clean_relevant_stories_and_counts_votes(db):
         assert len(one) == 1 and one[0]["votes"] == 2 and one[0]["mine"] is True
         assert c.execute("select pulse.hub_vote(%s, 'a@member.ch', false)", (sid,)).fetchone()[0] == 1
         assert c.execute("select value from pulse.setting where key = 'public'").fetchone()[0] == "false"
+
+
+def test_pulse_cut_off_follows_the_finer_score(db):
+    with psycopg.connect(db, autocommit=True) as c:
+        c.execute("""
+          insert into pulse.items (id, origin, source_id, url, title, published_at, summary_en, relevance, score, igs, scope) values
+            ('o:s1', 'open', 'lid', 'https://lid.ch/s1', 'Strong three', now(), 'A strong 3.', 3, 57, '{}', 'swiss'),
+            ('o:s2', 'open', 'lid', 'https://lid.ch/s2', 'Weak three', now(), 'A weak 3.', 3, 42, '{}', 'swiss'),
+            ('o:s3', 'open', 'lid', 'https://lid.ch/s3', 'Unscored three', now(), 'Old 3.', 3, null, '{}', 'swiss'),
+            ('o:s4', 'open', 'lid', 'https://lid.ch/s4', 'Top four', now(), 'A strong 4.', 4, 78, '{}', 'swiss');
+        """)
+        def titles():
+            return [s["title"] for s in c.execute("select pulse.hub_stories(14)").fetchone()[0]]
+        assert c.execute("select value from pulse.setting where key = 'min_score'").fetchone()[0] == "60"
+        t = titles()   # default 60: the same as relevance 4 or 5
+        assert "Top four" in t and not {"Strong three", "Weak three", "Unscored three"} & set(t)
+        c.execute("update pulse.setting set value = '50' where key = 'min_score'")
+        t = titles()   # 50 adds the better half of the 3s; an unscored 3 counts as 40
+        assert "Strong three" in t and not {"Weak three", "Unscored three"} & set(t)
+        assert t.index("Top four") < t.index("Strong three")   # best score first
+        c.execute("update pulse.setting set value = '60' where key = 'min_score'")

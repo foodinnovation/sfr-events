@@ -116,6 +116,10 @@ Members can mark a story useful (one vote each, withdrawable). There are no comm
   serves staff only. To open Pulse to everyone, do both:
   `update pulse.setting set value = 'true', updated_at = now() where key = 'public';` in the ig-wiki SQL
   editor, and `"public": true` in `config/pulse.json` (a push republishes the site).
+* **How much Pulse shows.** Each item has a 0-100 score inside its 1-5 rating (3 = 40-59, 4 = 60-79, 5 = 80-100).
+  The hub shows items at or above `pulse.setting` `min_score` (default 60, the same as "rated 4 or 5"; 50 adds the
+  better half of the 3s): `update pulse.setting set value = '50', updated_at = now() where key = 'min_score';`
+  takes effect on the next page load.
 * Funding calls and tenders appear as a members-only teaser for now.
 
 ## Layout
