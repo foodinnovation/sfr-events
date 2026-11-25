@@ -63,7 +63,7 @@ Deno.serve(async (req: Request) => {
       where kind='mail_click' and ${W} group by 1 order by 2 desc limit 20`;
     const home = await sql`select case when kind = 'booking_open' then 'calendar-shown' else split_part(ref, ': ', 1) end button,
         count(*)::int clicks from events.metric
-      where (kind = 'home_click' or (kind = 'booking_open' and coalesce(ref, 'home') = 'home')) and ${W}
+      where (kind = 'home_click' or (kind = 'booking_open' and coalesce(ref, 'home') in ('home', 'calendly'))) and ${W}
       group by 1 order by 2 desc limit 20`;
     const services = await sql`select case when kind = 'booking_open' then 'calendar-shown' else ref end action,
         count(*)::int clicks from events.metric
