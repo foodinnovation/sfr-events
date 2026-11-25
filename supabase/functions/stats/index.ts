@@ -13,7 +13,7 @@ const ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ??
 
 function json(req: Request, status: number, body: unknown) {
   const origin = req.headers.get("origin") ?? "";
-  return new Response(JSON.stringify(body), { status, headers: {
+  return new Response(status === 204 ? null : JSON.stringify(body), { status, headers: {
     "Access-Control-Allow-Origin": ORIGINS.includes(origin) ? origin : ORIGINS[0],
     "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
     "Access-Control-Allow-Methods": "GET, OPTIONS", "Vary": "Origin",
@@ -43,7 +43,7 @@ Deno.serve(async (req: Request) => {
         count(*) filter (where kind='mail_click')::int mail_clicks,
         count(*) filter (where kind like 'kn_%')::int knowledge
       from events.metric where ${W}`;
-    const daily = await sql`select to_char(d, 'YYYY-MM-DD') day, coalesce(v, 0)::int views
+    const daily = await sql`select to_char(d, 'YYYY-MM-DD') as day, coalesce(v, 0)::int views
       from generate_series(${from}::date, ${to}::date, '1 day') d
       left join (select at::date dd, count(*) v from events.metric where kind='view' and ${W} group by 1) x on x.dd = d
       order by d`;
@@ -71,7 +71,7 @@ Deno.serve(async (req: Request) => {
       group by 1 order by 2 desc limit 40`;
     const searches = await sql`select lower(ref) term, count(*)::int n from events.metric
       where kind='search' and ${W} group by 1 order by 2 desc limit 20`;
-    const filters = await sql`select ref filter, count(*)::int n from events.metric
+    const filters = await sql`select ref as filter, count(*)::int n from events.metric
       where kind='filter' and ${W} group by 1 order by 2 desc limit 20`;
     const topics = await sql`select m.ref slug, coalesce(max(a.topic_label), m.ref) label, count(*)::int n
       from events.metric m left join knowledge.article a on a.topic_slug = m.ref
