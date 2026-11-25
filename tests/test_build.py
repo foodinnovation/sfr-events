@@ -218,3 +218,18 @@ def test_pulse_page_and_tab_follow_the_settings_file(tmp_path, monkeypatch):
 def test_privacy_page_explains_pulse_votes():
     priv = b.privacy_page()
     assert "<h2>Pulse</h2>" in priv and "marks a story as useful" in priv
+
+
+def test_footer_supported_by_and_imprint():
+    from datetime import date
+    page = b.index_page([], date(2026, 11, 25), ads={"enabled": False})
+    i = [page.index(x) for x in ("minerva-foundation.svg", "avina.png", "seedling-foundation.png")]
+    assert i == sorted(i) and "Supported by" in page
+    assert "Presentations are available to members" not in page
+    assert "Technoparkstrasse 1<br>8005 Zürich" in page and "Postfach" not in page
+    assert '<a href="imprint/">Imprint</a>' in page
+    imp = b.imprint_page()
+    for part in ("CHE-371.512.462", "CHE-371.512.462 MWST", "Dr Lucas Grob, Managing Director", "Wolfram Brück, President",
+                 "+41 79 766 87 59", "mailto:contact@swissfoodresearch.ch", "Liability for links", "Copyright"):
+        assert part in imp
+    assert "peter.braun" not in imp and "Postfach" not in imp and "—" not in imp

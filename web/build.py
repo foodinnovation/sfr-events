@@ -304,12 +304,22 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
 <main>
 {body}
 </main>
+<section class="partner-banner" aria-label="Supported by">
+  <div class="wrap partner-row">
+    <span class="partner-label">Supported by</span>
+    <ul class="partner-logos">
+      <li><img src="{up}assets/img/partners/minerva-foundation.svg" alt="Minerva Foundation"></li>
+      <li><img src="{up}assets/img/partners/avina.png" alt="Avina Foundation"></li>
+      <li><img src="{up}assets/img/partners/seedling-foundation.png" alt="Seedling Foundation"></li>
+    </ul>
+  </div>
+</section>
 <footer class="site-footer">
   <div class="wrap footer-row">
     <img src="{up}assets/img/logo-sfr-white.svg" alt="{ORG}" height="48">
-    <p>Presentations are available to members of {ORG} and to registered participants of each event.
-    Questions: <a href="mailto:{CONTACT}">{CONTACT}</a></p>
-    <p class="sfr-note"><a href="{up}privacy/">Privacy</a> &middot; <a href="https://www.swissfoodresearch.ch/">{ORG}</a></p>
+    <address class="footer-address">{ORG}<br>Technoparkstrasse 1<br>8005 Z\u00fcrich<br>
+      <a href="mailto:{CONTACT}">{CONTACT}</a></address>
+    <p class="sfr-note"><a href="{up}privacy/">Privacy</a> &middot; <a href="{up}imprint/">Imprint</a> &middot; <a href="https://www.swissfoodresearch.ch/">{ORG}</a></p>
   </div>
 </footer>
 <dialog id="signin" class="dialog" aria-labelledby="signin-title">
@@ -895,6 +905,51 @@ Federal Data Protection and Information Commissioner (FDPIC).</p>
     return shell(f"Privacy | {ORG}", body, 1, f"How the SFR hub of {ORG} handles personal data.", tab="")
 
 
+# --------------------------------------------------------------------------- imprint
+
+def imprint_page() -> str:
+    """English translation of the German Impressum of Swiss Food Research, as supplied (25.11.2026)."""
+    body = f"""
+<section class="hero hero-compact"><div class="wrap">
+  <p class="sfr-sub01 eyebrow">{ORG}</p>
+  <h1>Imprint</h1>
+</div></section>
+<div class="wrap block"><div class="prose">
+<h2>Contact information</h2>
+<p>{ORG}<br>Technoparkstrasse 1<br>CH-8005 Z\u00fcrich<br>Mobile: +41 79 766 87 59<br>
+<a href="mailto:{CONTACT}">{CONTACT}</a></p>
+
+<h2>Commercial register entry</h2>
+<p>Registered name: {ORG}<br>Number: CHE-371.512.462<br>Commercial register office: Z\u00fcrich</p>
+
+<h2>VAT number</h2>
+<p>CHE-371.512.462 MWST</p>
+
+<h2>Management</h2>
+<p>Dr Lucas Grob, Managing Director<br>Wolfram Br\u00fcck, President</p>
+
+<h2>Disclaimer</h2>
+<p>The author accepts no liability for the correctness, accuracy, timeliness, reliability or
+completeness of the information.</p>
+<p>Liability claims against the author for material or immaterial damage arising from access to, use
+or non-use of the published information, from misuse of the connection or from technical faults
+are excluded.</p>
+<p>The author expressly reserves the right to change, supplement or delete parts of the pages or the
+entire offering without separate notice, or to suspend publication temporarily or permanently.</p>
+
+<h2>Liability for links</h2>
+<p>References and links to third-party websites lie outside our area of responsibility. Any
+responsibility for such websites is declined. Access to and use of such websites is at the user's
+own risk.</p>
+
+<h2>Copyright</h2>
+<p>The copyright and all other rights to content, images, photos or other files on the website belong
+exclusively to the association {ORG} or to the specifically named rights holders. The written
+consent of the copyright holders must be obtained in advance for the reproduction of any element.</p>
+</div></div>"""
+    return shell(f"Imprint | {ORG}", body, 1, f"Imprint of {ORG}.", tab="")
+
+
 # --------------------------------------------------------------------------- build
 
 def public_json(events: list[dict]) -> list[dict]:
@@ -929,6 +984,8 @@ def build(out: Path, events: list[dict], today: date, attending: dict | None = N
     (out / "pulse" / "index.html").write_text(pulse_page())
     (out / "stats").mkdir()
     (out / "stats" / "index.html").write_text(stats_page())
+    (out / "imprint").mkdir()
+    (out / "imprint" / "index.html").write_text(imprint_page())
     (out / "privacy").mkdir()
     (out / "privacy" / "index.html").write_text(privacy_page())
     (out / "404.html").write_text(shell(f"Not found | {ORG}", '<div class="wrap block"><h1>Page not found</h1>'
