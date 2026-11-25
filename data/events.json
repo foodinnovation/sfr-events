@@ -2818,6 +2818,21 @@
   "presentations": 0
  },
  {
+  "id": 51421,
+  "slug": "2026-11-19-7-treffen-ig-zgl-luzern",
+  "kind": "ig",
+  "title": "7. Treffen IG ZGL Luzern",
+  "date": "2026-11-19",
+  "year": 2026,
+  "location": "Berufsbildungszentrum Natur und Ernährung (BBZN) Sursee, Centralstrasse 21, 6210 Sursee, Schweiz",
+  "url": null,
+  "innovation_groups": [
+   "Future Proof Farming Lucerne"
+  ],
+  "sessions": 0,
+  "presentations": 0
+ },
+ {
   "id": 378,
   "slug": null,
   "kind": "external",
