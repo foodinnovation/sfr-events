@@ -1,0 +1,20 @@
+{
+  "_help": "Text and links of the hub home page (web/build.py home_page). hero.image: one of the Design System pictures in web/static/img/ig-art (name without -wide.jpg), e.g. farming, bioconversion, sustainable-nutrition, general-dark. A push republishes the site in about 10 minutes.",
+  "hero": {
+    "image": "farming",
+    "title": "Turning agro-food innovation into market success: faster, de-risked and funded.",
+    "lead": "We bridge the gap between research, start-ups and industry to make innovation happen."
+  },
+  "booking": {
+    "url": "https://calendly.com/swissfoodreseach/1-1-meeting",
+    "title": "Have an idea or a project? Talk it through with us.",
+    "lead": "Book 45 minutes with a Swiss Food Research expert. You leave with clear next steps, the right contacts and your funding options.",
+    "topics": ["Partner search", "Proposal review", "Funding advice", "Scale-up", "IP strategy", "Regulatory questions", "Market validation"],
+    "facts": "45 minutes. Free, for members and non-members."
+  },
+  "newsletter": {
+    "title": "Newsletter",
+    "lead": "Upcoming meetings, calls for proposals and news from the network, in your inbox.",
+    "url": "https://forms.monday.com/forms/9e88ba9676846b05f7617f55989123df?r=euc1"
+  }
+}

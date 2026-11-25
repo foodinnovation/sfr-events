@@ -186,7 +186,7 @@ def test_privacy_and_statistics_pages():
     st = b.stats_page()
     assert 'name="robots" content="noindex"' in st and "assets/stats.js" in st and 'id="stats-out"' in st
     # every page: the Statistics tab exists but stays hidden until app.js sees staff; footer links privacy
-    page = b.index_page([], date(2026, 11, 24), ads={"enabled": False})
+    page = b.home_page([], date(2026, 11, 24))
     assert '<a hidden data-staff-only class="hub-tab" href="stats/">Statistics</a>' in page
     assert '<a href="privacy/">Privacy</a>' in page
 
@@ -198,7 +198,7 @@ def test_pulse_page_and_tab_follow_the_settings_file(tmp_path, monkeypatch):
     # no file or public false: staff-only tab, page not indexed
     cfg.write_text('{"public": false}')
     monkeypatch.setattr(b, "load_pulse", lambda path=cfg: __import__("json").loads(cfg.read_text()))
-    page = b.index_page([], date(2026, 11, 24), ads={"enabled": False})
+    page = b.home_page([], date(2026, 11, 24))
     assert '<a hidden data-staff-only class="hub-tab" href="pulse/">Pulse</a>' in page
     pl = b.pulse_page()
     assert 'name="robots" content="noindex"' in pl
@@ -217,7 +217,7 @@ def test_pulse_page_and_tab_follow_the_settings_file(tmp_path, monkeypatch):
     assert "—" not in pl and "fonts.googleapis" not in pl
     # public: an ordinary tab, indexable
     cfg.write_text('{"public": true}')
-    page = b.index_page([], date(2026, 11, 24), ads={"enabled": False})
+    page = b.home_page([], date(2026, 11, 24))
     assert '<a class="hub-tab" href="pulse/">Pulse</a>' in page
     assert 'name="robots"' not in b.pulse_page()
 
@@ -229,7 +229,7 @@ def test_privacy_page_explains_pulse_votes():
 
 def test_footer_supported_by_and_imprint():
     from datetime import date
-    page = b.index_page([], date(2026, 11, 25), ads={"enabled": False})
+    page = b.home_page([], date(2026, 11, 25))
     i = [page.index(x) for x in ("minerva-foundation.svg", "avina.png", "seedling-foundation.png")]
     assert i == sorted(i) and "Supported by" in page
     assert "Presentations are available to members" not in page
@@ -240,3 +240,73 @@ def test_footer_supported_by_and_imprint():
                  "+41 79 766 87 59", "mailto:contact@swissfoodresearch.ch", "Liability for links", "Copyright"):
         assert part in imp
     assert "peter.braun" not in imp and "Postfach" not in imp and "—" not in imp
+
+
+def _event(i, kind, d, slug=None, url=None, igs=()):
+    from datetime import time
+    return dict(id=i, slug=slug or f"e{i}", kind=kind, ig=None, title=f"Event {i}", summary="", date=d, year=d.year,
+                start=time(9), end=time(12), location="Technopark Zürich", url=url, source="monday",
+                sessions=[], decks=[], igs=set(igs))
+
+
+def test_home_page_shows_next_three_sfr_and_ig_events_only():
+    from datetime import date
+    today = date(2026, 11, 25)
+    evs = [_event(1, "ig", date(2026, 11, 20)),                      # past
+           _event(2, "external", date(2026, 11, 26), url="https://x.example"),   # partner: not on home
+           _event(3, "ig", date(2026, 12, 3), url="https://ti.to/swissfoodresearch-events/x", igs=(9,)),
+           _event(4, "sfr", date(2026, 12, 10)),
+           _event(5, "ig", date(2027, 1, 28)),
+           _event(6, "sfr", date(2027, 2, 4))]                        # fourth: not on home
+    page = b.home_page(evs, today)
+    assert [f'href="events/e{i}/"' in page for i in (1, 2, 3, 4, 5, 6)] == [False, False, True, True, True, False]
+    assert 'href="events/e3/#register"' in page and "Register" in page        # sign-up link: Register
+    assert 'href="events/e4/" data-home="event"' in page                      # none: Details
+    assert "Bioconversion" in page and 'href="events/"' in page
+    assert "<h1>Turning agro-food innovation into market success" in page
+    assert "—" not in page and "&mdash;" not in page
+
+
+def test_home_page_keeps_calendly_and_pulse_off_until_asked():
+    from datetime import date
+    page = b.home_page([], date(2026, 11, 25))
+    cfg = b.load_home()
+    # Calendly only as a link and a data attribute: no iframe, no script from Calendly before the click
+    assert f'data-url="{cfg["booking"]["url"]}"' in page and "<iframe" not in page
+    assert "assets.calendly.com" not in page and "calendly.com/assets" not in page
+    assert "Free, for members and non-members" in page and "Show available slots" in page
+    # Pulse block hidden in the HTML; home.js shows it only when the function serves the visitor
+    assert 'id="home-news" aria-labelledby="h-news" data-public="0" hidden' in page
+    assert "assets/home.js" in page and "No meetings are scheduled yet" in page
+    # Radicle card for everyone; newsletter goes to the monday form; hero picture from the Design System
+    assert 'href="knowledge/"' in page and b.MEMBERSHIP_URL in page
+    assert cfg["newsletter"]["url"] in page
+    assert f'--hero-img:url({b.SITE_BASE}assets/img/ig-art/{cfg["hero"]["image"]}-wide.jpg)' in page
+    assert (b.ROOT / "static" / "img" / "ig-art" / f'{cfg["hero"]["image"]}-wide.jpg').exists()
+
+
+def test_old_events_list_links_are_forwarded():
+    from datetime import date
+    page = b.home_page([], date(2026, 11, 25))
+    assert 'q.has("group") || q.has("type") || q.has("q")' in page and 'location.replace("events/"' in page
+
+
+def test_events_list_lives_under_events(tmp_path):
+    from datetime import date
+    d = date(2026, 12, 3)
+    evs = [_event(3, "ig", d)]
+    lst = b.index_page(evs, date(2026, 11, 25), ads={"enabled": False})
+    assert 'href="e3/"' in lst and 'href="events/e3/"' not in lst            # relative to /events/
+    assert 'href="../assets/site.css"' in lst and '<a class="hub-tab is-on" href="../events/"' in lst
+    ev = b.event_page(evs[0], date(2026, 11, 25))
+    assert '<p class="crumbs"><a href="../../events/">All events</a></p>' in ev
+    b.build(tmp_path / "s", evs, date(2026, 11, 25))
+    assert (tmp_path / "s" / "index.html").read_text().count('id="home-split"') == 1
+    assert 'id="filters"' in (tmp_path / "s" / "events" / "index.html").read_text()
+    assert (tmp_path / "s" / "events" / "e3" / "index.html").exists()
+    assert 'href="/events/">All events</a>' in (tmp_path / "s" / "404.html").read_text()
+
+
+def test_privacy_page_explains_calendly():
+    priv = b.privacy_page()
+    assert "<h2>Booking a 1:1 session</h2>" in priv and "loads only when you click" in priv
