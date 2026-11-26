@@ -623,7 +623,7 @@
       '<div class="finder-form">' +
         '<textarea id="finder-idea" class="finder-idea" rows="4" placeholder="e.g. We are developing a precision fermentation platform to produce animal-free whey proteins at scale for the Swiss food industry…">' + esc(f.idea) + '</textarea>' +
         '<div class="finder-controls">' +
-          '<label class="finder-check"><input type="checkbox" id="finder-active"' + (f.activeOnly ? ' checked' : '') + '> Active in 2026 only</label>' +
+          '<label class="finder-check"><input type="checkbox" id="finder-active"' + (f.activeOnly ? ' checked' : '') + '> Active in ' + checkYear() + ' only</label>' +
           '<label class="finder-sev">Min. gap severity ' +
             '<select id="finder-sev">' +
               [1, 2, 3, 4, 5].map(function (n) { return '<option value="' + n + '"' + (n === f.minSev ? ' selected' : '') + '>Level ' + n + '+</option>'; }).join('') +
@@ -704,7 +704,7 @@
   function finderBrowseHtml() {
     var f = state.finder;
     if (!f.instruments) return '<div class="state-block"><div class="spinner"></div>Loading instruments…</div>';
-    var list = f.instruments.filter(function (i) { return i.active_2026; });
+    var list = f.instruments.filter(function (i) { return i.active; });
     var h = '<div class="finder-section"><div class="finder-section-t">Funding instruments (' + list.length + ' active)</div>' +
       '<div class="finder-browse">';
     list.forEach(function (i) { h += instrumentCardHtml(i); });
@@ -712,18 +712,39 @@
     return h;
   }
 
+  // The year the Funding Schemes board checked the programmes for (from the data; the current year if missing).
+  function checkYear() {
+    var all = (state.finder.instruments || []).concat((state.finder.result && state.finder.result.instruments) || []);
+    for (var k = 0; k < all.length; k++) if (all[k].check_year) return all[k].check_year;
+    return new Date().getFullYear();
+  }
+  function fmtDate(d) {
+    if (!d) return '';
+    var p = String(d).split('-');
+    var m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][Number(p[1]) - 1];
+    return Number(p[2]) + ' ' + m + ' ' + p[0];
+  }
   function instrumentCardHtml(i) {
-    var badge = i.active_2026
-      ? '<span class="inst-badge active">Active 2026</span>'
+    var year = i.check_year || checkYear();
+    var badge = i.active && i.status === 'yes' ? '<span class="inst-badge active">Active ' + year + '</span>'
+      : i.active ? '<span class="inst-badge likely">Likely active ' + year + '</span>'
+      : i.status === 'no' || i.deadline_type === 'closed' ? '<span class="inst-badge closed">Not open in ' + year + '</span>'
       : '<span class="inst-badge">Check status</span>';
+    var when = i.deadline ? 'Deadline ' + fmtDate(i.deadline)
+      : i.deadline_type && i.deadline_type !== 'closed' ? i.deadline_type.charAt(0).toUpperCase() + i.deadline_type.slice(1) : '';
+    if (i.opens_on && i.deadline_type === 'upcoming / announced') when = 'Opens ' + fmtDate(i.opens_on) + (when ? ' · ' + when : '');
     var link = i.link ? '<a class="inst-link" href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer">Open →</a>' : '';
     var topic = i.project_topic ? '<div class="inst-topic">' + esc(str(i.project_topic).slice(0, 150)) + (str(i.project_topic).length > 150 ? '…' : '') + '</div>' : '';
     return '<div class="inst-card">' +
       '<div class="inst-top"><span class="inst-name">' + esc(i.name) + '</span>' + badge + '</div>' +
       '<div class="inst-meta">' + esc(i.funder || '\u2013') +
+        (i.funding_type ? ' · ' + esc(i.funding_type) : '') +
         (i.stage ? ' · ' + esc(i.stage) : '') +
         (i.max_funding_chf ? ' · <span class="inst-max">max. ' + esc(i.max_funding_chf) + '</span>' : '') +
-      '</div>' + topic + link +
+      '</div>' +
+      (when ? '<div class="inst-when">' + esc(when) + '</div>' : '') +
+      topic +
+      '<div class="inst-foot">' + link + (i.verified_on ? '<span class="inst-verified">Verified ' + fmtDate(i.verified_on) + '</span>' : '') + '</div>' +
     '</div>';
   }
 

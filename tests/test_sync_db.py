@@ -265,7 +265,9 @@ def test_knowledge_write_and_access(db):
         "gaps": [("g1", "soil", "No long-term soil carbon trials in the Jura.", 4, "1-2 M", "evidence", "unexplored")],
     }
     inst = [dict(id="9", name="Innovation project", funder="Innosuisse", stage=None, link=None,
-                 max_funding_chf=None, project_topic="any", impact_area=None, location="CH", active_2026=True)]
+                 max_funding_chf=None, project_topic="any", impact_area=None, location="CH", status="yes",
+                 check_year=2027, active=True, funding_type="grant", deadline_type="rolling / continuous",
+                 opens_on=None, deadline=None, verified_on="2026-11-26")]
     with psycopg.connect(db) as c, c.cursor() as cur:
         report = {}
         cur.execute("set role events_job")            # the job's own rights: RLS applies, no COPY

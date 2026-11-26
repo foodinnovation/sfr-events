@@ -218,12 +218,18 @@ async function search(req: Request, q: string, limit: number) {
   });
 }
 
-const INSTRUMENT = () => sql`select id, name, funder, stage, link, max_funding_chf, project_topic, location, active_2026
-                             from knowledge.instrument`;
+// Status from the Funding Schemes board (yes / likely / no / unclear for the check year, with the day it was
+// verified). A call with a fixed deadline that has passed no longer counts as active.
+const INSTRUMENT = () => sql`
+  select id, name, funder, stage, link, max_funding_chf, project_topic, location, status, check_year,
+         (active and not coalesce(deadline_type = 'fixed deadline' and deadline < current_date, false)) active,
+         funding_type, deadline_type, to_char(opens_on, 'YYYY-MM-DD') opens_on,
+         to_char(deadline, 'YYYY-MM-DD') deadline, to_char(verified_on, 'YYYY-MM-DD') verified_on
+  from knowledge.instrument`;
 
 async function instruments(req: Request) {
-  const rows = await sql`select id, name, funder, stage, link, max_funding_chf, project_topic, active_2026
-                         from knowledge.instrument order by active_2026 desc, name`;
+  const rows = (await INSTRUMENT()).map(({ location: _l, ...i }: Row) => i);
+  rows.sort((a: Row, b: Row) => (Number(b.active) - Number(a.active)) || String(a.name).localeCompare(String(b.name)));
   return json(req, 200, rows);
 }
 
@@ -244,7 +250,7 @@ async function finder(req: Request) {
     order by ts_rank_cd(g.fts, to_tsquery('english', ${qe})) desc, g.severity desc limit 10` : [];
 
   const all = await INSTRUMENT();
-  const ok = (i: Row) => (!activeOnly || i.active_2026 === true) && applicable(i.location);
+  const ok = (i: Row) => (!activeOnly || i.active === true) && applicable(i.location);
   const picked: Row[] = [];
   const pickedIds = new Set<string>();
   if (q) {

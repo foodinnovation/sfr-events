@@ -284,18 +284,33 @@ async function toolProject(id: string) {
     url: p.source_url, source_url: undefined, cited_in_topics: articles };
 }
 
+// Status from the Funding Schemes board: yes / likely / no / unclear for the check year, with the day it was
+// verified. The view below marks a programme active when the board says yes or likely, the call is not
+// closed and a fixed deadline has not passed (same rule as the Knowledge tab's funding finder).
 async function toolProgrammes(query: string, activeOnly: boolean, limit: number) {
   const q = orQuery(query.slice(0, 200));
   const rows = q
-    ? await sql`select id, name, funder, stage, link, max_funding_chf, project_topic, impact_area, location, active_2026
-                from knowledge.instrument
-                where fts @@ to_tsquery('simple', ${q}) and (${!activeOnly} or active_2026 is true)
-                order by ts_rank_cd(fts, to_tsquery('simple', ${q})) desc, name limit ${limit}`
-    : await sql`select id, name, funder, stage, link, max_funding_chf, project_topic, impact_area, location, active_2026
-                from knowledge.instrument where (${!activeOnly} or active_2026 is true)
-                order by active_2026 desc nulls last, name limit ${limit}`;
-  const [t] = await sql`select count(*)::int n from knowledge.instrument where (${!activeOnly} or active_2026 is true)`;
-  return { total_matching_filter: t.n, shown: rows.length, programmes: rows };
+    ? await sql`select * from (
+                  select id, name, funder, stage, link, max_funding_chf, project_topic, impact_area, location,
+                         status status_in_check_year, check_year,
+                         (active and not coalesce(deadline_type = 'fixed deadline' and deadline < current_date, false)) active,
+                         funding_type, deadline_type, to_char(opens_on, 'YYYY-MM-DD') opens_on,
+                         to_char(deadline, 'YYYY-MM-DD') deadline, to_char(verified_on, 'YYYY-MM-DD') verified_on,
+                         ts_rank_cd(fts, to_tsquery('simple', ${q})) rank
+                  from knowledge.instrument where fts @@ to_tsquery('simple', ${q})) x
+                where (${!activeOnly} or active) order by rank desc, name limit ${limit}`
+    : await sql`select * from (
+                  select id, name, funder, stage, link, max_funding_chf, project_topic, impact_area, location,
+                         status status_in_check_year, check_year,
+                         (active and not coalesce(deadline_type = 'fixed deadline' and deadline < current_date, false)) active,
+                         funding_type, deadline_type, to_char(opens_on, 'YYYY-MM-DD') opens_on,
+                         to_char(deadline, 'YYYY-MM-DD') deadline, to_char(verified_on, 'YYYY-MM-DD') verified_on
+                  from knowledge.instrument) x
+                where (${!activeOnly} or active) order by active desc, name limit ${limit}`;
+  const [t] = await sql`select count(*)::int n, max(check_year) y from knowledge.instrument
+                        where (${!activeOnly} or (active and not coalesce(deadline_type = 'fixed deadline' and deadline < current_date, false)))`;
+  return { check_year: t.y, total_matching_filter: t.n, shown: rows.length,
+           programmes: rows.map(({ rank: _r, ...p }: Row) => p) };
 }
 
 // ------------------------------------------------------------------ MCP
@@ -324,9 +339,9 @@ const TOOLS = [
     description: "One Swiss research project: summary, funder, institution, lead and partners, dates, status, budget in CHF, technology readiness level, link to the source record, and the Radicle topics that cite it.",
     inputSchema: { type: "object", required: ["id"], properties: { id: str("Project id, e.g. aramis:12345 or snf:198765") } } },
   { name: "radicle_funding_programmes", title: "List funding programmes", annotations: RO,
-    description: "Funding programmes tracked by Swiss Food Research (funder, stage, maximum funding, topic, impact area, location, link). Optional search words; by default only programmes active in 2026.",
+    description: "Funding programmes tracked by Swiss Food Research (funder, stage, maximum funding, topic, impact area, location, link). Optional search words; by default only programmes active in the board's check year (status yes or likely, verified date given).",
     inputSchema: { type: "object", properties: { query: str("Optional search words, e.g. innosuisse startup packaging"),
-      active_only: { type: "boolean", description: "Only programmes active in 2026 (default true)" }, limit: int("1-100, default 30") } } },
+      active_only: { type: "boolean", description: "Only programmes marked active (yes or likely) for the check year (default true)" }, limit: int("1-100, default 30") } } },
 ];
 
 async function runTool(name: string, a: Record<string, unknown>) {

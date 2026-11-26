@@ -103,7 +103,11 @@ which the sync job refills from:
 * radicle's Supabase copy (`wiki_articles`, `projects` with `stage_gate = 'passed'`,
   `white_spots`), through the read-only login `knowledge_reader`. Radicle's own compile step
   pushes to that copy, so the tab is as current as radicle's last pipeline run;
-* the monday board Funding Schemes (1737639790) for the funding finder's programmes;
+* the monday board Funding Schemes (1737639790) for the funding finder's programmes. The column "Active in
+  check year" (yes / likely / no / unclear) decides what counts as active: yes or likely, unless the deadline
+  type is closed or a fixed deadline has passed. The check year comes from that column's description
+  ("Check year 2027 ..."), so next year only the description changes. Cards show the funding type, the
+  deadline or deadline type and the "Last verified" date. The group "Funding Schemes - old version" is skipped;
 * the contact routing in `sync/knowledge.py` (names and roles only, no email addresses).
 
 A failure here never stops the event sync: it shows as a warning on the run and in the report.

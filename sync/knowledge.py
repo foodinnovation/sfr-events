@@ -28,12 +28,17 @@ RADICLE_HOSTS = [h for h in (os.environ.get("RADICLE_DB_HOST"),
                              "aws-0-eu-west-1.pooler.supabase.com",
                              "aws-1-eu-west-1.pooler.supabase.com") if h]
 
-# Instrument columns on Funding Schemes, as radicle reads them (src/connectors/funding_instruments.py)
+# Instrument columns on Funding Schemes (radicle reads the first eight: src/connectors/funding_instruments.py)
+ACTIVE_COL = "color_mky8wv9"          # "Active in check year": yes / likely / no / unclear
 INST_COLS = {
     "text_mkxwas09": "funder", "drop_down_Mjj3p6VO": "stage", "dropdown_mky8chs3": "location",
     "text_mkya77zc": "link", "text_Mjj3wdkj": "max_funding_chf", "text_Mjj3ZlYt": "project_topic",
-    "dropdown_mky1v9rk": "impact_area", "color_mky8wv9": "active",
+    "dropdown_mky1v9rk": "impact_area", ACTIVE_COL: "status",
+    "color_mm4x9nkz": "funding_type", "color_mm4xd6af": "deadline_type",
+    "date_mm4x76e9": "opens_on", "date_mm4xyrmk": "deadline", "date_mm4xdqb6": "verified_on",
 }
+OLD_GROUP = "topics"                  # group "Funding Schemes - old version": not shown
+STATUSES = ("yes", "likely", "no", "unclear")
 
 # Who to talk to, by topic slug and keyword (from radicle's config/contacts.yaml).
 CONTACTS = [
@@ -98,17 +103,39 @@ def read_radicle(conn) -> dict:
     return {"articles": articles, "projects": projects, "gaps": gaps}
 
 
-def parse_instrument(item: dict) -> dict:
+def parse_instrument(item: dict, check_year: int | None = None) -> dict:
+    """One Funding Schemes item. Active means the board says yes or likely for the check year and the
+    call is not marked closed; a 'ja' from older entries counts as yes."""
     cols = {c["id"]: (c.get("text") or "").strip() for c in item.get("column_values", [])}
     row = {field: (cols.get(cid) or None) for cid, field in INST_COLS.items()}
-    active = (row.pop("active") or "").lower()
-    row.update(id=str(item["id"]), name=item["name"].strip(), active_2026="yes" in active or "ja" in active)
+    status = (row["status"] or "").lower()
+    status = "yes" if status in ("ja", "active", "yes") or status.startswith("yes") else status
+    row["status"] = status if status in STATUSES else None
+    for d in ("opens_on", "deadline", "verified_on"):
+        m = re.match(r"\d{4}-\d{2}-\d{2}", row[d] or "")
+        row[d] = m.group(0) if m else None
+    closed = (row["deadline_type"] or "").lower() == "closed"
+    row.update(id=str(item["id"]), name=item["name"].strip(), check_year=check_year,
+               active=row["status"] in ("yes", "likely") and not closed)
     return row
 
 
+def check_year(mon) -> int | None:
+    """The year the board's activity column refers to, from its description ('Check year 2027 ...')."""
+    try:
+        cols = mon.gql('query($b:[ID!]){ boards(ids:$b){ columns(ids:["%s"]) { description } } }' % ACTIVE_COL,
+                       {"b": [FUNDING_BOARD]})["boards"][0]["columns"]
+        m = re.search(r"(20\d\d)", (cols[0].get("description") or "") if cols else "")
+        return int(m.group(1)) if m else None
+    except Exception:
+        return None
+
+
 def read_instruments(mon) -> list[dict]:
-    fields = 'id name column_values(ids:["%s"]) { id text }' % '","'.join(INST_COLS)
-    return [parse_instrument(i) for i in mon._items(FUNDING_BOARD, fields) if (i.get("name") or "").strip()]
+    year = check_year(mon)
+    fields = 'id name group { id } column_values(ids:["%s"]) { id text }' % '","'.join(INST_COLS)
+    return [parse_instrument(i, year) for i in mon._items(FUNDING_BOARD, fields)
+            if (i.get("name") or "").strip() and (i.get("group") or {}).get("id") != OLD_GROUP]
 
 
 # --------------------------------------------------------------------------- writer
@@ -143,10 +170,10 @@ def write(cur, radicle: dict | None, instruments: list[dict], report: dict) -> N
 
     if instruments:   # an empty read is treated as a monday hiccup, not as 'no instruments'
         cur.execute("delete from knowledge.instrument")
-        _insert(cur, "instrument", ["id", "name", "funder", "stage", "link", "max_funding_chf",
-                                    "project_topic", "impact_area", "location", "active_2026"],
-                [[i["id"], i["name"], i["funder"], i["stage"], i["link"], i["max_funding_chf"],
-                  i["project_topic"], i["impact_area"], i["location"], i["active_2026"]] for i in instruments])
+        cols = ["id", "name", "funder", "stage", "link", "max_funding_chf", "project_topic", "impact_area",
+                "location", "status", "check_year", "active", "funding_type", "deadline_type", "opens_on",
+                "deadline", "verified_on"]
+        _insert(cur, "instrument", cols, [[i.get(c) for c in cols] for i in instruments])
     counts["knowledge_instruments"] = len(instruments)
 
     cur.execute("delete from knowledge.contact")

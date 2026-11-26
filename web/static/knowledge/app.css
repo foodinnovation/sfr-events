@@ -851,6 +851,12 @@ a.proj-title:hover { color: var(--primary); }
 .inst-name { font-weight: 700; font-size: 13.5px; color: var(--text); }
 .inst-badge { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: var(--sfr-ink-04); color: var(--muted); white-space: nowrap; flex-shrink: 0; }
 .inst-badge.active { background: rgb(32 191 85 / .14); color: #0f6b3a; }
+.inst-badge.likely { background: rgb(253 171 61 / .18); color: #8a4b00; }
+.inst-badge.closed { background: rgb(223 47 74 / .12); color: #9b1c33; }
+.inst-when { font-size: 12px; color: var(--text); margin-top: 4px; font-weight: 600; }
+.inst-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-top: 7px; }
+.inst-foot .inst-link { margin-top: 0; }
+.inst-verified { font-size: 11px; color: var(--muted); margin-left: auto; }
 .inst-meta { font-size: 12px; color: var(--muted); margin-top: 5px; }
 .inst-max { color: #14965f; font-weight: 600; }
 .inst-topic { font-size: 12px; color: var(--muted); margin-top: 6px; }
