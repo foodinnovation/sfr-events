@@ -180,17 +180,24 @@
     var open = {};   // keep open sections open when the period changes
     Array.prototype.forEach.call(out.querySelectorAll("details[data-sec]"), function (x) { open[x.getAttribute("data-sec")] = x.open; });
 
+    var outline = '<nav class="st-outline" aria-label="Sections"><p class="st-outline-h">On this page</p><ul>' +
+      '<li><a href="#st-overview" data-goto="">Overview</a></li>' +
+      sections.map(function (x) {
+        return '<li><a href="#st-sec-' + x[0] + '" data-goto="' + x[0] + '"' + (open[x[0]] ? ' class="is-open"' : "") + ">" + esc(x[1]) + "</a></li>";
+      }).join("") + '</ul><p class="st-outline-act"><button type="button" class="st-link" data-fold="open">Expand all</button>' +
+      '<button type="button" class="st-link" data-fold="close">Collapse all</button></p></nav>';
     var html =
-      '<div class="st-kpis">' + kpis.map(function (k) {
+      '<div class="st-layout">' + outline + '<div class="st-main">' +
+      '<section id="st-overview" class="st-overview"><div class="st-kpis">' + kpis.map(function (k) {
         return '<div class="st-kpi"><span class="st-num">' + k[1] + '</span><span class="st-lab">' + esc(k[0]) + "</span></div>";
       }).join("") + "</div>" +
-      '<section class="st-card"><h2 class="st-h">Page views per day</h2><div class="st-chart">' + bars +
+      '<h2 class="st-h st-h-chart">Page views per day</h2><div class="st-chart">' + bars +
       '</div><p class="st-axis"><span>' + esc(d.from) + "</span><span>" + esc(d.to) + "</span></p></section>" +
       sections.map(function (x) {
-        return '<details class="st-sec" data-sec="' + x[0] + '"' + (open[x[0]] ? " open" : "") + ">" +
+        return '<details class="st-sec" id="st-sec-' + x[0] + '" data-sec="' + x[0] + '"' + (open[x[0]] ? " open" : "") + ">" +
           '<summary><h2 class="st-sec-h">' + esc(x[1]) + '</h2><span class="st-sec-hint">' + esc(x[2]) + "</span></summary>" +
           '<div class="st-sec-body">' + x[3] + "</div></details>";
-      }).join("");
+      }).join("") + "</div></div>";
     out.innerHTML = html;
   }
 
@@ -215,6 +222,29 @@
     if (!s) { out.innerHTML = ""; note.textContent = "Sign in with your Swiss Food Research address to see the statistics."; return; }
     if (!loaded) { loaded = true; load(); }
   }
+
+  /* outline: jump to a section and open it; fold or unfold everything; mark open sections */
+  function syncOutline() {
+    Array.prototype.forEach.call(out.querySelectorAll("details[data-sec]"), function (x) {
+      var l = out.querySelector('[data-goto="' + x.getAttribute("data-sec") + '"]');
+      if (l) l.classList.toggle("is-open", x.open);
+    });
+  }
+  out.addEventListener("toggle", syncOutline, true);
+  out.addEventListener("click", function (e) {
+    var g = e.target.closest("[data-goto]"), f = e.target.closest("[data-fold]");
+    if (g) {
+      e.preventDefault();
+      var key = g.getAttribute("data-goto");
+      var target = key ? document.getElementById("st-sec-" + key) : document.getElementById("st-overview");
+      if (!target) return;
+      if (key) target.open = true;
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else if (f) {
+      var on = f.getAttribute("data-fold") === "open";
+      Array.prototype.forEach.call(out.querySelectorAll("details[data-sec]"), function (x) { x.open = on; });
+    }
+  });
 
   var sel = document.getElementById("st-period");
   sel.addEventListener("change", function () {
