@@ -41,6 +41,7 @@ PUBLISHABLE_KEY = "sb_publishable_o-EAN8xKYr-dKhcoflQ5SQ_49go67yT"   # public by
 SITE_BASE = os.environ.get("SITE_BASE", "/")   # path of the site root on its host (hub.swissfoodresearch.ch)
 ORG = "Swiss Food Research"
 CONTACT = "contact@swissfoodresearch.ch"
+RADICLE_DAILY_CAP = 200   # keep in step with RADICLE_DAILY_CAP in supabase/functions/radicle-mcp
 MEMBERSHIP_URL = "https://www.swissfoodresearch.ch/en/membership-benefits/"
 HUB_DESCRIPTION = ("The Swiss Food Research hub: upcoming Innovation Group meetings and SFR events, "
                    "agro-food news, Radicle \u2013 Knowledge and a free 1:1 session for your idea or project.")
@@ -1105,6 +1106,58 @@ def stats_page() -> str:
 PRIVACY_UPDATED = "26 November 2026"
 
 
+def connect_page() -> str:
+    """Radicle connector: how to add it to an AI app, and the sign-in step of its OAuth flow.
+    radicle-mcp/authorize sends people here with ?req=<signed request>; connect.js signs them in
+    with the hub login and posts the session to radicle-mcp/approve. Not linked from the menu."""
+    url = f"{SUPABASE_URL}/functions/v1/radicle-mcp"
+    body = f"""
+<section class="hero hero-compact"><div class="wrap">
+  <p class="sfr-sub01 eyebrow">Radicle for members</p>
+  <h1>Use Radicle in your AI</h1>
+</div></section>
+<div class="wrap block cx" id="connect" data-mcp="{esc(url)}">
+  <section class="cx-approve" id="cx-approve" hidden aria-live="polite">
+    <h2 id="cx-title">Connect Radicle</h2>
+    <div id="cx-body"></div>
+  </section>
+  <div class="cx-guide" id="cx-guide">
+    <p class="lead">Radicle connects to Claude, ChatGPT and other AI apps that support remote MCP connectors. Your AI can then
+    search Radicle's topic articles, research gaps, Swiss research projects and funding programmes and cite them in its answers.
+    Radicle is for members of {ORG}: you sign in with your work address, as on the Knowledge tab.</p>
+    <h2>Connector address</h2>
+    <div class="cx-url"><code id="cx-url">{esc(url)}</code><button type="button" class="btn btn-secondary btn-sm" id="cx-copy">Copy</button></div>
+    <h2>Claude</h2>
+    <ol>
+      <li>Open <strong>Customize &gt; Connectors</strong>, select <strong>+</strong>, then <strong>Add custom connector</strong>.</li>
+      <li>Name it <strong>Radicle</strong>, paste the connector address and select <strong>Add</strong>.</li>
+      <li>Select <strong>Connect</strong> and sign in with your work address on the page that opens.</li>
+    </ol>
+    <p class="muted">On Claude Team and Enterprise plans an Owner adds the connector for the organisation first; members then select Connect.
+    The Free plan allows one custom connector.</p>
+    <h2>ChatGPT</h2>
+    <ol>
+      <li>Open <strong>Settings &gt; Apps &amp; Connectors &gt; Advanced settings</strong> and turn on <strong>Developer mode</strong>
+      (on Business and Enterprise plans an admin may need to allow it).</li>
+      <li>Select <strong>Create</strong>, name it <strong>Radicle</strong>, paste the connector address and choose <strong>OAuth</strong>.</li>
+      <li>Sign in with your work address on the page that opens.</li>
+    </ol>
+    <h2>Other apps</h2>
+    <p>Le Chat, Cursor, VS Code and other MCP clients work the same way: add a remote (HTTP) MCP server with the address above and
+    sign in when asked.</p>
+    <h2>Good to know</h2>
+    <ul>
+      <li>Radicle only reads: your AI cannot change anything.</li>
+      <li>Each person can make {RADICLE_DAILY_CAP} Radicle calls a day. A typical research question uses five to ten.</li>
+      <li>Each call is logged with your email address, as described in our <a href="../privacy/#radicle-connector">privacy notes</a>.</li>
+      <li>Questions: <a href="mailto:{CONTACT}">{CONTACT}</a>.</li>
+    </ul>
+  </div>
+</div>"""
+    return shell(f"Use Radicle in your AI | {ORG}", body, 1, "Connect Radicle to Claude, ChatGPT or another AI app.",
+                 tab="knowledge", scripts=("connect.js",)).replace("<head>", '<head>\n<meta name="robots" content="noindex">', 1)
+
+
 def privacy_page() -> str:
     body = f"""
 <section class="hero hero-compact"><div class="wrap">
@@ -1145,6 +1198,15 @@ sign-in is kept in your browser's local storage (not a cookie) until you sign ou
 sign-in, Microsoft confirms your address under its own privacy terms. The sign-in service also keeps
 a record of sign-ins with the network (IP) address used, to protect accounts against misuse.
 To delete your account, write to us.</p>
+
+<h2 id="radicle-connector">Radicle in your AI app</h2>
+<p>Members can connect Radicle to Claude, ChatGPT or another AI app (an MCP connector). You sign in with the hub
+login; the app then receives its own access, valid for eight hours and renewed for up to 30 days while you
+remain a member. Each call the app makes to Radicle is logged with your email address, the domain of your
+organisation, the tool used and the time, so that we can enforce the daily limit of {RADICLE_DAILY_CAP} calls, trace
+misuse and see which parts of Radicle members use. The log does not contain what you ask your AI or Radicle's
+answers. It is deleted after 13 months, and only {ORG} staff can see it. Your questions and the answers are
+processed by the provider of your AI app under its own terms.</p>
 
 <h2>Presentations</h2>
 <p>Presentations stay on the SharePoint site of {ORG}. When you open one, the hub checks whether you may:
@@ -1278,6 +1340,8 @@ def build(out: Path, events: list[dict], today: date, attending: dict | None = N
     (out / "knowledge" / "index.html").write_text(knowledge_page())
     (out / "pulse").mkdir()
     (out / "pulse" / "index.html").write_text(pulse_page())
+    (out / "connect").mkdir()
+    (out / "connect" / "index.html").write_text(connect_page())
     (out / "stats").mkdir()
     (out / "stats" / "index.html").write_text(stats_page())
     (out / "imprint").mkdir()

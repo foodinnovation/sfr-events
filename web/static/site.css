@@ -246,6 +246,19 @@ a.item-title:hover { color: var(--text-link); text-decoration: underline; }
 .prose h2 { font-size: var(--text-xl); margin: var(--space-8) 0 var(--space-3); }
 .prose p { line-height: var(--leading-relaxed, 1.65); }
 
+/* Radicle connector page (/connect/) */
+.cx { max-width: 760px; }
+.cx-approve { border: 1px solid var(--border-subtle); border-radius: var(--radius-md); background: #fff; padding: var(--space-8); }
+.cx-approve h2 { margin-top: 0; }
+.cx-meta { display: flex; gap: var(--space-3); margin: 0 0 var(--space-2); font-size: var(--text-sm); }
+.cx-meta span { min-width: 110px; color: var(--text-muted); }
+.cx-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+.cx-guide h2 { font-size: var(--text-lg); margin: var(--space-8) 0 var(--space-3); }
+.cx-guide ol, .cx-guide ul { padding-left: 1.3em; }
+.cx-guide li { margin-bottom: var(--space-2); }
+.cx-url { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.cx-url code { font-size: var(--text-xs); background: var(--surface-sunken); padding: 8px 10px; border-radius: var(--radius-sm); word-break: break-all; }
+
 /* Statistics (staff only): a note-style page, outline on the left, folding headings, dense text */
 .st-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); }
 .st-controls label { font-size: var(--text-sm); color: var(--text-muted); }

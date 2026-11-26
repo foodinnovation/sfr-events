@@ -107,9 +107,23 @@ Deno.serve(async (req: Request) => {
       where kind = 'pl_filter' and ${W} group by 1 order by 2 desc limit 20`;
     const plSearches = await sql`select lower(ref) term, count(*)::int n from events.metric
       where kind = 'pl_search' and ${W} group by 1 order by 2 desc limit 20`;
+    // Radicle connector (MCP): per-person log in knowledge.mcp_log; only totals and organisations leave the database
+    const [cx] = await sql`select count(*) filter (where ok and left(tool, 1) <> '_')::int calls,
+        count(distinct email) filter (where ok and left(tool, 1) <> '_')::int people,
+        count(distinct domain) filter (where ok and left(tool, 1) <> '_')::int organisations,
+        count(*) filter (where tool = '_sign_in' and ok)::int connections,
+        count(*) filter (where error = 'limit')::int limit_hits,
+        count(*) filter (where error = 'no_access')::int refused
+      from knowledge.mcp_log where ${W}`;
+    const cxTools = await sql`select tool, count(*)::int calls from knowledge.mcp_log
+      where ok and left(tool, 1) <> '_' and ${W} group by 1 order by 2 desc`;
+    const cxOrgs = await sql`select coalesce(max(m.name), l.domain) organisation, count(*)::int calls, count(distinct l.email)::int people
+      from knowledge.mcp_log l left join public.crm_members m on lower(m.domain) = l.domain
+      where l.ok and left(l.tool, 1) <> '_' and ${W} group by l.domain order by 2 desc limit 20`;
     return json(req, 200, { from, to, totals, daily, roles, events, ads, mail, home, services, searches, filters,
       knowledge: { ...kn, topics }, sources, devices: dev,
-      pulse: { ...plTotals, stories_top: plStories, outlets: plOutlets, filters: plFilters, searches: plSearches } });
+      pulse: { ...plTotals, stories_top: plStories, outlets: plOutlets, filters: plFilters, searches: plSearches },
+      connector: { ...cx, tools: cxTools, organisations_top: cxOrgs } });
   } catch (e) {
     console.error("stats failed", (e as Error).message);
     return json(req, 500, { detail: "server" });
