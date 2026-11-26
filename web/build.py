@@ -1102,7 +1102,7 @@ def stats_page() -> str:
 
 # --------------------------------------------------------------------------- privacy
 
-PRIVACY_UPDATED = "25 November 2026"
+PRIVACY_UPDATED = "26 November 2026"
 
 
 def privacy_page() -> str:
@@ -1128,9 +1128,10 @@ servers record technical access data such as IP addresses under
 
 <h2>Usage counting</h2>
 <p>To learn which events and services interest visitors, the hub counts a few actions: page views,
-clicks on Register, on ads, on email buttons and on the home page's buttons, whether the 1:1 booking calendar was opened, searches and filters on the events list, and in
-Radicle \u2013 Knowledge the topics opened and how often the quick search and the Funding Finder are used.</p>
-<p>Each count holds only the time, the page, the action, a short reference (for example the event, the ad
+clicks on Register, on ads, on email buttons and on the home page's buttons, whether the 1:1 booking calendar was opened, searches and filters on the events list, in
+Radicle \u2013 Knowledge the topics opened and how often the quick search and the Funding Finder are used, and in
+Pulse the stories opened, clicks to the original reports, Useful votes, and the filters and search terms used.</p>
+<p>Each count holds only the time, the page, the action, a short reference (for example the event, the ad, the Pulse story
 or a search term), the visitor's role (visitor, participant, member or staff), the website the visitor
 came from (domain only) and whether the device is mobile. No IP address, email address, cookie or
 identifier is stored, so counts cannot be linked to a person or to each other. Text typed into

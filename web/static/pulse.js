@@ -1,7 +1,8 @@
 /* SFR hub: Pulse tab. Loads stories from functions/v1/pulse (staff only until the tab is opened),
    filters them in the browser, shows one story at ?s=<id> and one Innovation Group at ?g=<slug>,
    and lets members mark a story useful. Pictures are SFR's own Innovation Group art.
-   Stores nothing in the browser. */
+   Stores nothing in the browser. Counts, through app.js (no cookie, no id): stories opened, clicks
+   to the original reports, Useful votes, filters and searches. */
 (function () {
   "use strict";
   var cfg = window.SFR_EVENTS || {};
@@ -53,6 +54,14 @@
 
   var session = null, access = null, data = null, can = false, started = false;
   var state = { scope: "all", ig: "", q: "", sort: "new" };
+
+  /* ------------------------------------------------------------------ counting */
+  var titles = {};   // story id -> title, for the counts (the stats page shows titles, not ids)
+  function remember(list) { (list || []).forEach(function (s) { titles[s.id] = s.title; }); }
+  function count(kind, ref) { if (window.SFR && window.SFR.track) window.SFR.track(kind, ref); }
+  function storyRef(id) { return id + "|" + (titles[id] || ""); }
+  function host(u) { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } }
+  var lastTerm = "";
   var heroHead = $("#pl-hero-head") ? $("#pl-hero-head").innerHTML : "";
   var used = {};   // crops already on screen, per artwork, so one picture does not repeat
 
@@ -106,7 +115,7 @@
   }
   function storyHref(s) { return "?s=" + encodeURIComponent(s.id); }
   function original(s, text) {
-    return '<a href="' + esc(s.url) + '" rel="noopener" target="_blank">' + (text || "Original") + ' <span aria-hidden="true">&#8599;</span></a>';
+    return '<a href="' + esc(s.url) + '" rel="noopener" target="_blank" data-orig="' + esc(s.id) + '">' + (text || "Original") + ' <span aria-hidden="true">&#8599;</span></a>';
   }
 
   /* ------------------------------------------------------------------ pictures */
@@ -300,9 +309,9 @@
     used = {};
     renderHero("story", s);
     var reports = (s.sources || []).map(function (r) {
-      return '<li class="deck"><span><a class="deck-title" href="' + esc(r.url) + '" rel="noopener" target="_blank">' + esc(r.title) + "</a>" +
+      return '<li class="deck"><span><a class="deck-title" href="' + esc(r.url) + '" rel="noopener" target="_blank" data-orig="' + esc(s.id) + '">' + esc(r.title) + "</a>" +
         '<span class="muted pl-small"> · ' + esc(srcName(r.name)) + " · " + added(r.at).toLowerCase() + "</span></span>" +
-        '<a class="btn btn-ghost btn-sm" href="' + esc(r.url) + '" rel="noopener" target="_blank">Open &#8599;</a></li>';
+        '<a class="btn btn-ghost btn-sm" href="' + esc(r.url) + '" rel="noopener" target="_blank" data-orig="' + esc(s.id) + '">Open &#8599;</a></li>';
     }).join("");
     var igs = igsOf(s).map(function (g) { return IG[g][0]; });
     $("#pl-story").innerHTML =
@@ -362,9 +371,11 @@
     }).then(function (res) {
       if (!res.ok) { closed(res.status, res.body); return; }
       can = !!res.body.can_vote;
+      remember(res.body.stories);
       if (id) {
         $("#pl-feed").hidden = true; $("#pl-story").hidden = false;
         renderStory(res.body.stories[0]);
+        count("pl_story", storyRef(res.body.stories[0].id));
       } else {
         data = res.body;
         showFeed();
@@ -387,6 +398,7 @@
       .then(function (res) {
         btn.disabled = false;
         if (!res.ok) { if (window.SFR) window.SFR.toast("Your vote could not be saved."); return; }
+        if (res.body.mine) count("pl_vote", storyRef(id));
         ((data && data.stories) || []).forEach(function (s) { if (s.id === id) { s.votes = res.body.votes; s.mine = res.body.mine; } });
         $$('[data-vote="' + id + '"]').forEach(function (b) {
           b.classList.toggle("is-on", res.body.mine);
@@ -400,12 +412,21 @@
   /* ------------------------------------------------------------------ events */
   function setIg(g) {
     state.ig = g && IG[g] ? g : "";
+    if (state.ig) count("pl_filter", "group: " + IG[state.ig][0]);
     history.replaceState({}, "", feedHref());
     if (!data) { go(feedHref()); return; }
     if (!$("#pl-story").hidden) { showFeed(); }
     else { renderIgChips(); renderFeed(); document.title = (state.ig ? IG[state.ig][0] + " | " : "") + "Pulse | Swiss Food Research"; }
     var top = $("#pl-hero"); if (top && top.scrollIntoView) window.scrollTo(0, 0);
   }
+  document.addEventListener("click", function (e) {
+    var o = e.target.closest("[data-orig]");
+    if (o && root.contains(o)) {
+      var h = host(o.href), id = o.getAttribute("data-orig");
+      count("pl_source", h + "|" + id + "|" + (titles[id] || ""));
+      return;
+    }
+  });
   document.addEventListener("click", function (e) {
     var t = e.target.closest("[data-open],[data-back],[data-vote],[data-pl-signin],[data-scope],[data-ig]");
     if (!t || !(root.contains(t) || $("#pl-hero").contains(t))) return;
@@ -415,16 +436,25 @@
     else if (t.hasAttribute("data-pl-signin")) { e.preventDefault(); if (window.SFR) window.SFR.openDialog(); }
     else if (t.hasAttribute("data-scope")) {
       state.scope = t.getAttribute("data-scope");
+      if (SCOPE[state.scope]) count("pl_filter", "region: " + SCOPE[state.scope]);
       $$("[data-scope]").forEach(function (c) { var on = c === t; c.classList.toggle("is-on", on); c.setAttribute("aria-pressed", on); });
       renderFeed();
     } else if (t.hasAttribute("data-ig")) { e.preventDefault(); setIg(t.getAttribute("data-ig")); }
   });
-  var qTimer = null;
+  var qTimer = null, sTimer = null;
   $("#pl-q").addEventListener("input", function (e) {
     clearTimeout(qTimer);
     qTimer = setTimeout(function () { state.q = e.target.value.trim().toLowerCase(); if (data) renderFeed(); }, 150);
+    clearTimeout(sTimer);
+    sTimer = setTimeout(function () {   // count a finished search term, not every keystroke
+      var t = state.q;
+      if (t.length >= 3 && t !== lastTerm && t.indexOf("@") < 0) { lastTerm = t; count("pl_search", t); }
+    }, 1500);
   });
-  $("#pl-sort").addEventListener("change", function (e) { state.sort = e.target.value; if (data) renderFeed(); });
+  $("#pl-sort").addEventListener("change", function (e) {
+    state.sort = e.target.value; if (data) renderFeed();
+    if (state.sort !== "new") count("pl_filter", "sort: " + e.target.options[e.target.selectedIndex].text);
+  });
   window.addEventListener("popstate", show);
 
   function start(s, a) {

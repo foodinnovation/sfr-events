@@ -84,8 +84,32 @@ Deno.serve(async (req: Request) => {
       where kind='view' and source is not null and ${W} group by 1 order by 2 desc limit 10`;
     const [dev] = await sql`select count(*) filter (where mobile)::int mobile, count(*) filter (where not mobile)::int desktop
       from events.metric where kind='view' and ${W}`;
+    // Pulse: refs are "<story id>|<title>", for clicks to an original "<domain>|<story id>|<title>"
+    const [plTotals] = await sql`select count(*) filter (where kind = 'view' and page like '%/pulse/%')::int views,
+        count(*) filter (where kind = 'pl_story')::int stories,
+        count(*) filter (where kind = 'pl_source')::int originals,
+        count(*) filter (where kind = 'pl_vote')::int votes,
+        count(*) filter (where kind = 'home_click' and ref like 'pulse%')::int from_home
+      from events.metric where ${W}`;
+    const plStories = await sql`select x.id, max(x.title) title,
+        count(*) filter (where x.kind = 'pl_story')::int opened,
+        count(*) filter (where x.kind = 'pl_source')::int originals,
+        count(*) filter (where x.kind = 'pl_vote')::int votes
+      from (select kind,
+              case when kind = 'pl_source' then split_part(ref, '|', 2) else split_part(ref, '|', 1) end as id,
+              nullif(case when kind = 'pl_source' then substring(ref from '^[^|]*\\|[^|]*\\|(.*)$')
+                   else substring(ref from '^[^|]*\\|(.*)$') end, '') as title
+            from events.metric where kind in ('pl_story', 'pl_source', 'pl_vote') and ref is not null and ${W}) x
+      where x.id <> '' group by x.id order by 3 desc, 4 desc, 5 desc limit 30`;
+    const plOutlets = await sql`select split_part(ref, '|', 1) as outlet, count(*)::int clicks from events.metric
+      where kind = 'pl_source' and ref is not null and ${W} group by 1 order by 2 desc limit 15`;
+    const plFilters = await sql`select ref as filter, count(*)::int n from events.metric
+      where kind = 'pl_filter' and ${W} group by 1 order by 2 desc limit 20`;
+    const plSearches = await sql`select lower(ref) term, count(*)::int n from events.metric
+      where kind = 'pl_search' and ${W} group by 1 order by 2 desc limit 20`;
     return json(req, 200, { from, to, totals, daily, roles, events, ads, mail, home, services, searches, filters,
-      knowledge: { ...kn, topics }, sources, devices: dev });
+      knowledge: { ...kn, topics }, sources, devices: dev,
+      pulse: { ...plTotals, stories_top: plStories, outlets: plOutlets, filters: plFilters, searches: plSearches } });
   } catch (e) {
     console.error("stats failed", (e as Error).message);
     return json(req, 500, { detail: "server" });

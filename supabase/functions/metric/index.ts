@@ -8,7 +8,8 @@ import postgres from "npm:postgres@3.4.5";
 
 const sql = postgres(Deno.env.get("SUPABASE_DB_URL")!, { max: 2, prepare: false });
 const KINDS = new Set(["view", "register", "ad_view", "ad_click", "mail_click", "search", "filter",
-  "kn_topic", "kn_search", "kn_finder", "home_click", "booking_open", "svc_click"]);
+  "kn_topic", "kn_search", "kn_finder", "home_click", "booking_open", "svc_click",
+  "pl_story", "pl_source", "pl_vote", "pl_filter", "pl_search"]);
 const ROLES = new Set(["visitor", "participant", "member", "staff"]);
 const BOT = /bot|crawl|spider|slurp|headless|lighthouse|preview|facebookexternalhit|embedly|monitor/i;
 const HOSTS = /^(foodinnovation\.github\.io|hub\.swissfoodresearch\.ch|localhost(:\d+)?)$/;
@@ -25,7 +26,7 @@ export function clean(e: Record<string, unknown>) {
   page = page.split(/[?#]/)[0];
   let ref = clip(e.r, 120);
   if (ref && /@/.test(ref)) ref = null;                       // never an email address
-  if (kind === "search" && (!ref || ref.length < 3)) return null;   // no term, no row
+  if ((kind === "search" || kind === "pl_search") && (!ref || ref.length < 3)) return null;   // no term, no row
   const role = ROLES.has(String(e.o)) ? String(e.o) : "visitor";
   let source: string | null = null;
   try {
