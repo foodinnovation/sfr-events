@@ -57,9 +57,13 @@
     return h + "</tbody></table></section>";
   }
 
+  var TOOL = { radicle_topics: "Topic list", radicle_topic: "Topic article", radicle_search: "Search",
+    radicle_project: "Project", radicle_funding_programmes: "Funding programmes" };
+
   function render(d) {
     var t = d.totals || {};
     var pl = d.pulse || {};
+    var cx = d.connector || {};
     var kpis = [
       ["Page views", fmt(t.views)],
       ["Register clicks", fmt(t.registers)],
@@ -163,6 +167,20 @@
             { label: "Opened", num: true, get: function (r) { return fmt(r.n); } }
           ], kn.topics || [])
         ])],
+      ["connector", "Radicle connector", fmt(cx.calls) + " calls · " + fmt(cx.people) + " people · " + fmt(cx.organisations) + " organisations",
+        two([
+          card("Use", dl([["Calls", cx.calls], ["People", cx.people], ["Organisations", cx.organisations],
+            ["New connections", cx.connections], ["Stopped at the daily limit", cx.limit_hits], ["Refused (no access)", cx.refused]])),
+          table("Tools", [
+            { label: "Tool", get: function (r) { return TOOL[r.tool] || r.tool; } },
+            { label: "Calls", num: true, get: function (r) { return fmt(r.calls); } }
+          ], cx.tools || [], "No calls in this period.")
+        ]) +
+        table("Organisations", [
+          { label: "Organisation", get: function (r) { return r.organisation; } },
+          { label: "People", num: true, get: function (r) { return fmt(r.people); } },
+          { label: "Calls", num: true, get: function (r) { return fmt(r.calls); } }
+        ], cx.organisations_top || [], "No calls in this period.")],
       ["audience", "Audience", fmt(dev.desktop) + " desktop · " + fmt(dev.mobile) + " mobile",
         two([
           table("Views by role", [
