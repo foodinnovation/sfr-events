@@ -59,12 +59,14 @@
 
   function render(d) {
     var t = d.totals || {};
+    var pl = d.pulse || {};
     var kpis = [
       ["Page views", fmt(t.views)],
       ["Register clicks", fmt(t.registers)],
       ["Ad clicks", fmt(t.ad_clicks)],
       ["Email button clicks", fmt(t.mail_clicks)],
-      ["Radicle – Knowledge actions", fmt(t.knowledge)]
+      ["Radicle – Knowledge actions", fmt(t.knowledge)],
+      ["Pulse stories opened", fmt(pl.stories)]
     ];
     var max = Math.max.apply(null, (d.daily || []).map(function (x) { return x.views; }).concat([1]));
     var bars = (d.daily || []).map(function (x) {
@@ -88,7 +90,33 @@
         { label: "Register clicks", num: true, get: function (r) { return fmt(r.registers); } },
         { label: "Click rate", num: true, get: function (r) { return pct(r.registers, r.views); } }
       ], d.events || []) +
+      table("Pulse: stories", [
+        { label: "Story", html: true, get: function (r) {
+          return '<a href="../pulse/?s=' + encodeURIComponent(r.id) + '">' + esc(r.title || "(title not recorded)") + "</a>";
+        } },
+        { label: "Opened", num: true, get: function (r) { return fmt(r.opened); } },
+        { label: "Clicks to originals", num: true, get: function (r) { return fmt(r.originals); } },
+        { label: "Useful votes", num: true, get: function (r) { return fmt(r.votes); } }
+      ], pl.stories_top || [], "No Pulse story opened, followed or voted on in this period.") +
       '<div class="st-two">' +
+      '<section class="st-card"><h2 class="st-h">Pulse: use</h2><dl class="st-dl">' +
+        "<div><dt>Pulse page views</dt><dd>" + fmt(pl.views) + "</dd></div>" +
+        "<div><dt>Stories opened</dt><dd>" + fmt(pl.stories) + "</dd></div>" +
+        "<div><dt>Clicks to original reports</dt><dd>" + fmt(pl.originals) + "</dd></div>" +
+        "<div><dt>Useful votes</dt><dd>" + fmt(pl.votes) + "</dd></div>" +
+        "<div><dt>Clicks from the home page</dt><dd>" + fmt(pl.from_home) + "</dd></div></dl></section>" +
+      table("Pulse: sources followed", [
+        { label: "Website", get: function (r) { return r.outlet || "(unknown)"; } },
+        { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
+      ], pl.outlets || [], "No clicks to original reports in this period.") +
+      table("Pulse: filters used", [
+        { label: "Filter", get: function (r) { return r.filter; } },
+        { label: "Times", num: true, get: function (r) { return fmt(r.n); } }
+      ], pl.filters || []) +
+      table("Pulse: searches", [
+        { label: "Search term", get: function (r) { return r.term; } },
+        { label: "Times", num: true, get: function (r) { return fmt(r.n); } }
+      ], pl.searches || []) +
       table("Ads on the events list", [
         { label: "Ad", get: function (r) { return adName(r.ad); } },
         { label: "Shown", num: true, get: function (r) { return fmt(r.shown); } },
