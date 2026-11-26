@@ -215,6 +215,11 @@ def test_pulse_page_and_tab_follow_the_settings_file(tmp_path, monkeypatch):
     for gone in ("57 ", "4 or 5", "rated 4", "every three hours"):
         assert gone not in pl
     assert "—" not in pl and "fonts.googleapis" not in pl
+    # members: an ordinary tab (visitors are told how to get access), not indexed
+    cfg.write_text('{"public": false, "audience": "members"}')
+    page = b.home_page([], date(2026, 11, 24))
+    assert '<a class="hub-tab" href="pulse/">Pulse</a>' in page and 'data-audience="members"' in page
+    assert 'name="robots" content="noindex"' in b.pulse_page()
     # public: an ordinary tab, indexable
     cfg.write_text('{"public": true}')
     page = b.home_page([], date(2026, 11, 24))
@@ -276,7 +281,7 @@ def test_home_page_keeps_calendly_and_pulse_off_until_asked():
     assert "assets.calendly.com" not in page and "calendly.com/assets" not in page
     assert "Free, for members and non-members" in page and "Show available slots" in page
     # Pulse block hidden in the HTML; home.js shows it only when the function serves the visitor
-    assert 'id="home-news" aria-labelledby="h-news" data-public="0" hidden' in page
+    assert 'id="home-news" aria-labelledby="h-news" data-audience="' in page and 'data-audience="public"' not in page
     assert "assets/home.js" in page and "No meetings are scheduled yet" in page
     # Radicle card for everyone; newsletter goes to the monday form; hero picture from the Design System
     assert 'href="knowledge/"' in page and b.MEMBERSHIP_URL in page

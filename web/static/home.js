@@ -44,9 +44,9 @@
   }
   var asked = null;
   function loadPulse(session, access) {
-    var isPublic = news && news.dataset.public === "1";
-    var staff = access && access.access === "staff";
-    if (!news || !(isPublic || staff)) { if (news) { news.hidden = true; split.classList.add("is-solo"); } return; }
+    var aud = news ? news.dataset.audience : "staff", role = access && access.access;
+    var open = aud === "public" || role === "staff" || (aud === "members" && role === "member" && !!session);
+    if (!news || !open) { if (news) { news.hidden = true; split.classList.add("is-solo"); } return; }
     var key = session ? session.access_token : "anon";
     if (asked === key) return;
     asked = key;
@@ -67,5 +67,5 @@
   $$("[data-home-signin]").forEach(function (b) {
     b.addEventListener("click", function () { if (window.SFR && window.SFR.openDialog) window.SFR.openDialog(); });
   });
-  if (news && news.dataset.public === "1") loadPulse(null, null);
+  if (news && news.dataset.audience === "public") loadPulse(null, null);
 })();

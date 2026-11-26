@@ -258,11 +258,19 @@ PULSE_FILE = ROOT.parent / "config" / "pulse.json"
 
 
 def load_pulse(path: Path = PULSE_FILE) -> dict:
-    """config/pulse.json: {"public": false} keeps the Pulse tab for staff only (shadow run)."""
+    """config/pulse.json: {"public": true} opens Pulse to everyone; otherwise "audience" says who reads it:
+    "members" (signed-in members and staff) or "staff" (the default, used for the shadow run)."""
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
         return {"public": False}
+
+
+def pulse_audience() -> str:
+    cfg = load_pulse()
+    if cfg.get("public"):
+        return "public"
+    return "members" if cfg.get("audience") == "members" else "staff"
 
 
 def shell(title: str, body: str, depth: int, description: str = "", tab: str = "events",
@@ -276,8 +284,9 @@ def shell(title: str, body: str, depth: int, description: str = "", tab: str = "
     tabs = (tab_link("events", f"{up}events/", "Events") + tab_link("services", f"{up}services/", "Services")
             + tab_link("knowledge", f"{up}knowledge/", "Knowledge"))
     pulse_tab = tab_link("pulse", f"{up}pulse/", "Pulse")
-    # Pulse: visible to everyone once config/pulse.json says public, before that to signed-in staff only
-    tabs += pulse_tab if load_pulse().get("public") else pulse_tab.replace('<a class="', '<a hidden data-staff-only class="', 1)
+    # Pulse: a tab for everyone once it is open to members or the public (visitors see how to get access);
+    # before that only signed-in staff see it
+    tabs += pulse_tab if pulse_audience() != "staff" else pulse_tab.replace('<a class="', '<a hidden data-staff-only class="', 1)
     # Statistics: in every page but hidden; app.js shows it to signed-in staff only
     tabs += tab_link("stats", f"{up}stats/", "Statistics").replace('<a class="', '<a hidden data-staff-only class="', 1)
     extra = "".join(f'<script src="{up}assets/{js}"></script>' for js in scripts)
@@ -688,7 +697,7 @@ def home_page(events: list[dict], today: date, cfg: dict | None = None) -> str:
     nxt = [e for e in events if e["kind"] in ("ig", "sfr") and e["date"] and e["date"] >= today and e["slug"]][:3]
     items = "".join(home_event(e) for e in nxt) or \
         '<li class="empty">No meetings are scheduled yet. The full list includes partner events.</li>'
-    pulse_public = bool(load_pulse().get("public"))
+    pulse_for = pulse_audience()
     hero, book, news = cfg["hero"], cfg["booking"], cfg["newsletter"]
     body = f"""
 <script>(function () {{ var q = new URLSearchParams(location.search);
@@ -711,7 +720,7 @@ def home_page(events: list[dict], today: date, cfg: dict | None = None) -> str:
         <a class="home-more" href="events/" data-home="all-events">All events &rarr;</a></div>
       <ol class="list">{items}</ol>
     </section>
-    <section class="home-news" id="home-news" aria-labelledby="h-news" data-public="{'1' if pulse_public else '0'}" hidden>
+    <section class="home-news" id="home-news" aria-labelledby="h-news" data-audience="{pulse_for}" hidden>
       <div class="home-head"><h2 id="h-news" class="section-head">Pulse: top 3 this week</h2>
         <a class="home-more" href="pulse/" data-home="pulse">More in Pulse &rarr;</a></div>
       <ol class="home-stories" id="home-stories"></ol>
@@ -986,8 +995,9 @@ def knowledge_page() -> str:
 
 def pulse_page() -> str:
     """Pulse: AI-curated agro-food news. An empty shell; stories load in the browser from
-    functions/v1/pulse, which serves staff only until pulse.setting 'public' is 'true'."""
-    public = bool(load_pulse().get("public"))
+    functions/v1/pulse, which serves staff, members or everyone as pulse.setting 'public' says
+    ('false', 'members', 'true')."""
+    public = pulse_audience() == "public"
     body = f"""
 <section class="hero pl-hero" id="pl-hero">
   <img class="pl-hero-art" id="pl-hero-art" alt="" hidden>
@@ -1003,7 +1013,7 @@ def pulse_page() -> str:
     <div class="pl-tiles" id="pl-tiles"></div>
   </div>
 </section>
-<div class="wrap pl-wrap" id="pulse">
+<div class="wrap pl-wrap" id="pulse" data-membership="{MEMBERSHIP_URL}">
   <div id="pl-feed">
     <form class="filters pl-filters" id="pl-filters" role="search" onsubmit="return false" hidden>
       <div class="chips" role="group" aria-label="Region">

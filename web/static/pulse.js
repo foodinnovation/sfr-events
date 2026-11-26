@@ -331,6 +331,12 @@
     if (body && body.detail === "not_open_yet") {
       note(signedIn ? "Pulse is in a test run and opens to everyone in December. Staff can preview it now."
                     : 'Pulse is in a test run and opens to everyone in December. Staff can preview it after <a href="#" data-pl-signin>signing in</a>.', !signedIn);
+    } else if (body && body.detail === "members_only") {
+      var join = ($("#pulse") && $("#pulse").dataset.membership) || "https://www.swissfoodresearch.ch/en/membership-benefits/";
+      note(signedIn ? 'Pulse is for Swiss Food Research members. Your email address does not belong to a member organisation. ' +
+                      '<a href="' + join + '" target="_blank" rel="noopener">Become a member</a>'
+                    : 'Pulse is for Swiss Food Research members. <a href="#" data-pl-signin>Sign in</a> with your work email, or ' +
+                      '<a href="' + join + '" target="_blank" rel="noopener">become a member</a>.', true);
     } else if (status === 404) {
       note('This story is no longer in Pulse. <a href="./" data-back>Back to Pulse</a>', true);
     } else {

@@ -10,7 +10,7 @@ The Swiss Food Research hub at hub.swissfoodresearch.ch: a home page and three t
   members and participants. One page per event at `/events/<slug>/`.
 * **Radicle – Knowledge**: radicle's topic articles, the ~6,600 relevant funded projects
   and a funding finder, for members and staff only.
-* **Pulse**: AI-curated agro-food news with links to the originals (staff only until opened, see below).
+* **Pulse**: AI-curated agro-food news with links to the originals (for signed-in members since 26 Nov 2026, see below).
 
 Staff edit events in one place only: the monday board **Events Planung**. Everything else
 follows from there.
@@ -121,11 +121,14 @@ Members can mark a story useful (one vote each, withdrawable). There are no comm
   at newsletters@). The page is an empty shell; the edge function `pulse` serves the stories
   (`pulse.hub_stories`: relevant items only, newsletter items only with a checked link, original title,
   no click-trackers and no mailbox ids in links) and records votes (`pulse.hub_vote`, table `pulse.vote`).
-* **Staff only until opened.** While `config/pulse.json` has `"public": false` the tab is hidden for everyone
-  but signed-in staff and the page is not indexed; while `pulse.setting` `public` is not `true` the function
-  serves staff only. To open Pulse to everyone, do both:
-  `update pulse.setting set value = 'true', updated_at = now() where key = 'public';` in the ig-wiki SQL
-  editor, and `"public": true` in `config/pulse.json` (a push republishes the site).
+* **Who reads Pulse.** Three stages, set in two places that must agree: `pulse.setting` `public` (what the
+  function serves) and `config/pulse.json` (tab and indexing; a push republishes the site).
+  * Staff only (shadow run): `'false'` and `{"public": false}`. The tab is hidden for all but signed-in staff.
+  * Members (since 26 Nov 2026): `'members'` and `{"public": false, "audience": "members"}`. The tab shows for
+    everyone; visitors and non-member accounts are asked to sign in or become a member; the page is not indexed.
+  * Everyone: `'true'` and `{"public": true}`. The page is indexed.
+  Change the setting in the ig-wiki SQL editor, e.g.
+  `update pulse.setting set value = 'true', updated_at = now() where key = 'public';`
 * **How much Pulse shows.** Each item has a 0-100 score inside its 1-5 rating (3 = 40-59, 4 = 60-79, 5 = 80-100).
   The hub shows items at or above `pulse.setting` `min_score` (default 60, the same as "rated 4 or 5"; 50 adds the
   better half of the 3s): `update pulse.setting set value = '50', updated_at = now() where key = 'min_score';`

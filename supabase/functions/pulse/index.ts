@@ -2,7 +2,8 @@
 //   GET  /pulse?days=14            stories of the last days (max 60), newest first within relevance
 //   GET  /pulse?item=<id>          the story holding that item, with all its reports
 //   POST /pulse {item, on}         a signed-in member or staff marks a story useful (on=false withdraws)
-// While pulse.setting 'public' is not 'true' (the shadow run), reading is for signed-in staff only.
+// pulse.setting 'public' says who reads Pulse: 'true' everyone, 'members' signed-in members and staff,
+// anything else signed-in staff only (the shadow run).
 // Stories come from schema "pulse", filled by foodinnovation/sfr-pulse; only what pulse.hub_stories
 // allows leaves the database (relevant items with a clean link from open or allowed sources).
 
@@ -43,11 +44,17 @@ Deno.serve(async (req: Request) => {
   try {
     const me = await who(req);
     const [s] = await sql`select value from pulse.setting where key = 'public'`;
-    const isPublic = s?.value === "true";
+    const audience = s?.value === "true" ? "public" : s?.value === "members" ? "members" : "staff";
+    const isPublic = audience === "public";
+    const insider = me.role === "member" || me.role === "staff";
+    const canRead = isPublic || me.role === "staff" || (audience === "members" && insider);
+    const closed = () => audience === "members"
+      ? json(req, me.email ? 403 : 401, { detail: "members_only", role: me.role })
+      : json(req, me.email ? 403 : 401, { detail: "not_open_yet", role: me.role });
 
     if (req.method === "POST") {
-      if (me.role !== "member" && me.role !== "staff") return json(req, me.email ? 403 : 401, { detail: "members_only" });
-      if (!isPublic && me.role !== "staff") return json(req, 403, { detail: "not_open_yet" });
+      if (!insider) return json(req, me.email ? 403 : 401, { detail: "members_only" });
+      if (!canRead) return closed();
       const body = await req.json().catch(() => ({}));
       const item = String(body.item ?? "");
       if (!ITEM.test(item)) return json(req, 400, { detail: "item" });
@@ -56,9 +63,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (req.method !== "GET") return json(req, 405, { detail: "method" });
-    if (!isPublic && me.role !== "staff") {
-      return json(req, me.email ? 403 : 401, { detail: "not_open_yet", role: me.role });
-    }
+    if (!canRead) return closed();
     const url = new URL(req.url);
     const item = url.searchParams.get("item");
     if (item !== null && !ITEM.test(item)) return json(req, 400, { detail: "item" });
@@ -66,8 +71,7 @@ Deno.serve(async (req: Request) => {
     const [r] = await sql`select pulse.hub_stories(${days}, ${me.email}, ${item}) j`;
     const stories = r.j ?? [];
     if (item !== null && !stories.length) return json(req, 404, { detail: "not_found" });
-    return json(req, 200, { public: isPublic, role: me.role, can_vote: me.role === "member" || me.role === "staff",
-                            days, stories });
+    return json(req, 200, { public: isPublic, audience, role: me.role, can_vote: insider, days, stories });
   } catch (e) {
     console.error("pulse failed", (e as Error).message);
     return json(req, 500, { detail: "server" });
