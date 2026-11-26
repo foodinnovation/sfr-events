@@ -43,7 +43,7 @@
   }
 
   function table(title, cols, rows, empty) {
-    var h = '<section class="st-card"><h2 class="st-h">' + esc(title) + "</h2>";
+    var h = '<section class="st-card"><h3 class="st-h">' + esc(title) + "</h3>";
     if (!rows.length) return h + '<p class="muted">' + esc(empty || "Nothing recorded in this period.") + "</p></section>";
     h += '<table class="st-table"><thead><tr>' + cols.map(function (c) {
       return '<th' + (c.num ? ' class="num"' : "") + ">" + esc(c.label) + "</th>";
@@ -75,98 +75,122 @@
     }).join("");
     var roleTotal = (d.roles || []).reduce(function (a, r) { return a + r.views; }, 0);
     var dev = d.devices || {};
+    var kn = d.knowledge || {};
+    var sum = function (list, k) { return (list || []).reduce(function (a, r) { return a + (r[k] || 0); }, 0); };
+    var dl = function (items) {
+      return '<dl class="st-dl">' + items.map(function (i) { return "<div><dt>" + esc(i[0]) + "</dt><dd>" + fmt(i[1]) + "</dd></div>"; }).join("") + "</dl>";
+    };
+    var card = function (title, inner) { return '<section class="st-card"><h3 class="st-h">' + esc(title) + "</h3>" + inner + "</section>"; };
+    var two = function (parts) { return '<div class="st-two">' + parts.join("") + "</div>"; };
+
+    var sections = [
+      ["events", "Events", fmt(sum(d.events, "views")) + " event page views · " + fmt(t.registers) + " register clicks",
+        table("Interest and registrations", [
+          { label: "Event", html: true, get: function (r) {
+            return r.slug && r.slug !== "null" ? '<a href="../events/' + encodeURIComponent(r.slug) + '/">' + esc(r.title) + "</a>" : esc(r.title);
+          } },
+          { label: "Date", get: function (r) { return r.date || ""; } },
+          { label: "Views", num: true, get: function (r) { return fmt(r.views); } },
+          { label: "Register clicks", num: true, get: function (r) { return fmt(r.registers); } },
+          { label: "Click rate", num: true, get: function (r) { return pct(r.registers, r.views); } }
+        ], d.events || []) +
+        two([
+          table("Ads on the events list", [
+            { label: "Ad", get: function (r) { return adName(r.ad); } },
+            { label: "Shown", num: true, get: function (r) { return fmt(r.shown); } },
+            { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } },
+            { label: "Click rate", num: true, get: function (r) { return pct(r.clicks, r.shown); } }
+          ], d.ads || []),
+          table("Email buttons", [
+            { label: "Button", get: function (r) {
+              var b = String(r.button || "");
+              return b.indexOf("ad: ") === 0 ? "Ad: " + adName(b.slice(4)) : b.charAt(0).toUpperCase() + b.slice(1);
+            } },
+            { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
+          ], d.mail || []),
+          table("Searches", [
+            { label: "Search term", get: function (r) { return r.term; } },
+            { label: "Times", num: true, get: function (r) { return fmt(r.n); } }
+          ], d.searches || []),
+          table("Filters used", [
+            { label: "Filter", get: function (r) { return r.filter; } },
+            { label: "Times", num: true, get: function (r) { return fmt(r.n); } }
+          ], d.filters || [])
+        ])],
+      ["pulse", "Pulse", fmt(pl.views) + " page views · " + fmt(pl.stories) + " stories opened",
+        two([
+          card("Use", dl([["Pulse page views", pl.views], ["Stories opened", pl.stories], ["Clicks to original reports", pl.originals],
+            ["Useful votes", pl.votes], ["Clicks from the home page", pl.from_home]])),
+          table("Sources followed", [
+            { label: "Website", get: function (r) { return r.outlet || "(unknown)"; } },
+            { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
+          ], pl.outlets || [], "No clicks to original reports in this period.")
+        ]) +
+        table("Stories", [
+          { label: "Story", html: true, get: function (r) {
+            return '<a href="../pulse/?s=' + encodeURIComponent(r.id) + '">' + esc(r.title || "(title not recorded)") + "</a>";
+          } },
+          { label: "Opened", num: true, get: function (r) { return fmt(r.opened); } },
+          { label: "Clicks to originals", num: true, get: function (r) { return fmt(r.originals); } },
+          { label: "Useful votes", num: true, get: function (r) { return fmt(r.votes); } }
+        ], pl.stories_top || [], "No Pulse story opened, followed or voted on in this period.") +
+        two([
+          table("Filters used", [
+            { label: "Filter", get: function (r) { return r.filter; } },
+            { label: "Times", num: true, get: function (r) { return fmt(r.n); } }
+          ], pl.filters || []),
+          table("Searches", [
+            { label: "Search term", get: function (r) { return r.term; } },
+            { label: "Times", num: true, get: function (r) { return fmt(r.n); } }
+          ], pl.searches || [])
+        ])],
+      ["pages", "Home page and Services", fmt(sum(d.home, "clicks")) + " home page clicks · " + fmt(sum(d.services, "clicks")) + " Services clicks",
+        two([
+          table("Home page", [
+            { label: "Button", get: function (r) { return HOME[r.button] || r.button; } },
+            { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
+          ], d.home || [], "No clicks on the home page in this period."),
+          table("Services page", [
+            { label: "Action", get: function (r) { return svcAction(r.action); } },
+            { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
+          ], d.services || [], "No clicks on the Services page in this period.")
+        ])],
+      ["knowledge", "Radicle – Knowledge", fmt(t.knowledge) + " actions",
+        two([
+          card("Use", dl([["Topics opened", kn.topics_opened], ["Quick searches", kn.searches], ["Funding Finder runs", kn.finder_runs]])),
+          table("Topics opened", [
+            { label: "Topic", get: function (r) { return r.label; } },
+            { label: "Opened", num: true, get: function (r) { return fmt(r.n); } }
+          ], kn.topics || [])
+        ])],
+      ["audience", "Audience", fmt(dev.desktop) + " desktop · " + fmt(dev.mobile) + " mobile",
+        two([
+          table("Views by role", [
+            { label: "Role", get: function (r) { return { visitor: "Visitor (not signed in)", participant: "Participant", member: "Member", staff: "Staff" }[r.role] || r.role; } },
+            { label: "Views", num: true, get: function (r) { return fmt(r.views); } },
+            { label: "Share", num: true, get: function (r) { return pct(r.views, roleTotal); } }
+          ], d.roles || []),
+          table("Where visitors came from", [
+            { label: "Website", get: function (r) { return r.source; } },
+            { label: "Views", num: true, get: function (r) { return fmt(r.views); } }
+          ], d.sources || [], "No visits from other websites in this period."),
+          card("Devices", dl([["Desktop", dev.desktop], ["Mobile", dev.mobile]]))
+        ])]
+    ];
+    var open = {};   // keep open sections open when the period changes
+    Array.prototype.forEach.call(out.querySelectorAll("details[data-sec]"), function (x) { open[x.getAttribute("data-sec")] = x.open; });
+
     var html =
       '<div class="st-kpis">' + kpis.map(function (k) {
         return '<div class="st-kpi"><span class="st-num">' + k[1] + '</span><span class="st-lab">' + esc(k[0]) + "</span></div>";
       }).join("") + "</div>" +
       '<section class="st-card"><h2 class="st-h">Page views per day</h2><div class="st-chart">' + bars +
       '</div><p class="st-axis"><span>' + esc(d.from) + "</span><span>" + esc(d.to) + "</span></p></section>" +
-      table("Events: interest and registrations", [
-        { label: "Event", html: true, get: function (r) {
-          return r.slug && r.slug !== "null" ? '<a href="../events/' + encodeURIComponent(r.slug) + '/">' + esc(r.title) + "</a>" : esc(r.title);
-        } },
-        { label: "Date", get: function (r) { return r.date || ""; } },
-        { label: "Views", num: true, get: function (r) { return fmt(r.views); } },
-        { label: "Register clicks", num: true, get: function (r) { return fmt(r.registers); } },
-        { label: "Click rate", num: true, get: function (r) { return pct(r.registers, r.views); } }
-      ], d.events || []) +
-      table("Pulse: stories", [
-        { label: "Story", html: true, get: function (r) {
-          return '<a href="../pulse/?s=' + encodeURIComponent(r.id) + '">' + esc(r.title || "(title not recorded)") + "</a>";
-        } },
-        { label: "Opened", num: true, get: function (r) { return fmt(r.opened); } },
-        { label: "Clicks to originals", num: true, get: function (r) { return fmt(r.originals); } },
-        { label: "Useful votes", num: true, get: function (r) { return fmt(r.votes); } }
-      ], pl.stories_top || [], "No Pulse story opened, followed or voted on in this period.") +
-      '<div class="st-two">' +
-      '<section class="st-card"><h2 class="st-h">Pulse: use</h2><dl class="st-dl">' +
-        "<div><dt>Pulse page views</dt><dd>" + fmt(pl.views) + "</dd></div>" +
-        "<div><dt>Stories opened</dt><dd>" + fmt(pl.stories) + "</dd></div>" +
-        "<div><dt>Clicks to original reports</dt><dd>" + fmt(pl.originals) + "</dd></div>" +
-        "<div><dt>Useful votes</dt><dd>" + fmt(pl.votes) + "</dd></div>" +
-        "<div><dt>Clicks from the home page</dt><dd>" + fmt(pl.from_home) + "</dd></div></dl></section>" +
-      table("Pulse: sources followed", [
-        { label: "Website", get: function (r) { return r.outlet || "(unknown)"; } },
-        { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
-      ], pl.outlets || [], "No clicks to original reports in this period.") +
-      table("Pulse: filters used", [
-        { label: "Filter", get: function (r) { return r.filter; } },
-        { label: "Times", num: true, get: function (r) { return fmt(r.n); } }
-      ], pl.filters || []) +
-      table("Pulse: searches", [
-        { label: "Search term", get: function (r) { return r.term; } },
-        { label: "Times", num: true, get: function (r) { return fmt(r.n); } }
-      ], pl.searches || []) +
-      table("Ads on the events list", [
-        { label: "Ad", get: function (r) { return adName(r.ad); } },
-        { label: "Shown", num: true, get: function (r) { return fmt(r.shown); } },
-        { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } },
-        { label: "Click rate", num: true, get: function (r) { return pct(r.clicks, r.shown); } }
-      ], d.ads || []) +
-      table("Email buttons", [
-        { label: "Button", get: function (r) {
-          var b = String(r.button || "");
-          return b.indexOf("ad: ") === 0 ? "Ad: " + adName(b.slice(4)) : b.charAt(0).toUpperCase() + b.slice(1);
-        } },
-        { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
-      ], d.mail || []) +
-      table("Home page", [
-        { label: "Button", get: function (r) { return HOME[r.button] || r.button; } },
-        { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
-      ], d.home || [], "No clicks on the home page in this period.") +
-      table("Services page", [
-        { label: "Action", get: function (r) { return svcAction(r.action); } },
-        { label: "Clicks", num: true, get: function (r) { return fmt(r.clicks); } }
-      ], d.services || [], "No clicks on the Services page in this period.") +
-      table("Searches on the events list", [
-        { label: "Search term", get: function (r) { return r.term; } },
-        { label: "Times", num: true, get: function (r) { return fmt(r.n); } }
-      ], d.searches || []) +
-      table("Filters used", [
-        { label: "Filter", get: function (r) { return r.filter; } },
-        { label: "Times", num: true, get: function (r) { return fmt(r.n); } }
-      ], d.filters || []) +
-      table("Radicle – Knowledge: topics opened", [
-        { label: "Topic", get: function (r) { return r.label; } },
-        { label: "Opened", num: true, get: function (r) { return fmt(r.n); } }
-      ], (d.knowledge && d.knowledge.topics) || []) +
-      '<section class="st-card"><h2 class="st-h">Radicle – Knowledge: use</h2><dl class="st-dl">' +
-        "<div><dt>Topics opened</dt><dd>" + fmt(d.knowledge && d.knowledge.topics_opened) + "</dd></div>" +
-        "<div><dt>Quick searches</dt><dd>" + fmt(d.knowledge && d.knowledge.searches) + "</dd></div>" +
-        "<div><dt>Funding Finder runs</dt><dd>" + fmt(d.knowledge && d.knowledge.finder_runs) + "</dd></div></dl></section>" +
-      table("Views by role", [
-        { label: "Role", get: function (r) { return { visitor: "Visitor (not signed in)", participant: "Participant", member: "Member", staff: "Staff" }[r.role] || r.role; } },
-        { label: "Views", num: true, get: function (r) { return fmt(r.views); } },
-        { label: "Share", num: true, get: function (r) { return pct(r.views, roleTotal); } }
-      ], d.roles || []) +
-      table("Where visitors came from", [
-        { label: "Website", get: function (r) { return r.source; } },
-        { label: "Views", num: true, get: function (r) { return fmt(r.views); } }
-      ], d.sources || [], "No visits from other websites in this period.") +
-      '<section class="st-card"><h2 class="st-h">Devices</h2><dl class="st-dl">' +
-        "<div><dt>Desktop</dt><dd>" + fmt(dev.desktop) + "</dd></div>" +
-        "<div><dt>Mobile</dt><dd>" + fmt(dev.mobile) + "</dd></div></dl></section>" +
-      "</div>";
+      sections.map(function (x) {
+        return '<details class="st-sec" data-sec="' + x[0] + '"' + (open[x[0]] ? " open" : "") + ">" +
+          '<summary><h2 class="st-sec-h">' + esc(x[1]) + '</h2><span class="st-sec-hint">' + esc(x[2]) + "</span></summary>" +
+          '<div class="st-sec-body">' + x[3] + "</div></details>";
+      }).join("");
     out.innerHTML = html;
   }
 
